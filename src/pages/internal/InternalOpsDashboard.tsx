@@ -59,41 +59,12 @@ export default function InternalOpsDashboard() {
           </p>
         </div>
 
-        {/* Pipeline Pillar KPIs */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <KPICard
-            title="Enrollment"
-            value={enrollments.length}
-            subtitle="Members in enrollment"
-            icon={<Users className="h-5 w-5" />}
-          />
-          <KPICard
-            title="Eligibility & Auth"
-            value={rulesDecisions.length}
-            subtitle="Authorization decisions"
-            icon={<ClipboardCheck className="h-5 w-5" />}
-          />
-          <KPICard
-            title="Fulfillment"
-            value={orders.length}
-            subtitle="Orders in pipeline"
-            icon={<Package className="h-5 w-5" />}
-          />
-          <KPICard
-            title="Billing"
-            value={billingRecords.length}
-            subtitle="Billing records"
-            icon={<CreditCard className="h-5 w-5" />}
-          />
-        </div>
+        {/* Pipeline Dashboard */}
+        <ProgramPipelineDashboard />
 
         {/* Queue Tabs */}
-        <Tabs defaultValue="pipeline" className="space-y-4">
+        <Tabs defaultValue="eligibility" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="pipeline" className="gap-2">
-              <LayoutGrid className="h-4 w-4" />
-              Program Pipeline
-            </TabsTrigger>
             <TabsTrigger value="eligibility" className="gap-2">
               <Shield className="h-4 w-4" />
               Eligibility ({eligibilityExceptions.length})
@@ -111,11 +82,6 @@ export default function InternalOpsDashboard() {
               Consents ({missingConsents.length})
             </TabsTrigger>
           </TabsList>
-
-          {/* Program Pipeline Dashboard */}
-          <TabsContent value="pipeline">
-            <ProgramPipelineDashboard />
-          </TabsContent>
 
           {/* Eligibility Exceptions */}
 
