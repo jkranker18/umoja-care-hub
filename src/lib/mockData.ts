@@ -647,20 +647,20 @@ export const demoSteps = [
     title: 'CBO Member Roster',
     description: 'See the members enrolled by a community partner organization.',
     portal: 'cbo' as UserRole,
-    path: '/cbo/dashboard',
+    path: '/cbo',
   },
   {
     step: 4,
     title: 'Health Plan Outcomes',
     description: 'Review program KPIs and population health outcomes.',
     portal: 'healthplan' as UserRole,
-    path: '/healthplan/dashboard',
+    path: '/healthplan',
   },
   {
     step: 5,
     title: 'Resolve an Exception',
     description: 'Handle eligibility or delivery exceptions in the Ops cockpit.',
     portal: 'internal' as UserRole,
-    path: '/internal/ops',
+    path: '/internal',
   },
 ];
