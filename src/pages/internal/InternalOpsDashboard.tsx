@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { members, enrollments, rulesDecisions, orders, serviceCases, programs } from '@/lib/mockData';
+import { members, enrollments, rulesDecisions, orders, serviceCases, programs, billingRecords } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,7 +21,10 @@ import {
   MessageSquare,
   CheckCircle,
   Clock,
-  LayoutGrid
+  LayoutGrid,
+  Users,
+  ClipboardCheck,
+  CreditCard
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -56,37 +59,31 @@ export default function InternalOpsDashboard() {
           </p>
         </div>
 
-        {/* KPIs */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        {/* Pipeline Pillar KPIs */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <KPICard
-            title="Eligibility Exceptions"
-            value={eligibilityExceptions.length}
-            subtitle="Require review"
-            icon={<Shield className="h-5 w-5" />}
+            title="Enrollment"
+            value={enrollments.length}
+            subtitle="Members in enrollment"
+            icon={<Users className="h-5 w-5" />}
           />
           <KPICard
-            title="Delivery Exceptions"
-            value={deliveryExceptions.length}
-            subtitle="Need attention"
+            title="Eligibility & Auth"
+            value={rulesDecisions.length}
+            subtitle="Authorization decisions"
+            icon={<ClipboardCheck className="h-5 w-5" />}
+          />
+          <KPICard
+            title="Fulfillment"
+            value={orders.length}
+            subtitle="Orders in pipeline"
             icon={<Package className="h-5 w-5" />}
           />
           <KPICard
-            title="High-Risk Members"
-            value={highRiskMembers.length}
-            subtitle="2+ risk flags"
-            icon={<AlertTriangle className="h-5 w-5" />}
-          />
-          <KPICard
-            title="Missing Consents"
-            value={missingConsents.length}
-            subtitle="Blocking enrollment"
-            icon={<FileWarning className="h-5 w-5" />}
-          />
-          <KPICard
-            title="Open Service Cases"
-            value={openCases.length}
-            subtitle="In progress"
-            icon={<MessageSquare className="h-5 w-5" />}
+            title="Billing"
+            value={billingRecords.length}
+            subtitle="Billing records"
+            icon={<CreditCard className="h-5 w-5" />}
           />
         </div>
 
