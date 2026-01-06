@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Layers, RefreshCw, Eye, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
 
 export default function Integrations() {
   const samplePayloads = {
@@ -95,11 +96,12 @@ export default function Integrations() {
           <CardContent>
             <div className="relative p-8 bg-muted/30 rounded-lg">
               {/* Central Platform */}
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary rounded-full flex items-center justify-center z-10">
-                <div className="text-center text-primary-foreground">
-                  <div className="font-bold">Umoja</div>
-                  <div className="text-xs">Platform</div>
-                </div>
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white rounded-full flex items-center justify-center z-10 shadow-lg p-3">
+                <img 
+                  src={umojaLogo} 
+                  alt="Umoja Food For Health" 
+                  className="w-full object-contain"
+                />
               </div>
 
               {/* Integration Cards */}
