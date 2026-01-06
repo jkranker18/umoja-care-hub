@@ -9,6 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { SourceOfTruth } from '@/components/shared/SourceOfTruth';
+import { ProgramPipelineDashboard } from '@/components/internal/ProgramPipelineDashboard';
 import { 
   AlertTriangle, 
   Package, 
@@ -19,7 +20,8 @@ import {
   RefreshCw, 
   MessageSquare,
   CheckCircle,
-  Clock
+  Clock,
+  LayoutGrid
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -89,8 +91,12 @@ export default function InternalOpsDashboard() {
         </div>
 
         {/* Queue Tabs */}
-        <Tabs defaultValue="eligibility" className="space-y-4">
+        <Tabs defaultValue="pipeline" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="pipeline" className="gap-2">
+              <LayoutGrid className="h-4 w-4" />
+              Program Pipeline
+            </TabsTrigger>
             <TabsTrigger value="eligibility" className="gap-2">
               <Shield className="h-4 w-4" />
               Eligibility ({eligibilityExceptions.length})
@@ -108,6 +114,13 @@ export default function InternalOpsDashboard() {
               Consents ({missingConsents.length})
             </TabsTrigger>
           </TabsList>
+
+          {/* Program Pipeline Dashboard */}
+          <TabsContent value="pipeline">
+            <ProgramPipelineDashboard />
+          </TabsContent>
+
+          {/* Eligibility Exceptions */}
 
           {/* Eligibility Exceptions */}
           <TabsContent value="eligibility">

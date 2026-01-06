@@ -174,6 +174,18 @@ export interface Rule {
   updatedAt: string;
 }
 
+export interface BillingRecord {
+  id: string;
+  memberId: string;
+  enrollmentId: string;
+  orderId: string;
+  status: 'pending' | 'submitted' | 'paid' | 'rejected';
+  amount: number;
+  submittedAt?: string;
+  paidAt?: string;
+  source: 'NetSuite';
+}
+
 // Demo data
 export const programs: Program[] = [
   {
@@ -435,6 +447,24 @@ export const orders: Order[] = enrollments.filter(e => e.status === 'active').sl
     createdAt: enrollment.enrollmentDate,
     source: 'NetSuite',
   }];
+});
+
+// Generate billing records for orders
+export const billingRecords: BillingRecord[] = orders.map((order, idx) => {
+  const statuses: BillingRecord['status'][] = ['pending', 'submitted', 'submitted', 'paid', 'paid', 'paid', 'rejected'];
+  const status = statuses[Math.floor(Math.random() * statuses.length)];
+  
+  return {
+    id: `bill-${String(idx + 1).padStart(3, '0')}`,
+    memberId: order.memberId,
+    enrollmentId: order.enrollmentId,
+    orderId: order.id,
+    status,
+    amount: Math.floor(Math.random() * 200) + 100,
+    submittedAt: status !== 'pending' ? `2024-04-${String(Math.floor(Math.random() * 10) + 1).padStart(2, '0')}` : undefined,
+    paidAt: status === 'paid' ? `2024-04-${String(Math.floor(Math.random() * 10) + 10).padStart(2, '0')}` : undefined,
+    source: 'NetSuite',
+  };
 });
 
 export const campaigns: Campaign[] = [
