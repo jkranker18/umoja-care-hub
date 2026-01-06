@@ -113,7 +113,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Logo area for desktop */}
-        <div className="hidden lg:flex items-center gap-3 p-4 border-b border-sidebar-border bg-white">
+        <div className="hidden lg:flex items-center gap-3 p-4 border-b border-sidebar-border">
           {currentRole === 'cbo' ? (
             <img 
               src={laFoodBankLogo} 
