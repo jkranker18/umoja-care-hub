@@ -2,6 +2,7 @@ import { useApp } from '@/contexts/AppContext';
 import { UserRole } from '@/lib/mockData';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import laFoodBankLogo from '@/assets/la-food-bank-logo.png';
 import {
   Home,
   User,
@@ -112,13 +113,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Logo area for desktop */}
         <div className="hidden lg:flex items-center gap-3 p-4 border-b border-sidebar-border">
-          <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
-            <span className="text-sidebar-primary-foreground font-bold text-lg">U</span>
-          </div>
-          <div>
-            <div className="font-display font-semibold text-sidebar-foreground">Umoja Health</div>
-            <div className="text-xs text-sidebar-foreground/60">Platform POC</div>
-          </div>
+          {currentRole === 'cbo' ? (
+            <img 
+              src={laFoodBankLogo} 
+              alt="LA Regional Food Bank" 
+              className="h-12 object-contain"
+            />
+          ) : (
+            <>
+              <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
+                <span className="text-sidebar-primary-foreground font-bold text-lg">U</span>
+              </div>
+              <div>
+                <div className="font-display font-semibold text-sidebar-foreground">Umoja Health</div>
+                <div className="text-xs text-sidebar-foreground/60">Platform POC</div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Navigation */}
