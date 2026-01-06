@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Bell, HelpCircle, Menu, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -59,10 +60,11 @@ export function Header({ onMenuClick }: HeaderProps) {
         </Button>
         
         <button onClick={() => navigate('/')} className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">U</span>
-          </div>
-          <span className="font-display font-semibold text-lg hidden sm:inline">Umoja Health</span>
+          <img 
+            src={umojaLogo} 
+            alt="Umoja Food For Health" 
+            className="h-8 object-contain"
+          />
         </button>
       </div>
 

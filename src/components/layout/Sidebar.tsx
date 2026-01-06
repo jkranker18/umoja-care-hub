@@ -3,6 +3,7 @@ import { UserRole } from '@/lib/mockData';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import laFoodBankLogo from '@/assets/la-food-bank-logo.png';
+import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
 import {
   Home,
   User,
@@ -120,15 +121,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="h-12 object-contain"
             />
           ) : (
-            <>
-              <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
-                <span className="text-sidebar-primary-foreground font-bold text-lg">U</span>
-              </div>
-              <div>
-                <div className="font-display font-semibold text-sidebar-foreground">Umoja Health</div>
-                <div className="text-xs text-sidebar-foreground/60">Platform POC</div>
-              </div>
-            </>
+            <img 
+              src={umojaLogo} 
+              alt="Umoja Food For Health" 
+              className="h-10 object-contain"
+            />
           )}
         </div>
 

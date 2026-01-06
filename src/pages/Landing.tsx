@@ -9,14 +9,12 @@ import {
   Settings, 
   RefreshCw,
   Layers,
-  Heart,
   Brain,
   Puzzle,
   ArrowRight,
   Zap,
-  Shield,
-  BarChart3
 } from 'lucide-react';
+import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -51,15 +49,11 @@ export default function Landing() {
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">U</span>
-            </div>
-            <div>
-              <div className="font-display font-bold text-xl">Umoja Health Platform</div>
-              <div className="text-xs text-muted-foreground">POC Demo</div>
-            </div>
-          </div>
+          <img 
+            src={umojaLogo} 
+            alt="Umoja Food For Health" 
+            className="h-10 object-contain"
+          />
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={resetDemoData}>
               <RefreshCw className="h-4 w-4 mr-2" />
