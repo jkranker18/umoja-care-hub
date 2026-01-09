@@ -146,7 +146,6 @@ export default function CBODashboard() {
                   <TableHead>Enrollment Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Next Shipment</TableHead>
-                  <TableHead>Issues</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -169,22 +168,6 @@ export default function CBODashboard() {
                         <StatusPill status={enrollment?.status || 'pending'} />
                       </TableCell>
                       <TableCell>{enrollment?.nextShipmentDate || '-'}</TableCell>
-                      <TableCell>
-                        {member.riskFlags.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {member.riskFlags.slice(0, 2).map(flag => (
-                              <span key={flag} className="px-2 py-0.5 bg-destructive/10 text-destructive rounded text-xs">
-                                {flag}
-                              </span>
-                            ))}
-                            {member.riskFlags.length > 2 && (
-                              <span className="text-xs text-muted-foreground">+{member.riskFlags.length - 2}</span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
                       <TableCell>
                         <Button variant="ghost" size="sm">
                           <ExternalLink className="h-4 w-4" />
