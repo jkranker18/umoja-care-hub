@@ -165,20 +165,6 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
           })}
         </nav>
 
-        {/* Integration Layer Link */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-sidebar-border">
-          <NavLink
-            to="/integrations"
-            onClick={onClose}
-            className={cn(
-              'nav-item',
-              location.pathname === '/integrations' ? 'nav-item-active' : 'nav-item-inactive'
-            )}
-          >
-            <Layers className="h-5 w-5" />
-            <span>Integration Layer</span>
-          </NavLink>
-        </div>
       </aside>
     </>
   );
