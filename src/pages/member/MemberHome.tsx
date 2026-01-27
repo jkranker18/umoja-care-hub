@@ -255,17 +255,11 @@ export default function MemberHome() {
     >
       <div className="space-y-6">
         {/* Welcome Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-display font-bold">Welcome back, {member?.firstName}!</h1>
-            <p className="text-muted-foreground">
-              Here's your program status and upcoming activities.
-            </p>
-          </div>
-          <Button onClick={() => navigate('/member/tasks')}>
-            <ClipboardList className="h-4 w-4 mr-2" />
-            View My Tasks
-          </Button>
+        <div>
+          <h1 className="text-2xl font-display font-bold">Welcome back, {member?.firstName}!</h1>
+          <p className="text-muted-foreground">
+            Here's your program status and upcoming activities.
+          </p>
         </div>
 
         {/* Status Cards */}
