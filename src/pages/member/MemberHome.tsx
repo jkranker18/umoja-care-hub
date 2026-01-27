@@ -9,7 +9,8 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle } from 'lucide-react';
+import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -55,6 +56,14 @@ export default function MemberHome() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [issueType, setIssueType] = useState<string>('');
   const [issueDetails, setIssueDetails] = useState('');
+
+  // Contact Support modal state
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
+  const [supportSubject, setSupportSubject] = useState<string>('');
+  const [supportMessage, setSupportMessage] = useState('');
+  const [supportSubmitting, setSupportSubmitting] = useState(false);
+  const [supportSubmitted, setSupportSubmitted] = useState(false);
+  const [supportCaseNumber, setSupportCaseNumber] = useState('');
   const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
   // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming
@@ -193,6 +202,40 @@ export default function MemberHome() {
     setSelectedOrderId(null);
     setIssueType('');
     setIssueDetails('');
+  };
+
+  const handleOpenSupportModal = () => {
+    setSupportSubject('');
+    setSupportMessage('');
+    setSupportSubmitting(false);
+    setSupportSubmitted(false);
+    setSupportCaseNumber('');
+    setSupportModalOpen(true);
+  };
+
+  const handleSupportSubmit = () => {
+    setSupportSubmitting(true);
+    // Simulate Salesforce API call
+    setTimeout(() => {
+      const caseNum = `SF-${Math.floor(100000 + Math.random() * 900000)}`;
+      setSupportCaseNumber(caseNum);
+      setSupportSubmitting(false);
+      setSupportSubmitted(true);
+    }, 2000);
+  };
+
+  const handleSupportModalClose = (open: boolean) => {
+    if (!open) {
+      setSupportModalOpen(false);
+      // Reset state after close animation
+      setTimeout(() => {
+        setSupportSubject('');
+        setSupportMessage('');
+        setSupportSubmitting(false);
+        setSupportSubmitted(false);
+        setSupportCaseNumber('');
+      }, 200);
+    }
   };
 
   const handleEducationClick = () => setActiveTab('content');
@@ -530,7 +573,7 @@ export default function MemberHome() {
               <h3 className="font-semibold">Need Help?</h3>
               <p className="text-sm text-muted-foreground">Our support team is here to assist you.</p>
             </div>
-            <Button>
+            <Button onClick={handleOpenSupportModal}>
               <MessageSquare className="h-4 w-4 mr-2" />
               Contact Support
             </Button>
@@ -581,6 +624,93 @@ export default function MemberHome() {
               Submit Issue
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Support Modal */}
+      <Dialog open={supportModalOpen} onOpenChange={handleSupportModalClose}>
+        <DialogContent className="sm:max-w-md">
+          {!supportSubmitting && !supportSubmitted && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center justify-between">
+                  <DialogTitle>Contact Support</DialogTitle>
+                  <IntegrationBadge type="Salesforce" />
+                </div>
+                <DialogDescription>
+                  Submit a support request and we'll get back to you shortly.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="support-subject">Subject</Label>
+                  <Select value={supportSubject} onValueChange={setSupportSubject}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a topic" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="order_issue">Order Issue</SelectItem>
+                      <SelectItem value="delivery_question">Delivery Question</SelectItem>
+                      <SelectItem value="dietary_preferences">Dietary Preferences</SelectItem>
+                      <SelectItem value="program_questions">Program Questions</SelectItem>
+                      <SelectItem value="technical_support">Technical Support</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="support-message">Message</Label>
+                  <Textarea
+                    id="support-message"
+                    placeholder="Please describe how we can help you..."
+                    value={supportMessage}
+                    onChange={(e) => setSupportMessage(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setSupportModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSupportSubmit} 
+                  disabled={!supportSubject || !supportMessage.trim()}
+                >
+                  Submit Request
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {supportSubmitting && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <Loader2 className="h-12 w-12 text-primary animate-spin" />
+              <div className="text-center">
+                <p className="font-semibold text-lg">Creating case in Salesforce...</p>
+                <p className="text-sm text-muted-foreground">Please wait while we submit your request</p>
+              </div>
+            </div>
+          )}
+
+          {supportSubmitted && (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle className="h-10 w-10 text-success" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="font-semibold text-lg">Case Created Successfully</p>
+                <p className="text-2xl font-bold text-primary">{supportCaseNumber}</p>
+                <IntegrationBadge type="Salesforce" className="mx-auto" />
+              </div>
+              <p className="text-sm text-muted-foreground text-center max-w-xs">
+                We've received your request and will respond within 24 hours.
+              </p>
+              <Button onClick={() => setSupportModalOpen(false)} className="mt-4">
+                Close
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </DashboardLayout>
