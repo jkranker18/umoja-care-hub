@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useApp } from '@/contexts/AppContext';
 import { programs, enrollments, orders, contentPlans, assessments } from '@/lib/mockData';
@@ -11,16 +11,29 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle } from 'lucide-react';
 import { format, addWeeks, subWeeks } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useEducationProgress, ModuleId } from '@/hooks/useEducationProgress';
 
 export default function MemberHome() {
   const { members } = useApp();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const location = useLocation();
+  const { completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
+  
+  // Handle navigation state for active tab
+  const initialTab = (location.state as any)?.activeTab || 'overview';
+  const [activeTab, setActiveTab] = useState(initialTab);
+  
+  // Update tab when navigating back with state
+  useEffect(() => {
+    if ((location.state as any)?.activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location.state]);
   
   // Mock: using first member as current user
   const member = members[0];
@@ -29,9 +42,6 @@ export default function MemberHome() {
   const memberOrders = orders.filter(o => o.memberId === member?.id);
   const contentPlan = contentPlans.find(cp => cp.memberId === member?.id);
   const assessment = assessments.find(a => a.memberId === member?.id);
-
-  const completedModules = contentPlan?.modules.filter(m => m.status === 'completed').length || 0;
-  const totalModules = contentPlan?.modules.length || 0;
 
   // Calculate next shipment date (2 weeks from today)
   const nextShipmentDate = addWeeks(new Date(), 2);
@@ -230,7 +240,7 @@ export default function MemberHome() {
           />
           <KPICard
             title="Content Progress"
-            value={`${completedModules}/${totalModules}`}
+            value={`${completedCount}/${eduTotalModules}`}
             subtitle="Modules completed"
             icon={<BookOpen className="h-5 w-5" />}
           />
@@ -455,9 +465,9 @@ export default function MemberHome() {
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-muted-foreground">Overall Progress</span>
-                    <span className="font-medium">0 of 3 complete</span>
+                    <span className="font-medium">{completedCount} of {eduTotalModules} complete</span>
                   </div>
-                  <Progress value={0} />
+                  <Progress value={progressPercent} />
                 </div>
                 <div className="space-y-3">
                   <div 
@@ -465,15 +475,15 @@ export default function MemberHome() {
                     onClick={() => navigate('/member/education/general-nutrition')}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
-                        <BookOpen className="h-5 w-5 text-muted-foreground" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('general-nutrition') ? 'bg-success/10' : 'bg-muted'}`}>
+                        <BookOpen className={`h-5 w-5 ${isComplete('general-nutrition') ? 'text-success' : 'text-muted-foreground'}`} />
                       </div>
                       <div>
                         <p className="font-medium">General Nutrition</p>
                         <p className="text-sm text-muted-foreground">What Your Body Needs to Stay Healthy</p>
                       </div>
                     </div>
-                    <StatusPill status="pending" />
+                    <StatusPill status={isComplete('general-nutrition') ? 'completed' : 'pending'} />
                   </div>
                   
                   <div 
@@ -481,15 +491,15 @@ export default function MemberHome() {
                     onClick={() => navigate('/member/education/reading-nutrition-label')}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
-                        <BookOpen className="h-5 w-5 text-muted-foreground" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('reading-nutrition-label') ? 'bg-success/10' : 'bg-muted'}`}>
+                        <BookOpen className={`h-5 w-5 ${isComplete('reading-nutrition-label') ? 'text-success' : 'text-muted-foreground'}`} />
                       </div>
                       <div>
                         <p className="font-medium">Reading a Nutrition Label</p>
                         <p className="text-sm text-muted-foreground">Learn to make healthier food choices</p>
                       </div>
                     </div>
-                    <StatusPill status="pending" />
+                    <StatusPill status={isComplete('reading-nutrition-label') ? 'completed' : 'pending'} />
                   </div>
                   
                   <div 
@@ -497,15 +507,15 @@ export default function MemberHome() {
                     onClick={() => navigate('/member/education/budget-friendly-meals')}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
-                        <BookOpen className="h-5 w-5 text-muted-foreground" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('budget-friendly-meals') ? 'bg-success/10' : 'bg-muted'}`}>
+                        <BookOpen className={`h-5 w-5 ${isComplete('budget-friendly-meals') ? 'text-success' : 'text-muted-foreground'}`} />
                       </div>
                       <div>
                         <p className="font-medium">Budget-Friendly Meals Made Easy</p>
                         <p className="text-sm text-muted-foreground">Create satisfying meals without overspending</p>
                       </div>
                     </div>
-                    <StatusPill status="pending" />
+                    <StatusPill status={isComplete('budget-friendly-meals') ? 'completed' : 'pending'} />
                   </div>
                 </div>
               </CardContent>
