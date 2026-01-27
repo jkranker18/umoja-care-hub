@@ -162,8 +162,11 @@ export default function MemberHome() {
     },
   ];
 
-  // Get 3 most recent orders for overview display
-  const displayOrders = demoOrders.slice(0, 3);
+  // Get representative orders for overview: last delivered, in transit, next to ship
+  const lastDelivered = demoOrders.filter(o => o.shipmentStatus === 'delivered').slice(-1)[0];
+  const inTransit = demoOrders.find(o => o.shipmentStatus === 'in_transit');
+  const nextToShip = demoOrders.find(o => o.shipmentStatus === 'processing');
+  const displayOrders = [lastDelivered, inTransit, nextToShip].filter(Boolean);
 
   const handleReportIssue = (orderId: string) => {
     setSelectedOrderId(orderId);
