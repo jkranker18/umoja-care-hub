@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useApp } from '@/contexts/AppContext';
 import { programs, enrollments, orders, contentPlans, assessments } from '@/lib/mockData';
@@ -6,16 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
-import { SourceOfTruth } from '@/components/shared/SourceOfTruth';
-import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, CalendarDays, ClipboardList, MessageSquare, Heart, Utensils, BookOpen } from 'lucide-react';
-import { format } from 'date-fns';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen } from 'lucide-react';
+import { format, addWeeks } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 export default function MemberHome() {
   const { members } = useApp();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
   
   // Mock: using first member as current user
   const member = members[0];
@@ -27,6 +28,20 @@ export default function MemberHome() {
 
   const completedModules = contentPlan?.modules.filter(m => m.status === 'completed').length || 0;
   const totalModules = contentPlan?.modules.length || 0;
+
+  // Calculate next shipment date (2 weeks from today)
+  const nextShipmentDate = addWeeks(new Date(), 2);
+
+  // Demo allergens and chronic conditions
+  const allergens = ['Eggs', 'Soy', 'Shellfish'];
+  const chronicConditions = ['Hypertension'];
+
+  // Get orders by status for display
+  const deliveredOrder = memberOrders.find(o => o.shipmentStatus === 'delivered');
+  const inTransitOrder = memberOrders.find(o => o.shipmentStatus === 'in_transit');
+  const pendingOrder = memberOrders.find(o => o.shipmentStatus === 'processing' || o.shipmentStatus === 'shipped');
+  
+  const displayOrders = [deliveredOrder, inTransitOrder, pendingOrder].filter(Boolean);
 
   return (
     <DashboardLayout>
@@ -55,14 +70,14 @@ export default function MemberHome() {
           />
           <KPICard
             title="Next Shipment"
-            value={enrollment?.nextShipmentDate ? format(new Date(enrollment.nextShipmentDate), 'MMM d') : 'TBD'}
+            value={format(nextShipmentDate, 'MMM d')}
             subtitle="Estimated delivery"
             icon={<Package className="h-5 w-5" />}
           />
           <KPICard
             title="Benefit Level"
-            value={enrollment?.benefitLevel || '12 weeks'}
-            subtitle="Weekly meals"
+            value="12 weeks"
+            subtitle="Weekly | 14 meals/week"
             icon={<Utensils className="h-5 w-5" />}
           />
           <KPICard
@@ -74,7 +89,7 @@ export default function MemberHome() {
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="plan">My Plan</TabsTrigger>
@@ -104,28 +119,20 @@ export default function MemberHome() {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Frequency:</span>
-                      <p className="font-medium">{program?.benefitsFrequency}</p>
+                      <p className="font-medium">Weekly</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Duration:</span>
-                      <p className="font-medium">{program?.benefitsDuration}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Source:</span>
-                      <p className="font-medium">{enrollment?.enrollmentSource}</p>
+                      <p className="font-medium">12 weeks</p>
                     </div>
                   </div>
-                  <SourceOfTruth source="NetSuite" description="Eligibility & Benefits" />
                 </CardContent>
               </Card>
 
               {/* Latest Assessment */}
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Latest Assessment</CardTitle>
-                    <IntegrationBadge type="Healthie" />
-                  </div>
+                  <CardTitle className="text-lg">Latest Assessment</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {assessment ? (
@@ -135,10 +142,23 @@ export default function MemberHome() {
                         <p className="font-medium">{assessment.type}</p>
                       </div>
                       <div>
-                        <span className="text-sm text-muted-foreground">Diet Score:</span>
-                        <div className="flex items-center gap-3 mt-1">
-                          <Progress value={assessment.dietScore} className="flex-1" />
-                          <span className="font-medium">{assessment.dietScore}/100</span>
+                        <span className="text-sm text-muted-foreground">Allergens:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {allergens.map(allergen => (
+                            <Badge key={allergen} variant="secondary" className="bg-destructive/10 text-destructive border-destructive/20">
+                              {allergen}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-sm text-muted-foreground">Tailored For:</span>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {chronicConditions.map(condition => (
+                            <Badge key={condition} variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                              {condition}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
                       {assessment.sdohNeeds.length > 0 && (
@@ -151,7 +171,6 @@ export default function MemberHome() {
                           </div>
                         </div>
                       )}
-                      <SourceOfTruth source="Healthie" description="Intake & Assessments" lastSync="Mar 20, 2024" />
                     </>
                   ) : (
                     <p className="text-muted-foreground">No assessments completed yet.</p>
@@ -165,15 +184,15 @@ export default function MemberHome() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Recent Orders</CardTitle>
-                  <Button variant="ghost" size="sm" onClick={() => navigate('/member/orders')}>
+                  <Button variant="ghost" size="sm" onClick={() => setActiveTab('orders')}>
                     View All
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                {memberOrders.length > 0 ? (
+                {displayOrders.length > 0 ? (
                   <div className="space-y-3">
-                    {memberOrders.slice(0, 3).map(order => (
+                    {displayOrders.map(order => order && (
                       <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <Package className="h-5 w-5 text-muted-foreground" />
@@ -189,7 +208,6 @@ export default function MemberHome() {
                 ) : (
                   <p className="text-muted-foreground text-center py-4">No orders yet.</p>
                 )}
-                <SourceOfTruth source="NetSuite" description="Fulfillment & Tracking" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -220,11 +238,10 @@ export default function MemberHome() {
                     </div>
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-medium text-sm text-muted-foreground">Next Delivery</h4>
-                      <p className="text-2xl font-bold">{enrollment?.nextShipmentDate ? format(new Date(enrollment.nextShipmentDate), 'MMM d') : 'TBD'}</p>
+                      <p className="text-2xl font-bold">{format(nextShipmentDate, 'MMM d')}</p>
                     </div>
                   </div>
                 </div>
-                <SourceOfTruth source="NetSuite" description="Meal Plan Configuration" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -259,7 +276,6 @@ export default function MemberHome() {
                     </div>
                   ))}
                 </div>
-                <SourceOfTruth source="NetSuite" description="Order Fulfillment" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -267,13 +283,8 @@ export default function MemberHome() {
           <TabsContent value="content">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Education Plan</CardTitle>
-                    <CardDescription>Your personalized learning modules from Nudge.</CardDescription>
-                  </div>
-                  <IntegrationBadge type="Nudge" />
-                </div>
+                <CardTitle>Education Plan</CardTitle>
+                <CardDescription>Your personalized learning modules.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="mb-4">
@@ -303,7 +314,6 @@ export default function MemberHome() {
                     </div>
                   ))}
                 </div>
-                <SourceOfTruth source="Nudge" description="Content & Engagement" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
