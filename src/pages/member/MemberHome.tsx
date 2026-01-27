@@ -18,13 +18,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEducationProgress, ModuleId } from '@/hooks/useEducationProgress';
+import { useSupportCases } from '@/hooks/useSupportCases';
 
 export default function MemberHome() {
   const { members } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const { completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
-  
+  const { addCase } = useSupportCases();
   // Handle navigation state for active tab
   const initialTab = (location.state as any)?.activeTab || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -218,6 +219,12 @@ export default function MemberHome() {
     // Simulate Salesforce API call
     setTimeout(() => {
       const caseNum = `SF-${Math.floor(100000 + Math.random() * 900000)}`;
+      // Save case to shared state
+      addCase({
+        caseNumber: caseNum,
+        subject: supportSubject,
+        message: supportMessage,
+      });
       setSupportCaseNumber(caseNum);
       setSupportSubmitting(false);
       setSupportSubmitted(true);

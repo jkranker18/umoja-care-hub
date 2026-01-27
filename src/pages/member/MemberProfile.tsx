@@ -5,12 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Phone, MapPin, Check, Pencil } from 'lucide-react';
+import { User, Phone, MapPin, Check, Pencil, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useSupportCases } from '@/hooks/useSupportCases';
+import { StatusPill } from '@/components/shared/StatusPill';
+import { format } from 'date-fns';
 
 export default function MemberProfile() {
   const { members } = useApp();
   const { toast } = useToast();
+  const { cases } = useSupportCases();
   const member = members[0];
 
   // Address state
@@ -221,6 +225,44 @@ export default function MemberProfile() {
                 {address.apt && <p>{address.apt}</p>}
                 <p>{address.city}, {address.state} {address.zip}</p>
               </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* My Cases Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">My Cases</CardTitle>
+            </div>
+            <CardDescription>Support requests you've submitted.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {cases.length > 0 ? (
+              <div className="space-y-3">
+                {cases.map((supportCase) => (
+                  <div 
+                    key={supportCase.caseNumber} 
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{supportCase.caseNumber}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {supportCase.subject.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} • {format(new Date(supportCase.createdAt), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                    </div>
+                    <StatusPill status={supportCase.status === 'open' ? 'pending' : supportCase.status === 'resolved' ? 'completed' : 'active'} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">No support cases yet.</p>
             )}
           </CardContent>
         </Card>
