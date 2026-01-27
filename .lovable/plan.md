@@ -1,183 +1,58 @@
 
+# Contact Support with Simulated Salesforce Integration
 
-# Implementation Plan: Pivot Demo for External Health Plan Audience
+## Overview
+Create a Contact Support modal that simulates sending a support request to Salesforce. The modal will include a form, show a loading state with Salesforce branding, and display a success confirmation - all for demo purposes without actual API integration.
 
-This plan converts the member portal demo from an internal C-suite demo to a cleaner, external health plan demo by removing internal controls and updating content to match your specified benefit details.
+## What You'll Get
+- A "Contact Support" button that opens a professional support form
+- Form fields for subject and message
+- A simulated "sending to Salesforce" loading state with progress indicator
+- Success confirmation showing "Case Created" with a mock case number
+- Salesforce branding badge to reinforce the integration story
 
----
+## User Experience Flow
+1. User clicks "Contact Support" button
+2. Modal opens with a support request form
+3. User fills in subject and message
+4. User clicks "Submit Request"
+5. Modal shows loading state: "Sending to Salesforce..." with a spinner
+6. After 2 seconds, displays success: "Case #SF-XXXXX created successfully"
+7. User can close the modal or it auto-closes
 
-## Summary of Changes
-
-| Area | Change |
-|------|--------|
-| Header | Remove demo controls and role switcher |
-| Header | Add clickable bell notification with content progress modal |
-| Top 4 Cards | Update Next Shipment to 2 weeks from today |
-| Top 4 Cards | Update Benefit Level to show "12 weeks, 14 meals/week, weekly" |
-| Overview - Current Program | Remove Source badges, update frequency to weekly, duration to 12 weeks |
-| Latest Assessment | Replace Diet Score with Allergens + Chronic Conditions |
-| Recent Orders | Show 1 delivered, 1 in transit, 1 pending shipment |
-| Recent Orders | "View All" navigates to My Orders tab |
-
----
-
-## Phase 1: Header Cleanup and Notification Modal
-
-### 1.1 Remove Demo Controls from Header
-
-**File:** `src/components/layout/Header.tsx`
-
-Remove the following elements:
-- "Start Demo" / "Demo Active" button
-- "Reset Data" button
-- Role switcher dropdown (Member Portal / CBO Portal / etc.)
-
-Keep:
-- Logo
-- Mobile menu button
-- Bell notification icon
-- Help icon
-
-### 1.2 Add Notification Modal
-
-**File:** `src/components/layout/Header.tsx`
-
-Create a dialog/modal triggered by clicking the bell icon:
-- Uses existing `Dialog` component from `@/components/ui/dialog`
-- Modal title: "Complete Your Progress"
-- Modal content: Message encouraging user to complete their education content modules
-- Shows current progress (e.g., "You've completed 2 of 6 modules")
-- Call-to-action button to navigate to the Education tab
-
----
-
-## Phase 2: Top 4 KPI Cards Updates
-
-**File:** `src/pages/member/MemberHome.tsx`
-
-### 2.1 Next Shipment Card
-- Calculate date as 2 weeks from today using `date-fns`
-- Display format: "Feb 10" (or appropriate date)
-- Update subtitle to "Estimated delivery"
-
-### 2.2 Benefit Level Card
-- Value: "12 weeks"
-- Subtitle: "Weekly | 14 meals/week"
-- This provides clear benefit structure at a glance
-
----
-
-## Phase 3: Overview - Current Program Section
-
-**File:** `src/pages/member/MemberHome.tsx`
-
-### 3.1 Remove Source References
-- Remove the `<SourceOfTruth source="NetSuite" .../>` component from the Current Program card
-- Remove the "Source" field from the details grid
-
-### 3.2 Update Program Details
-- Hardcode or override `Frequency` to show "Weekly"
-- Hardcode or override `Duration` to show "12 weeks"
-
----
-
-## Phase 4: Latest Assessment Section Redesign
-
-**File:** `src/pages/member/MemberHome.tsx`
-
-### 4.1 Remove Healthie References
-- Remove `<IntegrationBadge type="Healthie" />` from the card header
-- Remove `<SourceOfTruth source="Healthie" .../>` at the bottom
-
-### 4.2 Replace Diet Score with Health Profile
-Instead of showing diet score progress bar, display:
-
-**Allergens Section:**
-- Label: "Allergens"
-- Display as tags/badges: Eggs, Soy, Shellfish
-
-**Chronic Conditions Section:**
-- Label: "Tailored For"
-- Display as tags/badges: Hypertension
-
-This shows what the member reported and what their meals are customized for.
-
----
-
-## Phase 5: Recent Orders Section Updates
-
-**File:** `src/pages/member/MemberHome.tsx`
-
-### 5.1 Update Order Display Logic
-Currently shows first 3 orders randomly. Change to show exactly:
-1. One order with status "delivered" (last completed)
-2. One order with status "in_transit" (current shipment)
-3. One order with status "processing" or "shipped" (next to ship)
-
-This will require filtering/sorting the `memberOrders` array to find one of each status type.
-
-### 5.2 Fix "View All" Navigation
-Currently navigates to `/member/orders` which may not exist. Change to:
-- Use React state to control the active tab
-- Set the tab to "orders" when "View All" is clicked
-- This keeps the user on the same page but switches to the My Orders tab
-
-**Implementation approach:**
-- Add `useState` for `activeTab` with default value "overview"
-- Pass `activeTab` to `<Tabs value={activeTab}>`
-- Update `onValueChange` to sync state
-- "View All" button calls `setActiveTab("orders")`
-
----
-
-## Technical Details
+## Implementation Details
 
 ### Files to Modify
 
-| File | Changes |
-|------|---------|
-| `src/components/layout/Header.tsx` | Remove demo controls, add notification modal |
-| `src/pages/member/MemberHome.tsx` | Update cards, program section, assessment, orders |
-| `src/lib/mockData.ts` | Optionally add allergen/condition fields to Member or Assessment type |
+**1. `src/pages/member/MemberHome.tsx`**
+- Add state for the support modal (`supportModalOpen`)
+- Add state for form fields (`supportSubject`, `supportMessage`)
+- Add state for submission status (`submitting`, `submitted`, `caseNumber`)
+- Wire the "Contact Support" button to open the modal
+- Add the support modal with:
+  - Form with subject dropdown and message textarea
+  - Loading state with spinner and "Connecting to Salesforce..." text
+  - Success state with Salesforce badge and mock case number
+  - Reset function when modal closes
 
-### New Component Structure for Assessment Card
+### Form Fields
+- **Subject** (dropdown):
+  - Order Issue
+  - Delivery Question
+  - Dietary Preferences
+  - Program Questions
+  - Technical Support
+  - Other
+- **Message** (textarea): Free-form description
 
-```text
-Latest Assessment
-├── Type: Initial Intake Assessment
-├── Allergens
-│   ├── [Eggs] [Soy] [Shellfish]
-├── Tailored For
-│   └── [Hypertension]
-└── (SDOH Needs section remains if needed)
-```
+### Visual States
+1. **Form State**: Shows the input form with Salesforce badge in header
+2. **Submitting State**: Shows spinner with "Creating case in Salesforce..." message
+3. **Success State**: Shows checkmark, case number (e.g., SF-847291), and "Created in Salesforce" badge
 
-### Date Calculation for Next Shipment
-
-```text
-Using date-fns:
-- addWeeks(new Date(), 2) 
-- format(date, 'MMM d')
-- Result example: "Feb 10"
-```
-
----
-
-## Implementation Order
-
-1. **Header changes** - Quick win, removes internal controls
-2. **Notification modal** - Adds interactivity to bell icon
-3. **KPI cards** - Update values and subtitles
-4. **Current Program** - Remove sources, update frequency/duration
-5. **Latest Assessment** - Redesign with allergens and conditions
-6. **Recent Orders** - Fix filtering logic and View All navigation
-
----
-
-## Notes
-
-- All changes are scoped to the Member Portal (`/member` route)
-- No changes needed to other portals (CBO, Health Plan, Internal Ops)
-- Mock data can be enhanced to include allergen/condition data, or we can hardcode it for demo purposes
-- The notification modal is a nice touch for demo interactivity
-
+### Technical Notes
+- Uses existing `IntegrationBadge` component for Salesforce branding
+- Uses `setTimeout` to simulate API delay (2 seconds)
+- Generates random case number for demo realism
+- Form resets when modal is closed
+- Uses existing Dialog, Select, Textarea, and Button components
