@@ -30,19 +30,22 @@ import { Button } from '@/components/ui/button';
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onMemberTabChange?: (tab: string) => void;
+  activeMemberTab?: string;
 }
 
 interface NavItem {
   label: string;
   path: string;
   icon: React.ElementType;
+  tabId?: string; // For member nav items that map to tabs
 }
 
 const memberNav: NavItem[] = [
-  { label: 'Home', path: '/member', icon: Home },
-  { label: 'My Program', path: '/member/plan', icon: ClipboardList },
-  { label: 'My Orders', path: '/member/orders', icon: Package },
-  { label: 'My Tasks', path: '/member/tasks', icon: FileText },
+  { label: 'Home', path: '/member', icon: Home, tabId: 'overview' },
+  { label: 'My Program', path: '/member', icon: ClipboardList, tabId: 'plan' },
+  { label: 'My Orders', path: '/member', icon: Package, tabId: 'orders' },
+  { label: 'Education', path: '/member', icon: FileText, tabId: 'content' },
   { label: 'Profile', path: '/member/profile', icon: User },
 ];
 
@@ -77,7 +80,7 @@ const navByRole: Record<UserRole, NavItem[]> = {
   internal: internalNav,
 };
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }: SidebarProps) {
   const { currentRole } = useApp();
   const location = useLocation();
   const navItems = navByRole[currentRole];
@@ -132,12 +135,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Navigation */}
         <nav className="p-3 space-y-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            // For member role with tabs, check if this tab is active
+            const isMemberTabItem = currentRole === 'member' && item.tabId;
+            const isActive = isMemberTabItem 
+              ? activeMemberTab === item.tabId
+              : location.pathname === item.path;
+            
+            const handleClick = () => {
+              if (isMemberTabItem && onMemberTabChange) {
+                onMemberTabChange(item.tabId!);
+              }
+              onClose();
+            };
+
             return (
               <NavLink
-                key={item.path}
+                key={item.tabId || item.path}
                 to={item.path}
-                onClick={onClose}
+                onClick={handleClick}
                 className={cn(
                   'nav-item',
                   isActive ? 'nav-item-active' : 'nav-item-inactive'
