@@ -6,9 +6,10 @@ import { useApp } from '@/contexts/AppContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  onEducationClick?: () => void;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ children, onEducationClick }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { demoMode } = useApp();
 
@@ -18,7 +19,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header onMenuClick={() => setSidebarOpen(true)} />
+          <Header onMenuClick={() => setSidebarOpen(true)} onEducationClick={onEducationClick} />
           
           <main className="flex-1 overflow-y-auto p-4 lg:p-6">
             <div className="animate-fade-in">
