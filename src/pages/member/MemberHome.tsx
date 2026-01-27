@@ -45,6 +45,7 @@ export default function MemberHome() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [issueType, setIssueType] = useState<string>('');
   const [issueDetails, setIssueDetails] = useState('');
+  const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
   // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming
   const demoOrders = [
@@ -172,8 +173,9 @@ export default function MemberHome() {
   };
 
   const handleSubmitIssue = () => {
-    // In a real app, this would submit to backend
-    console.log('Issue reported:', { orderId: selectedOrderId, issueType, issueDetails });
+    if (selectedOrderId) {
+      setReportedOrders(prev => new Set(prev).add(selectedOrderId));
+    }
     setIssueModalOpen(false);
     setSelectedOrderId(null);
     setIssueType('');
@@ -401,15 +403,26 @@ export default function MemberHome() {
                       </div>
                       <div className="flex items-center gap-3">
                         {order.shipmentStatus === 'delivered' && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleReportIssue(order.id)}
-                            className="text-destructive border-destructive/30 hover:bg-destructive/10"
-                          >
-                            <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
-                            Report Issue
-                          </Button>
+                          reportedOrders.has(order.id) ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              disabled
+                              className="text-muted-foreground border-muted"
+                            >
+                              Issue Reported
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleReportIssue(order.id)}
+                              className="text-muted-foreground border-muted hover:bg-muted/50"
+                            >
+                              <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+                              Report Issue
+                            </Button>
+                          )
                         )}
                         <div className="text-right">
                           <StatusPill status={order.shipmentStatus} />
