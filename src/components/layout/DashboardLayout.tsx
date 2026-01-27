@@ -7,16 +7,23 @@ import { useApp } from '@/contexts/AppContext';
 interface DashboardLayoutProps {
   children: React.ReactNode;
   onEducationClick?: () => void;
+  onMemberTabChange?: (tab: string) => void;
+  activeMemberTab?: string;
 }
 
-export function DashboardLayout({ children, onEducationClick }: DashboardLayoutProps) {
+export function DashboardLayout({ children, onEducationClick, onMemberTabChange, activeMemberTab }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { demoMode } = useApp();
 
   return (
     <div className="min-h-screen bg-background">
       <div className="flex h-screen overflow-hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)} 
+          onMemberTabChange={onMemberTabChange}
+          activeMemberTab={activeMemberTab}
+        />
         
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header onMenuClick={() => setSidebarOpen(true)} onEducationClick={onEducationClick} />

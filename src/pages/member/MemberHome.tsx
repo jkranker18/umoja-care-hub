@@ -188,7 +188,11 @@ export default function MemberHome() {
   const handleEducationClick = () => setActiveTab('content');
 
   return (
-    <DashboardLayout onEducationClick={handleEducationClick}>
+    <DashboardLayout 
+      onEducationClick={handleEducationClick}
+      onMemberTabChange={setActiveTab}
+      activeMemberTab={activeTab}
+    >
       <div className="space-y-6">
         {/* Welcome Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
