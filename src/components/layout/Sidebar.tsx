@@ -40,7 +40,7 @@ interface NavItem {
 
 const memberNav: NavItem[] = [
   { label: 'Home', path: '/member', icon: Home },
-  { label: 'My Plan', path: '/member/plan', icon: ClipboardList },
+  { label: 'My Program', path: '/member/plan', icon: ClipboardList },
   { label: 'My Orders', path: '/member/orders', icon: Package },
   { label: 'My Tasks', path: '/member/tasks', icon: FileText },
   { label: 'Profile', path: '/member/profile', icon: User },
