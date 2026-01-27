@@ -4,15 +4,23 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useEducationProgress } from '@/hooks/useEducationProgress';
 
 export default function BudgetFriendlyMeals() {
   const navigate = useNavigate();
+  const { markComplete, isComplete } = useEducationProgress();
+  const isCompleted = isComplete('budget-friendly-meals');
+
+  const handleMarkComplete = () => {
+    markComplete('budget-friendly-meals');
+    navigate('/member', { state: { activeTab: 'content' } });
+  };
 
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => navigate('/member')} className="mb-2">
+        <Button variant="ghost" onClick={() => navigate('/member', { state: { activeTab: 'content' } })} className="mb-2">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Education
         </Button>
@@ -202,10 +210,17 @@ export default function BudgetFriendlyMeals() {
 
         {/* Mark Complete Button */}
         <div className="flex justify-center pt-4">
-          <Button size="lg" onClick={() => navigate('/member')}>
-            <CheckCircle className="h-5 w-5 mr-2" />
-            Mark as Complete
-          </Button>
+          {isCompleted ? (
+            <Button size="lg" variant="outline" disabled>
+              <CheckCircle className="h-5 w-5 mr-2 text-primary" />
+              Completed
+            </Button>
+          ) : (
+            <Button size="lg" onClick={handleMarkComplete}>
+              <CheckCircle className="h-5 w-5 mr-2" />
+              Mark as Complete
+            </Button>
+          )}
         </div>
       </div>
     </DashboardLayout>
