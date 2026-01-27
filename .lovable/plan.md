@@ -1,58 +1,68 @@
 
-# Contact Support with Simulated Salesforce Integration
+# Dynamic Next Shipment Card
 
 ## Overview
-Create a Contact Support modal that simulates sending a support request to Salesforce. The modal will include a form, show a loading state with Salesforce branding, and display a success confirmation - all for demo purposes without actual API integration.
+Update the "Next Shipment" status card to dynamically display the next upcoming or in-transit shipment based on actual delivery dates. The card will automatically transition from showing an "in transit" shipment to the next scheduled delivery once the current one is delivered.
 
-## What You'll Get
-- A "Contact Support" button that opens a professional support form
-- Form fields for subject and message
-- A simulated "sending to Salesforce" loading state with progress indicator
-- Success confirmation showing "Case Created" with a mock case number
-- Salesforce branding badge to reinforce the integration story
+## Current Behavior
+- The "Next Shipment" card shows a static date calculated as 2 weeks from today
+- It doesn't reflect actual shipment statuses or delivery dates
 
-## User Experience Flow
-1. User clicks "Contact Support" button
-2. Modal opens with a support request form
-3. User fills in subject and message
-4. User clicks "Submit Request"
-5. Modal shows loading state: "Sending to Salesforce..." with a spinner
-6. After 2 seconds, displays success: "Case #SF-XXXXX created successfully"
-7. User can close the modal or it auto-closes
+## New Behavior
+- The card will display the **next shipment that hasn't been delivered yet**
+- Priority order: show "in transit" shipments first, then "processing" shipments
+- Include both the delivery date and the current status (e.g., "In Transit" or "Scheduled")
+- Automatically updates: once Jan 27 passes, Feb 3 becomes the "next" shipment
 
 ## Implementation Details
 
-### Files to Modify
+### File to Modify
+**`src/pages/member/MemberHome.tsx`**
 
-**1. `src/pages/member/MemberHome.tsx`**
-- Add state for the support modal (`supportModalOpen`)
-- Add state for form fields (`supportSubject`, `supportMessage`)
-- Add state for submission status (`submitting`, `submitted`, `caseNumber`)
-- Wire the "Contact Support" button to open the modal
-- Add the support modal with:
-  - Form with subject dropdown and message textarea
-  - Loading state with spinner and "Connecting to Salesforce..." text
-  - Success state with Salesforce badge and mock case number
-  - Reset function when modal closes
+### Changes
 
-### Form Fields
-- **Subject** (dropdown):
-  - Order Issue
-  - Delivery Question
-  - Dietary Preferences
-  - Program Questions
-  - Technical Support
-  - Other
-- **Message** (textarea): Free-form description
+1. **Update demo orders to use fixed dates** (instead of relative)
+   - Change the "in transit" order to have estimated delivery of Jan 27, 2025
+   - Change the first "processing" order to Feb 3, 2025
+   - This ensures consistent demo behavior regardless of when the app is viewed
 
-### Visual States
-1. **Form State**: Shows the input form with Salesforce badge in header
-2. **Submitting State**: Shows spinner with "Creating case in Salesforce..." message
-3. **Success State**: Shows checkmark, case number (e.g., SF-847291), and "Created in Salesforce" badge
+2. **Add logic to determine the next shipment**
+   - Find the first order that is "in_transit" with a delivery date >= today
+   - If none in transit, find the first "processing" order with earliest delivery date
+   - If the in-transit delivery date has passed, treat it as "delivered" and skip to next
 
-### Technical Notes
-- Uses existing `IntegrationBadge` component for Salesforce branding
-- Uses `setTimeout` to simulate API delay (2 seconds)
-- Generates random case number for demo realism
-- Form resets when modal is closed
-- Uses existing Dialog, Select, Textarea, and Button components
+3. **Update the KPICard display**
+   - Show the estimated delivery date from the actual order
+   - Update subtitle to reflect status: "In Transit" or "Scheduled"
+
+### Technical Approach
+```typescript
+// Find next shipment: prioritize in-transit, then processing
+const today = new Date();
+const nextShipment = demoOrders.find(order => {
+  const deliveryDate = new Date(order.estimatedDelivery);
+  if (order.shipmentStatus === 'in_transit') {
+    return deliveryDate >= today;
+  }
+  return false;
+}) || demoOrders.find(order => order.shipmentStatus === 'processing');
+
+// Display in KPICard
+const nextShipmentDate = nextShipment?.estimatedDelivery;
+const nextShipmentStatus = nextShipment?.shipmentStatus === 'in_transit' 
+  ? 'In Transit' 
+  : 'Scheduled';
+```
+
+### Demo Order Dates (Fixed)
+| Order | Status | Delivery Date |
+|-------|--------|---------------|
+| ORD-004 | In Transit | Jan 27, 2025 |
+| ORD-005 | Processing | Feb 3, 2025 |
+| ORD-006 | Processing | Feb 10, 2025 |
+| (etc.) | Processing | Weekly thereafter |
+
+## User Experience
+- **Today (Jan 27)**: Shows "Jan 27" with subtitle "In Transit"
+- **Tomorrow (Jan 28)**: Shows "Feb 3" with subtitle "Scheduled" (since Jan 27 delivery is now in the past)
+- The card dynamically reflects the most relevant upcoming delivery
