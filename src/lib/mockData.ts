@@ -190,11 +190,11 @@ export interface BillingRecord {
 export const programs: Program[] = [
   {
     id: 'prog-001',
-    name: 'Diabetes Support – Medicaid',
-    description: 'Comprehensive nutrition program for Medicaid members with Type 2 Diabetes',
+    name: 'Cardiac Support – Medicaid',
+    description: 'Comprehensive nutrition program for Medicaid members with cardiovascular conditions',
     startDate: '2024-01-01',
     endDate: '2024-12-31',
-    eligibilityRules: 'Medicaid eligible, Diabetes diagnosis (ICD-10: E11.x), County in [Los Angeles, Orange, San Diego]',
+    eligibilityRules: 'Medicaid eligible, Cardiac diagnosis (ICD-10: I25.x), County in [Los Angeles, Orange, San Diego]',
     benefitsFrequency: 'Weekly',
     benefitsDuration: '12 weeks',
     status: 'active',
