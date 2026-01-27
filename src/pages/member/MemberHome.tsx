@@ -36,15 +36,48 @@ export default function MemberHome() {
   const allergens = ['Eggs', 'Soy', 'Shellfish'];
   const chronicConditions = ['Hypertension'];
 
+  // Demo orders - 1 delivered, 1 in transit, 1 next to ship
+  const demoOrders = [
+    {
+      id: 'ORD-001',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'delivered' as const,
+      trackingNumber: 'TRK-8834521',
+      estimatedDelivery: 'Jan 20, 2026',
+    },
+    {
+      id: 'ORD-002',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'in_transit' as const,
+      trackingNumber: 'TRK-8834522',
+      estimatedDelivery: 'Jan 27, 2026',
+    },
+    {
+      id: 'ORD-003',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834523',
+      estimatedDelivery: format(nextShipmentDate, 'MMM d, yyyy'),
+    },
+  ];
+
   // Get orders by status for display
-  const deliveredOrder = memberOrders.find(o => o.shipmentStatus === 'delivered');
-  const inTransitOrder = memberOrders.find(o => o.shipmentStatus === 'in_transit');
-  const pendingOrder = memberOrders.find(o => o.shipmentStatus === 'processing' || o.shipmentStatus === 'shipped');
+  const deliveredOrder = demoOrders.find(o => o.shipmentStatus === 'delivered');
+  const inTransitOrder = demoOrders.find(o => o.shipmentStatus === 'in_transit');
+  const pendingOrder = demoOrders.find(o => o.shipmentStatus === 'processing');
   
   const displayOrders = [deliveredOrder, inTransitOrder, pendingOrder].filter(Boolean);
 
+  const handleEducationClick = () => setActiveTab('content');
+
   return (
-    <DashboardLayout>
+    <DashboardLayout onEducationClick={handleEducationClick}>
       <div className="space-y-6">
         {/* Welcome Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -101,28 +134,27 @@ export default function MemberHome() {
             <div className="grid gap-4 lg:grid-cols-2">
               {/* Current Program */}
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Current Program</CardTitle>
                     <StatusPill status={enrollment?.status || 'pending'} />
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 pt-0">
                   <div>
                     <h3 className="font-semibold">{program?.name}</h3>
-                    <p className="text-sm text-muted-foreground">{program?.description}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-3 gap-3 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Enrolled:</span>
+                      <span className="text-muted-foreground text-xs">Enrolled</span>
                       <p className="font-medium">{enrollment?.enrollmentDate}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Frequency:</span>
+                      <span className="text-muted-foreground text-xs">Frequency</span>
                       <p className="font-medium">Weekly</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Duration:</span>
+                      <span className="text-muted-foreground text-xs">Duration</span>
                       <p className="font-medium">12 weeks</p>
                     </div>
                   </div>
@@ -131,46 +163,40 @@ export default function MemberHome() {
 
               {/* Latest Assessment */}
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Latest Assessment</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 pt-0">
                   {assessment ? (
                     <>
-                      <div>
-                        <span className="text-sm text-muted-foreground">Type:</span>
-                        <p className="font-medium">{assessment.type}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-muted-foreground">Allergens:</span>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {allergens.map(allergen => (
-                            <Badge key={allergen} variant="secondary" className="bg-destructive/10 text-destructive border-destructive/20">
-                              {allergen}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-sm text-muted-foreground">Tailored For:</span>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {chronicConditions.map(condition => (
-                            <Badge key={condition} variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                              {condition}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      {assessment.sdohNeeds.length > 0 && (
+                      <div className="flex items-center gap-4">
                         <div>
-                          <span className="text-sm text-muted-foreground">SDOH Needs Identified:</span>
-                          <div className="flex flex-wrap gap-2 mt-1">
-                            {assessment.sdohNeeds.map(need => (
-                              <span key={need} className="px-2 py-1 bg-muted rounded text-xs">{need}</span>
+                          <span className="text-muted-foreground text-xs">Type</span>
+                          <p className="font-medium text-sm">{assessment.type}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-6">
+                        <div>
+                          <span className="text-muted-foreground text-xs">Allergens</span>
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {allergens.map(allergen => (
+                              <Badge key={allergen} variant="secondary" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
+                                {allergen}
+                              </Badge>
                             ))}
                           </div>
                         </div>
-                      )}
+                        <div>
+                          <span className="text-muted-foreground text-xs">Tailored For</span>
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {chronicConditions.map(condition => (
+                              <Badge key={condition} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs">
+                                {condition}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     <p className="text-muted-foreground">No assessments completed yet.</p>
@@ -254,7 +280,7 @@ export default function MemberHome() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {memberOrders.map(order => (
+                  {demoOrders.map(order => (
                     <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

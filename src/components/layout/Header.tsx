@@ -1,7 +1,7 @@
-import { useApp } from '@/contexts/AppContext';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
 import {
   Dialog,
@@ -17,8 +17,14 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+interface HeaderProps {
+  onMenuClick?: () => void;
+  onEducationClick?: () => void;
+}
+
+export function Header({ onMenuClick, onEducationClick }: HeaderProps) {
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // Mock content progress data
   const completedModules = 2;
@@ -48,7 +54,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
       <div className="flex items-center gap-3">
         {/* Notifications with Modal */}
-        <Dialog>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -75,7 +81,14 @@ export function Header({ onMenuClick }: HeaderProps) {
               </p>
               <Button 
                 className="w-full" 
-                onClick={() => navigate('/member')}
+                onClick={() => {
+                  setDialogOpen(false);
+                  if (onEducationClick) {
+                    onEducationClick();
+                  } else {
+                    navigate('/member');
+                  }
+                }}
               >
                 Continue Learning
               </Button>
