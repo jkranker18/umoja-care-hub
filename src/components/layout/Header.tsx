@@ -15,10 +15,6 @@ import { Progress } from '@/components/ui/progress';
 
 interface HeaderProps {
   onMenuClick?: () => void;
-}
-
-interface HeaderProps {
-  onMenuClick?: () => void;
   onEducationClick?: () => void;
 }
 
