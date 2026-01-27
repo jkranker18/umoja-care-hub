@@ -633,10 +633,7 @@ export default function MemberHome() {
           {!supportSubmitting && !supportSubmitted && (
             <>
               <DialogHeader>
-                <div className="flex items-center justify-between">
-                  <DialogTitle>Contact Support</DialogTitle>
-                  <IntegrationBadge type="Salesforce" />
-                </div>
+                <DialogTitle>Contact Support</DialogTitle>
                 <DialogDescription>
                   Submit a support request and we'll get back to you shortly.
                 </DialogDescription>
@@ -701,7 +698,7 @@ export default function MemberHome() {
               <div className="text-center space-y-2">
                 <p className="font-semibold text-lg">Case Created Successfully</p>
                 <p className="text-2xl font-bold text-primary">{supportCaseNumber}</p>
-                <IntegrationBadge type="Salesforce" className="mx-auto" />
+                
               </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs">
                 We've received your request and will respond within 24 hours.
