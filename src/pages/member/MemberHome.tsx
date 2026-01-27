@@ -45,8 +45,9 @@ export default function MemberHome() {
   const contentPlan = contentPlans.find(cp => cp.memberId === member?.id);
   const assessment = assessments.find(a => a.memberId === member?.id);
 
-  // Calculate next shipment date (2 weeks from today)
-  const nextShipmentDate = addWeeks(new Date(), 2);
+  // Calculate the dynamic next shipment based on actual order data
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
 
   // Demo allergens and chronic conditions
   const allergens = ['Eggs', 'Soy', 'Shellfish'];
@@ -67,7 +68,7 @@ export default function MemberHome() {
   const [supportCaseNumber, setSupportCaseNumber] = useState('');
   const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
-  // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming
+  // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming (fixed dates for consistent demo)
   const demoOrders = [
     // 3 Delivered orders
     {
@@ -77,7 +78,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834521',
-      estimatedDelivery: format(subWeeks(new Date(), 3), 'MMM d, yyyy'),
+      estimatedDelivery: 'Jan 6, 2025',
     },
     {
       id: 'ORD-002',
@@ -86,7 +87,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834522',
-      estimatedDelivery: format(subWeeks(new Date(), 2), 'MMM d, yyyy'),
+      estimatedDelivery: 'Jan 13, 2025',
     },
     {
       id: 'ORD-003',
@@ -95,7 +96,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834523',
-      estimatedDelivery: format(subWeeks(new Date(), 1), 'MMM d, yyyy'),
+      estimatedDelivery: 'Jan 20, 2025',
     },
     // 1 In transit
     {
@@ -105,7 +106,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'in_transit' as const,
       trackingNumber: 'TRK-8834524',
-      estimatedDelivery: format(new Date(), 'MMM d, yyyy'),
+      estimatedDelivery: 'Jan 27, 2025',
     },
     // 8 Upcoming orders
     {
@@ -115,7 +116,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834525',
-      estimatedDelivery: format(addWeeks(new Date(), 1), 'MMM d, yyyy'),
+      estimatedDelivery: 'Feb 3, 2025',
     },
     {
       id: 'ORD-006',
@@ -124,7 +125,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834526',
-      estimatedDelivery: format(addWeeks(new Date(), 2), 'MMM d, yyyy'),
+      estimatedDelivery: 'Feb 10, 2025',
     },
     {
       id: 'ORD-007',
@@ -133,7 +134,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834527',
-      estimatedDelivery: format(addWeeks(new Date(), 3), 'MMM d, yyyy'),
+      estimatedDelivery: 'Feb 17, 2025',
     },
     {
       id: 'ORD-008',
@@ -142,7 +143,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834528',
-      estimatedDelivery: format(addWeeks(new Date(), 4), 'MMM d, yyyy'),
+      estimatedDelivery: 'Feb 24, 2025',
     },
     {
       id: 'ORD-009',
@@ -151,7 +152,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834529',
-      estimatedDelivery: format(addWeeks(new Date(), 5), 'MMM d, yyyy'),
+      estimatedDelivery: 'Mar 3, 2025',
     },
     {
       id: 'ORD-010',
@@ -160,7 +161,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834530',
-      estimatedDelivery: format(addWeeks(new Date(), 6), 'MMM d, yyyy'),
+      estimatedDelivery: 'Mar 10, 2025',
     },
     {
       id: 'ORD-011',
@@ -169,7 +170,7 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834531',
-      estimatedDelivery: format(addWeeks(new Date(), 7), 'MMM d, yyyy'),
+      estimatedDelivery: 'Mar 17, 2025',
     },
     {
       id: 'ORD-012',
@@ -178,9 +179,22 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834532',
-      estimatedDelivery: format(addWeeks(new Date(), 8), 'MMM d, yyyy'),
+      estimatedDelivery: 'Mar 24, 2025',
     },
   ];
+
+  // Find the next shipment: prioritize in-transit that hasn't passed, then processing
+  const nextShipment = demoOrders.find(order => {
+    if (order.shipmentStatus === 'in_transit') {
+      const deliveryDate = new Date(order.estimatedDelivery);
+      deliveryDate.setHours(0, 0, 0, 0);
+      return deliveryDate >= today;
+    }
+    return false;
+  }) || demoOrders.find(order => order.shipmentStatus === 'processing');
+
+  const nextShipmentDate = nextShipment ? new Date(nextShipment.estimatedDelivery) : addWeeks(new Date(), 2);
+  const nextShipmentStatus = nextShipment?.shipmentStatus === 'in_transit' ? 'In Transit' : 'Scheduled';
 
   // Get representative orders for overview: last delivered, in transit, next to ship
   const lastDelivered = demoOrders.filter(o => o.shipmentStatus === 'delivered').slice(-1)[0];
@@ -273,7 +287,7 @@ export default function MemberHome() {
           <KPICard
             title="Next Shipment"
             value={format(nextShipmentDate, 'MMM d')}
-            subtitle="Estimated delivery"
+            subtitle={nextShipmentStatus}
             icon={<Package className="h-5 w-5" />}
           />
           <KPICard
