@@ -9,9 +9,13 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen } from 'lucide-react';
-import { format, addWeeks } from 'date-fns';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle } from 'lucide-react';
+import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function MemberHome() {
   const { members } = useApp();
@@ -36,8 +40,15 @@ export default function MemberHome() {
   const allergens = ['Eggs', 'Soy', 'Shellfish'];
   const chronicConditions = ['Hypertension'];
 
-  // Demo orders - 1 delivered, 1 in transit, 1 next to ship
+  // Issue reporting modal state
+  const [issueModalOpen, setIssueModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [issueType, setIssueType] = useState<string>('');
+  const [issueDetails, setIssueDetails] = useState('');
+
+  // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming
   const demoOrders = [
+    // 3 Delivered orders
     {
       id: 'ORD-001',
       memberId: member?.id,
@@ -45,34 +56,129 @@ export default function MemberHome() {
       mealsCount: 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834521',
-      estimatedDelivery: 'Jan 20, 2026',
+      estimatedDelivery: format(subWeeks(new Date(), 3), 'MMM d, yyyy'),
     },
     {
       id: 'ORD-002',
       memberId: member?.id,
       mealPlan: 'Cardiac Friendly',
       mealsCount: 14,
-      shipmentStatus: 'in_transit' as const,
+      shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834522',
-      estimatedDelivery: 'Jan 27, 2026',
+      estimatedDelivery: format(subWeeks(new Date(), 2), 'MMM d, yyyy'),
     },
     {
       id: 'ORD-003',
       memberId: member?.id,
       mealPlan: 'Cardiac Friendly',
       mealsCount: 14,
-      shipmentStatus: 'processing' as const,
+      shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834523',
-      estimatedDelivery: format(nextShipmentDate, 'MMM d, yyyy'),
+      estimatedDelivery: format(subWeeks(new Date(), 1), 'MMM d, yyyy'),
+    },
+    // 1 In transit
+    {
+      id: 'ORD-004',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'in_transit' as const,
+      trackingNumber: 'TRK-8834524',
+      estimatedDelivery: format(new Date(), 'MMM d, yyyy'),
+    },
+    // 8 Upcoming orders
+    {
+      id: 'ORD-005',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834525',
+      estimatedDelivery: format(addWeeks(new Date(), 1), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-006',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834526',
+      estimatedDelivery: format(addWeeks(new Date(), 2), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-007',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834527',
+      estimatedDelivery: format(addWeeks(new Date(), 3), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-008',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834528',
+      estimatedDelivery: format(addWeeks(new Date(), 4), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-009',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834529',
+      estimatedDelivery: format(addWeeks(new Date(), 5), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-010',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834530',
+      estimatedDelivery: format(addWeeks(new Date(), 6), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-011',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834531',
+      estimatedDelivery: format(addWeeks(new Date(), 7), 'MMM d, yyyy'),
+    },
+    {
+      id: 'ORD-012',
+      memberId: member?.id,
+      mealPlan: 'Cardiac Friendly',
+      mealsCount: 14,
+      shipmentStatus: 'processing' as const,
+      trackingNumber: 'TRK-8834532',
+      estimatedDelivery: format(addWeeks(new Date(), 8), 'MMM d, yyyy'),
     },
   ];
 
-  // Get orders by status for display
-  const deliveredOrder = demoOrders.find(o => o.shipmentStatus === 'delivered');
-  const inTransitOrder = demoOrders.find(o => o.shipmentStatus === 'in_transit');
-  const pendingOrder = demoOrders.find(o => o.shipmentStatus === 'processing');
-  
-  const displayOrders = [deliveredOrder, inTransitOrder, pendingOrder].filter(Boolean);
+  // Get 3 most recent orders for overview display
+  const displayOrders = demoOrders.slice(0, 3);
+
+  const handleReportIssue = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setIssueType('');
+    setIssueDetails('');
+    setIssueModalOpen(true);
+  };
+
+  const handleSubmitIssue = () => {
+    // In a real app, this would submit to backend
+    console.log('Issue reported:', { orderId: selectedOrderId, issueType, issueDetails });
+    setIssueModalOpen(false);
+    setSelectedOrderId(null);
+    setIssueType('');
+    setIssueDetails('');
+  };
 
   const handleEducationClick = () => setActiveTab('content');
 
@@ -276,7 +382,7 @@ export default function MemberHome() {
             <Card>
               <CardHeader>
                 <CardTitle>Order History</CardTitle>
-                <CardDescription>Track all your meal shipments.</CardDescription>
+                <CardDescription>Track all your meal shipments. {demoOrders.length} total orders.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -293,11 +399,24 @@ export default function MemberHome() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <StatusPill status={order.shipmentStatus} />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Est. {order.estimatedDelivery}
-                        </p>
+                      <div className="flex items-center gap-3">
+                        {order.shipmentStatus === 'delivered' && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleReportIssue(order.id)}
+                            className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                          >
+                            <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+                            Report Issue
+                          </Button>
+                        )}
+                        <div className="text-right">
+                          <StatusPill status={order.shipmentStatus} />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {order.shipmentStatus === 'delivered' ? 'Delivered' : 'Est.'} {order.estimatedDelivery}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -359,6 +478,52 @@ export default function MemberHome() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Report Issue Modal */}
+      <Dialog open={issueModalOpen} onOpenChange={setIssueModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Report an Issue</DialogTitle>
+            <DialogDescription>
+              Let us know what went wrong with order #{selectedOrderId}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="issue-type">Issue Type</Label>
+              <Select value={issueType} onValueChange={setIssueType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select the type of issue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="quality">Quality</SelectItem>
+                  <SelectItem value="wrong_item">Wrong item</SelectItem>
+                  <SelectItem value="not_received">Item not received</SelectItem>
+                  <SelectItem value="damaged">Damaged</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="issue-details">Additional Details</Label>
+              <Textarea
+                id="issue-details"
+                placeholder="Please describe the issue in more detail..."
+                value={issueDetails}
+                onChange={(e) => setIssueDetails(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIssueModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitIssue} disabled={!issueType}>
+              Submit Issue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
