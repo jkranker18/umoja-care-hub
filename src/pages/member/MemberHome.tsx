@@ -125,7 +125,7 @@ export default function MemberHome() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="plan">My Plan</TabsTrigger>
+            <TabsTrigger value="plan">My Program</TabsTrigger>
             <TabsTrigger value="orders">My Orders</TabsTrigger>
             <TabsTrigger value="content">Education</TabsTrigger>
           </TabsList>
@@ -241,15 +241,15 @@ export default function MemberHome() {
           <TabsContent value="plan">
             <Card>
               <CardHeader>
-                <CardTitle>My Meal Plan</CardTitle>
+                <CardTitle>My Program</CardTitle>
                 <CardDescription>Your personalized nutrition plan based on your health goals.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                    <h3 className="font-semibold mb-2">Diabetes-Friendly Meal Plan</h3>
+                    <h3 className="font-semibold mb-2">Cardiac Friendly Meal Plan</h3>
                     <p className="text-sm text-muted-foreground">
-                      Low glycemic index meals designed to help manage blood sugar levels. 
+                      Heart-healthy meals low in sodium and saturated fat, designed to support cardiovascular health. 
                       Each delivery includes 14 meals with balanced macronutrients.
                     </p>
                   </div>
