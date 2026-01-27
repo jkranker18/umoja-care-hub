@@ -455,29 +455,58 @@ export default function MemberHome() {
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-muted-foreground">Overall Progress</span>
-                    <span className="font-medium">{completedModules} of {totalModules} complete</span>
+                    <span className="font-medium">0 of 3 complete</span>
                   </div>
-                  <Progress value={(completedModules / totalModules) * 100} />
+                  <Progress value={0} />
                 </div>
                 <div className="space-y-3">
-                  {contentPlan?.modules.map(module => (
-                    <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          module.status === 'completed' ? 'bg-success/10' : 'bg-muted'
-                        }`}>
-                          <BookOpen className={`h-5 w-5 ${
-                            module.status === 'completed' ? 'text-success' : 'text-muted-foreground'
-                          }`} />
-                        </div>
-                        <div>
-                          <p className="font-medium">{module.title}</p>
-                          <p className="text-sm text-muted-foreground capitalize">{module.type}</p>
-                        </div>
+                  <div 
+                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => navigate('/member/education/general-nutrition')}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
+                        <BookOpen className="h-5 w-5 text-muted-foreground" />
                       </div>
-                      <StatusPill status={module.status} />
+                      <div>
+                        <p className="font-medium">General Nutrition</p>
+                        <p className="text-sm text-muted-foreground">What Your Body Needs to Stay Healthy</p>
+                      </div>
                     </div>
-                  ))}
+                    <StatusPill status="pending" />
+                  </div>
+                  
+                  <div 
+                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => navigate('/member/education/reading-nutrition-label')}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
+                        <BookOpen className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Reading a Nutrition Label</p>
+                        <p className="text-sm text-muted-foreground">Learn to make healthier food choices</p>
+                      </div>
+                    </div>
+                    <StatusPill status="pending" />
+                  </div>
+                  
+                  <div 
+                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={() => navigate('/member/education/budget-friendly-meals')}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-muted">
+                        <BookOpen className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Budget-Friendly Meals Made Easy</p>
+                        <p className="text-sm text-muted-foreground">Create satisfying meals without overspending</p>
+                      </div>
+                    </div>
+                    <StatusPill status="pending" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
