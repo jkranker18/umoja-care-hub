@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
 import Landing from "./pages/Landing";
 import MemberHome from "./pages/member/MemberHome";
+import MemberProfile from "./pages/member/MemberProfile";
 import MemberSignup from "./pages/member/MemberSignup";
 import CBODashboard from "./pages/cbo/CBODashboard";
 import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
@@ -32,7 +33,7 @@ function App() {
             <Route path="/member/plan" element={<MemberHome />} />
             <Route path="/member/orders" element={<MemberHome />} />
             <Route path="/member/tasks" element={<MemberHome />} />
-            <Route path="/member/profile" element={<MemberHome />} />
+            <Route path="/member/profile" element={<MemberProfile />} />
             
             {/* CBO Portal */}
             <Route path="/cbo" element={<CBODashboard />} />
