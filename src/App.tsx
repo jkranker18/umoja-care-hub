@@ -8,6 +8,9 @@ import Landing from "./pages/Landing";
 import MemberHome from "./pages/member/MemberHome";
 import MemberProfile from "./pages/member/MemberProfile";
 import MemberSignup from "./pages/member/MemberSignup";
+import GeneralNutrition from "./pages/member/education/GeneralNutrition";
+import ReadingNutritionLabel from "./pages/member/education/ReadingNutritionLabel";
+import BudgetFriendlyMeals from "./pages/member/education/BudgetFriendlyMeals";
 import CBODashboard from "./pages/cbo/CBODashboard";
 import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
 import InternalOpsDashboard from "./pages/internal/InternalOpsDashboard";
@@ -34,6 +37,9 @@ function App() {
             <Route path="/member/orders" element={<MemberHome />} />
             <Route path="/member/tasks" element={<MemberHome />} />
             <Route path="/member/profile" element={<MemberProfile />} />
+            <Route path="/member/education/general-nutrition" element={<GeneralNutrition />} />
+            <Route path="/member/education/reading-nutrition-label" element={<ReadingNutritionLabel />} />
+            <Route path="/member/education/budget-friendly-meals" element={<BudgetFriendlyMeals />} />
             
             {/* CBO Portal */}
             <Route path="/cbo" element={<CBODashboard />} />
