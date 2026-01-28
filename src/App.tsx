@@ -18,7 +18,7 @@ import HealthPlanOutcomes from "./pages/healthplan/HealthPlanOutcomes";
 import HealthPlanMembers from "./pages/healthplan/HealthPlanMembers";
 import HealthPlanProfile from "./pages/healthplan/HealthPlanProfile";
 import InternalOpsDashboard from "./pages/internal/InternalOpsDashboard";
-import Integrations from "./pages/Integrations";
+import AdminManagement from "./pages/internal/AdminManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,15 +59,8 @@ function App() {
             
             {/* Internal Ops Portal */}
             <Route path="/internal" element={<InternalOpsDashboard />} />
-            <Route path="/internal/workflows" element={<InternalOpsDashboard />} />
-            <Route path="/internal/rules" element={<InternalOpsDashboard />} />
-            <Route path="/internal/campaigns" element={<InternalOpsDashboard />} />
+            <Route path="/internal/admins" element={<AdminManagement />} />
             <Route path="/internal/cases" element={<InternalOpsDashboard />} />
-            <Route path="/internal/integrations" element={<Integrations />} />
-            <Route path="/internal/data" element={<InternalOpsDashboard />} />
-            
-            {/* Integrations */}
-            <Route path="/integrations" element={<Integrations />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

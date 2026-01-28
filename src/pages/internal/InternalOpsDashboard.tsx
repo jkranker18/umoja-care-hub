@@ -1,36 +1,26 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { members, enrollments, rulesDecisions, orders, serviceCases, programs, billingRecords } from '@/lib/mockData';
+import { members, enrollments, rulesDecisions, orders, serviceCases, programs } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
-import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
-import { SourceOfTruth } from '@/components/shared/SourceOfTruth';
 import { ProgramPipelineDashboard } from '@/components/internal/ProgramPipelineDashboard';
 import { 
   AlertTriangle, 
   Package, 
   Shield, 
   FileWarning, 
-  Play, 
   Pause, 
   RefreshCw, 
   MessageSquare,
   CheckCircle,
   Clock,
-  LayoutGrid,
-  Users,
-  ClipboardCheck,
-  CreditCard
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function InternalOpsDashboard() {
-  const navigate = useNavigate();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   // Calculate exception counts
@@ -38,7 +28,6 @@ export default function InternalOpsDashboard() {
   const deliveryExceptions = orders.filter(o => o.shipmentStatus === 'exception');
   const highRiskMembers = members.filter(m => m.riskFlags.length >= 2);
   const missingConsents = members.filter(m => !m.consentGiven);
-  const openCases = serviceCases.filter(c => c.status === 'open' || c.status === 'in_progress');
 
   const handleAction = (action: string, id: string) => {
     setProcessingId(id);
@@ -86,17 +75,12 @@ export default function InternalOpsDashboard() {
           </div>
 
           {/* Eligibility Exceptions */}
-
-          {/* Eligibility Exceptions */}
           <TabsContent value="eligibility">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">Eligibility Exceptions Queue</CardTitle>
-                    <CardDescription>Members requiring manual eligibility review</CardDescription>
-                  </div>
-                  <IntegrationBadge type="NetSuite" />
+                <div>
+                  <CardTitle className="text-lg">Eligibility Exceptions Queue</CardTitle>
+                  <CardDescription>Members requiring manual eligibility review</CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
@@ -165,7 +149,6 @@ export default function InternalOpsDashboard() {
                     })}
                   </TableBody>
                 </Table>
-                <SourceOfTruth source="NetSuite" description="Rules Engine & Eligibility" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -174,12 +157,9 @@ export default function InternalOpsDashboard() {
           <TabsContent value="delivery">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">Delivery Exceptions Queue</CardTitle>
-                    <CardDescription>Shipments with delivery issues</CardDescription>
-                  </div>
-                  <IntegrationBadge type="NetSuite" />
+                <div>
+                  <CardTitle className="text-lg">Delivery Exceptions Queue</CardTitle>
+                  <CardDescription>Shipments with delivery issues</CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
@@ -234,7 +214,6 @@ export default function InternalOpsDashboard() {
                     })}
                   </TableBody>
                 </Table>
-                <SourceOfTruth source="NetSuite" description="Order Fulfillment" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
@@ -318,12 +297,9 @@ export default function InternalOpsDashboard() {
           <TabsContent value="consents">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">Missing Consents</CardTitle>
-                    <CardDescription>Members who haven't provided consent</CardDescription>
-                  </div>
-                  <IntegrationBadge type="Healthie" />
+                <div>
+                  <CardTitle className="text-lg">Missing Consents</CardTitle>
+                  <CardDescription>Members who haven't provided consent</CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
@@ -367,27 +343,10 @@ export default function InternalOpsDashboard() {
                     ))}
                   </TableBody>
                 </Table>
-                <SourceOfTruth source="Healthie" description="Consent Management" className="mt-4" />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* Quick Links */}
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => navigate('/internal/rules')}>
-            <Shield className="h-4 w-4 mr-2" />
-            Rules Engine
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/internal/campaigns')}>
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Campaigns
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/internal/integrations')}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Integration Status
-          </Button>
-        </div>
       </div>
     </DashboardLayout>
   );

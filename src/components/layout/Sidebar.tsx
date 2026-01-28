@@ -14,15 +14,7 @@ import {
   Building2,
   BarChart3,
   FileText,
-  Settings,
-  Zap,
-  Shield,
-  MessageSquare,
-  Layers,
-  GitBranch,
-  Database,
   AlertTriangle,
-  PlusCircle,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -63,12 +55,8 @@ const healthplanNav: NavItem[] = [
 
 const internalNav: NavItem[] = [
   { label: 'Ops Cockpit', path: '/internal', icon: LayoutDashboard },
-  { label: 'Workflows', path: '/internal/workflows', icon: GitBranch },
-  { label: 'Rules Engine', path: '/internal/rules', icon: Shield },
-  { label: 'Campaigns', path: '/internal/campaigns', icon: MessageSquare },
+  { label: 'Admin Management', path: '/internal/admins', icon: Users },
   { label: 'Service Cases', path: '/internal/cases', icon: AlertTriangle },
-  { label: 'Integrations', path: '/internal/integrations', icon: Zap },
-  { label: 'Data Explorer', path: '/internal/data', icon: Database },
 ];
 
 const navByRole: Record<UserRole, NavItem[]> = {
