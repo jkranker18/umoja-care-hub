@@ -706,7 +706,81 @@ export const rules: Rule[] = [
   },
 ];
 
-// Demo steps
+// Health Plan Organization and Users
+export interface HealthPlan {
+  id: string;
+  name: string;
+  planId: string;
+  contactName: string;
+  contactEmail: string;
+  phone: string;
+  address: string;
+  memberCount: number;
+}
+
+export interface HealthPlanUser {
+  id: string;
+  healthPlanId: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'analyst' | 'viewer';
+  status: 'active' | 'inactive';
+  lastLogin?: string;
+}
+
+export const healthPlans: HealthPlan[] = [
+  {
+    id: 'hp-001',
+    name: 'Blue Cross of California',
+    planId: 'BCCA-2024',
+    contactName: 'Jennifer Adams',
+    contactEmail: 'jadams@bluecross.com',
+    phone: '(800) 555-BLUE',
+    address: '21555 Oxnard St, Woodland Hills, CA 91367',
+    memberCount: 50,
+  },
+];
+
+export const healthPlanUsers: HealthPlanUser[] = [
+  {
+    id: 'hp-user-001',
+    healthPlanId: 'hp-001',
+    name: 'Jennifer Adams',
+    email: 'jadams@bluecross.com',
+    role: 'admin',
+    status: 'active',
+    lastLogin: '2024-03-28',
+  },
+  {
+    id: 'hp-user-002',
+    healthPlanId: 'hp-001',
+    name: 'Michael Torres',
+    email: 'mtorres@bluecross.com',
+    role: 'analyst',
+    status: 'active',
+    lastLogin: '2024-03-27',
+  },
+  {
+    id: 'hp-user-003',
+    healthPlanId: 'hp-001',
+    name: 'Sarah Kim',
+    email: 'skim@bluecross.com',
+    role: 'viewer',
+    status: 'active',
+    lastLogin: '2024-03-25',
+  },
+  {
+    id: 'hp-user-004',
+    healthPlanId: 'hp-001',
+    name: 'David Lee',
+    email: 'dlee@bluecross.com',
+    role: 'analyst',
+    status: 'inactive',
+    lastLogin: '2024-02-10',
+  },
+];
+
+
 export const demoSteps = [
   {
     step: 1,

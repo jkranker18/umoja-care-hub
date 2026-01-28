@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-type StatusType = 'active' | 'pending' | 'paused' | 'complete' | 'error' | 'approved' | 'denied' | 'pending_review' |
+type StatusType = 'active' | 'inactive' | 'pending' | 'paused' | 'complete' | 'error' | 'approved' | 'denied' | 'pending_review' |
   'open' | 'in_progress' | 'resolved' | 'closed' | 'draft' | 'published' | 'connected' | 'syncing' | 'disconnected' |
   'processing' | 'shipped' | 'in_transit' | 'delivered' | 'exception' | 'assigned' | 'completed';
 
@@ -11,6 +11,7 @@ interface StatusPillProps {
 
 const statusConfig: Record<StatusType, { label: string; className: string }> = {
   active: { label: 'Active', className: 'status-active' },
+  inactive: { label: 'Inactive', className: 'status-paused' },
   pending: { label: 'Pending', className: 'status-pending' },
   paused: { label: 'Paused', className: 'status-paused' },
   complete: { label: 'Complete', className: 'status-complete' },
