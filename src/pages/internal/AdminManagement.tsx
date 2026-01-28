@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { cboUsers, healthPlanUsers, cbos, healthPlans } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StatusPill } from '@/components/shared/StatusPill';
+import { useApp } from '@/contexts/AppContext';
 import { UserPlus, Building2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -52,6 +53,7 @@ const portalAdmins: AdminUser[] = [
 ];
 
 export default function AdminManagement() {
+  const { setCurrentRole } = useApp();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     organizationType: '' as 'cbo' | 'healthplan' | '',
@@ -60,6 +62,11 @@ export default function AdminManagement() {
     email: '',
     role: '',
   });
+
+  // Ensure sidebar renders the correct nav on refresh / direct URL access
+  useEffect(() => {
+    setCurrentRole('internal');
+  }, [setCurrentRole]);
 
   const cboAdmins = portalAdmins.filter(a => a.organizationType === 'cbo');
   const healthPlanAdmins = portalAdmins.filter(a => a.organizationType === 'healthplan');
