@@ -1,106 +1,117 @@
 
 
-# Make Program Dropdown and Date Selector Functional
+# Add Support Button to CBO and Health Plan Profile Pages
 
 ## Overview
-The Health Plan Dashboard has program and date range dropdowns that update state but don't actually filter the displayed data. This plan will make these filters functional across all KPIs, charts, and breakdowns.
+Add a "Contact Support" button and modal to the bottom of both the CBO Organization page and Health Plan Profile page, following the same pattern used in the Member portal. The reason/subject selector will have context-appropriate options for each portal type.
 
-## Current State
-- `programFilter` state exists but is not used to filter data
-- `dateRange` state exists but is not used to filter data
-- All metrics show unfiltered totals regardless of dropdown selection
+---
 
 ## Changes Summary
 
-**File:** `src/pages/healthplan/HealthPlanDashboard.tsx`
+| Page | Support Reasons |
+|------|-----------------|
+| CBO Organization | Member enrollment, Portal access, Referral tracking, Reporting issue, Technical support, Other |
+| Health Plan Profile | Member data inquiry, Outcomes reporting, Contract/billing, Portal access, Technical support, Other |
 
-### 1. Add Filtering Logic for Program Selection
+---
 
-Filter all data based on the selected program:
+## 1. Create Reusable Support Dialog Component
 
-```tsx
-// Filter enrollments by program
-const filteredEnrollments = programFilter === 'all' 
-  ? enrollments 
-  : enrollments.filter(e => e.programId === programFilter);
+**File:** `src/components/shared/SupportDialog.tsx` (new file)
 
-// Get member IDs for filtered enrollments
-const filteredMemberIds = new Set(filteredEnrollments.map(e => e.memberId));
-
-// Filter related data
-const filteredMembers = members.filter(m => filteredMemberIds.has(m.id));
-const filteredOrders = orders.filter(o => filteredMemberIds.has(o.memberId));
-const filteredContentPlans = contentPlans.filter(cp => filteredMemberIds.has(cp.memberId));
-```
-
-### 2. Update KPIs to Use Filtered Data
-
-Update all KPI calculations to use filtered data:
-
-| KPI | Current | Updated |
-|-----|---------|---------|
-| Eligible Members | `members.length` | `filteredMembers.length` or total eligible count |
-| Enrolled | `enrollments.length` | `filteredEnrollments.length` |
-| Active | Count from all enrollments | Count from `filteredEnrollments` |
-| On-time Shipments | From all orders | From `filteredOrders` |
-| Engagement Rate | From all content plans | From `filteredContentPlans` |
-
-### 3. Update Charts to Use Filtered Data
-
-The chart data is currently static mock data. Update to reflect program selection:
-- Enrollment Over Time: Generate data based on filtered enrollments
-- Shipment Performance: Generate data based on filtered orders
-- Content Engagement: Generate data based on filtered content plans
-
-### 4. Update Program Breakdown Cards
-
-- "By Program" card: When a specific program is selected, only show that program's stats
-- "By CBO Partner" card: Filter by members in the selected program
-- "Content Engagement" card: Filter by members in the selected program
-
-### 5. Add Date Range Filtering (Mock Implementation)
-
-Since the mock data doesn't have sufficient date granularity for real filtering, we'll:
-- Add visual feedback showing the selected range
-- Prepare the filtering structure for future real data integration
-- Adjust displayed trend values based on range selection
-
-### 6. Add useMemo for Performance
-
-Wrap filtering logic in `useMemo` to prevent unnecessary recalculations:
+Create a reusable support dialog component that:
+- Accepts a `subjectOptions` prop for context-specific reasons
+- Handles all modal state internally (open, submitting, submitted)
+- Uses the existing `useSupportCases` hook to persist cases
+- Follows the same visual pattern as the member support modal
 
 ```tsx
-const filteredData = useMemo(() => {
-  const filteredEnrollments = programFilter === 'all'
-    ? enrollments
-    : enrollments.filter(e => e.programId === programFilter);
-  
-  const memberIds = new Set(filteredEnrollments.map(e => e.memberId));
-  
-  return {
-    enrollments: filteredEnrollments,
-    members: members.filter(m => memberIds.has(m.id)),
-    orders: orders.filter(o => memberIds.has(o.memberId)),
-    contentPlans: contentPlans.filter(cp => memberIds.has(cp.memberId)),
-  };
-}, [programFilter]);
+interface SupportDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  subjectOptions: { value: string; label: string }[];
+  portalContext: string; // e.g., "CBO" or "Health Plan"
+}
 ```
 
 ---
 
-## File to Modify
+## 2. Update CBO Organization Page
+
+**File:** `src/pages/cbo/CBOOrganization.tsx`
+
+Add:
+- Import `SupportDialog` component
+- Import necessary icons (`MessageSquare`)
+- Add state for support modal: `supportModalOpen`
+- Add support card at the bottom (after Authorized Users)
+- Add `SupportDialog` with CBO-specific subject options
+
+**CBO Subject Options:**
+- `member_enrollment` - Member Enrollment
+- `portal_access` - Portal Access
+- `referral_tracking` - Referral Tracking
+- `reporting_issue` - Reporting Issue
+- `technical_support` - Technical Support
+- `other` - Other
+
+---
+
+## 3. Update Health Plan Profile Page
+
+**File:** `src/pages/healthplan/HealthPlanProfile.tsx`
+
+Add:
+- Import `SupportDialog` component
+- Import necessary icons (`MessageSquare`)
+- Add state for support modal: `supportModalOpen`
+- Add support card at the bottom (after Authorized Users)
+- Add `SupportDialog` with Health Plan-specific subject options
+
+**Health Plan Subject Options:**
+- `member_data` - Member Data Inquiry
+- `outcomes_reporting` - Outcomes Reporting
+- `contract_billing` - Contract / Billing
+- `portal_access` - Portal Access
+- `technical_support` - Technical Support
+- `other` - Other
+
+---
+
+## 4. Visual Design
+
+### Support Card (bottom of page)
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  Need Help?                                    [Contact Support]
+│  Our support team is here to assist you.                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+The card will have:
+- Light primary background (`bg-primary/5`)
+- Primary border (`border-primary/20`)
+- "Need Help?" heading with description
+- "Contact Support" button with MessageSquare icon
+
+---
+
+## Files to Create/Modify
 
 | File | Action |
 |------|--------|
-| `src/pages/healthplan/HealthPlanDashboard.tsx` | Modify - add filtering logic |
+| `src/components/shared/SupportDialog.tsx` | Create - reusable support modal component |
+| `src/pages/cbo/CBOOrganization.tsx` | Modify - add support card and dialog |
+| `src/pages/healthplan/HealthPlanProfile.tsx` | Modify - add support card and dialog |
 
 ---
 
 ## Technical Notes
 
-- Uses `useMemo` for efficient recalculation only when filter changes
-- Maintains cascade filtering: program selection filters enrollments, which filters orders, content, etc.
-- Date range filtering is prepared structurally but uses mock adjustment since underlying data lacks timestamps
-- The "By Program" breakdown will conditionally render only the selected program when filtered
-- All existing chart components remain unchanged, only their data inputs are filtered
+- The `SupportDialog` component encapsulates all modal state and logic, making it easy to add to any page
+- Uses the shared `useSupportCases` hook so all support cases appear in the member's "My Cases" section (for demo purposes, all portals share the same case storage)
+- Subject options are passed as props, allowing context-specific customization
+- The component follows the existing visual patterns (loading spinner, success checkmark, case number display)
+- Both pages will show the same styled support card at the bottom for visual consistency
 
