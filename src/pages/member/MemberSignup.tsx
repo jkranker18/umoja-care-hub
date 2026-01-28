@@ -301,7 +301,7 @@ export default function MemberSignup() {
 
                 <div className="space-y-2">
                   <Label>Health Goals (select all that apply)</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {['Manage blood sugar', 'Lower cholesterol', 'Lose weight', 'Eat healthier'].map(goal => (
                       <label
                         key={goal}
@@ -319,7 +319,7 @@ export default function MemberSignup() {
 
                 <div className="space-y-2">
                   <Label>Dietary Preferences</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {['Vegetarian', 'Low sodium', 'Gluten-free', 'Dairy-free'].map(pref => (
                       <label
                         key={pref}
@@ -337,7 +337,7 @@ export default function MemberSignup() {
 
                 <div className="space-y-2">
                   <Label>Barriers to Healthy Eating</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {['Cost', 'Transportation', 'Cooking skills', 'Time'].map(barrier => (
                       <label
                         key={barrier}
