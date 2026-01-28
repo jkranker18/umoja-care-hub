@@ -1,101 +1,144 @@
 
-
-# Update Member Intake Form - Health Information Fields
+# Update CBO Portal Navigation & Organization Page
 
 ## Overview
-Modify Step 3 (Health Goals) of the member intake form to collect more clinically relevant information: health insurance provider, chronic conditions, and food allergens.
+Simplify the CBO sidebar navigation and create a dedicated Organization page that displays the CBO's identity and authorized users.
 
 ## Changes Summary
 
-| Current Field | New Field |
-|--------------|-----------|
-| Select Program (dropdown) | Health Insurance Provider (text input) |
-| Health Goals (4 checkboxes) | Chronic Conditions (15 checkboxes + Other with text input) |
-| Barriers to Healthy Eating (4 checkboxes) | Allergens (FDA Big 9 checkboxes) |
+| Current Nav Item | Action |
+|-----------------|--------|
+| Dashboard | Keep (rename to "Home") |
+| Member Roster | Remove from nav (content stays on Dashboard) |
+| Add Member | Remove from nav |
+| Organization | Keep - but create proper dedicated page |
 
----
+## 1. Sidebar Navigation Update
 
-## 1. Health Insurance Provider
+**File:** `src/components/layout/Sidebar.tsx`
 
-Replace the program dropdown with a simple text input for the member's health insurance provider.
+Update `cboNav` array from:
+```tsx
+const cboNav: NavItem[] = [
+  { label: 'Dashboard', path: '/cbo', icon: LayoutDashboard },
+  { label: 'Member Roster', path: '/cbo/members', icon: Users },
+  { label: 'Add Member', path: '/cbo/add-member', icon: PlusCircle },
+  { label: 'Organization', path: '/cbo/organization', icon: Building2 },
+];
+```
 
-**New Field:**
-- Label: "Health Insurance Provider"
-- Type: Text input
-- Placeholder: "e.g., Kaiser Permanente, Blue Shield, Medi-Cal"
+To:
+```tsx
+const cboNav: NavItem[] = [
+  { label: 'Home', path: '/cbo', icon: Home },
+  { label: 'Organization', path: '/cbo/organization', icon: Building2 },
+];
+```
 
----
+## 2. New CBO Organization Page
 
-## 2. Chronic Conditions (Top 15)
+**File:** `src/pages/cbo/CBOOrganization.tsx` (new file)
 
-Replace the 4 health goals with the top 15 chronic conditions as checkboxes, plus an "Other" option with a text field.
+Create a dedicated page displaying:
 
-**Chronic Conditions List:**
-1. Type 2 Diabetes
-2. Hypertension (High Blood Pressure)
-3. Heart Disease
-4. Chronic Kidney Disease
-5. COPD (Chronic Obstructive Pulmonary Disease)
-6. Asthma
-7. Cancer
-8. Stroke
-9. Arthritis
-10. Obesity
-11. Depression
-12. Anxiety
-13. Alzheimer's/Dementia
-14. Osteoporosis
-15. Liver Disease
-16. Other (with text input)
+### Partner Information Card
+- **Partner ID**: The CBO's unique partner identifier (e.g., PRTN-LA001)
+- **Organization Name**: Full organization name
+- **Contact Information**: Primary contact, email, phone
+- **Service Area**: Counties/cities served
+- **Referral Link**: Copy-able enrollment link
 
----
+### Authorized Users Table
+Display a list of users authorized to log in on behalf of the CBO:
+- Name
+- Email
+- Role (Admin, Staff, Viewer)
+- Status (Active/Inactive)
+- Last Login
 
-## 3. FDA Major Food Allergens (Big 9)
+For the POC, this will use mock data for authorized users.
 
-Replace "Barriers to Healthy Eating" with the FDA-recognized major allergens.
+## 3. Mock Data Update
 
-**FDA Big 9 Allergens:**
-1. Milk
-2. Eggs
-3. Fish
-4. Shellfish (e.g., crab, lobster, shrimp)
-5. Tree Nuts (e.g., almonds, walnuts, pecans)
-6. Peanuts
-7. Wheat
-8. Soybeans
-9. Sesame
+**File:** `src/lib/mockData.ts`
 
----
+Add `CBOUser` interface and sample authorized users:
 
-## Technical Implementation
+```typescript
+export interface CBOUser {
+  id: string;
+  cboId: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'staff' | 'viewer';
+  status: 'active' | 'inactive';
+  lastLogin?: string;
+}
 
-### File: `src/pages/member/MemberSignup.tsx`
+export const cboUsers: CBOUser[] = [
+  {
+    id: 'cbo-user-001',
+    cboId: 'cbo-001',
+    name: 'Maria Garcia',
+    email: 'mgarcia@laregionalfoodbank.org',
+    role: 'admin',
+    status: 'active',
+    lastLogin: '2024-03-28',
+  },
+  // ... more users
+];
+```
 
-**Form State Updates (line 29-46):**
-- Add `healthInsuranceProvider: ''` field
-- Rename `healthGoals` to `chronicConditions`
-- Add `chronicConditionsOther: ''` for the "Other" text input
-- Rename `barriers` to `allergens`
-- Remove `programId` (no longer selecting a program here)
+## 4. Route Update
 
-**Step 3 Content Updates (lines 274-346):**
-- Replace program dropdown with text input
-- Replace health goals with chronic conditions checkboxes (3-column grid for better layout)
-- Add "Other" checkbox with conditional text input
-- Replace barriers with allergens checkboxes
+**File:** `src/App.tsx`
 
-**Toggle Function Update (line 110):**
-- Update field names from `healthGoals` and `barriers` to `chronicConditions` and `allergens`
+Update CBO routes:
+- Keep `/cbo` pointing to `CBODashboard`
+- Update `/cbo/organization` to point to new `CBOOrganization` component
+- Remove or keep `/cbo/members` and `/cbo/add-member` routes (they can stay for direct access but won't be in nav)
 
-### Updated Step Name
-- Rename step from "Health Goals" to "Health Information" to better reflect the content
+## Visual Design
 
----
+The Organization page will follow the existing card-based layout:
 
-## Visual Layout
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  Organization Profile                                       │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  LA Regional Food Bank                               │   │
+│  │  Partner ID: PRTN-LA001                              │   │
+│  │                                                       │   │
+│  │  Primary Contact: Maria Garcia                        │   │
+│  │  Email: mgarcia@laregionalfoodbank.org               │   │
+│  │  Phone: (323) 555-0101                               │   │
+│  │                                                       │   │
+│  │  Service Area: Los Angeles, Long Beach, Pasadena     │   │
+│  │                                                       │   │
+│  │  Referral Link: https://umoja.health/enroll?partner= │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  Authorized Users                                           │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │  Name          │ Email         │ Role   │ Status    │   │
+│  │  Maria Garcia  │ mgarcia@...   │ Admin  │ Active    │   │
+│  │  Jose Martinez │ jmartinez@... │ Staff  │ Active    │   │
+│  │  Sarah Johnson │ sjohnson@...  │ Viewer │ Inactive  │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
 
-The form will use a responsive grid:
-- Chronic Conditions: 3 columns on desktop, 2 on tablet, 1 on mobile
-- Allergens: 3 columns on desktop, 2 on tablet, 1 on mobile
-- "Other" text input appears below checkboxes when "Other" is selected
+## Files to Modify/Create
 
+1. **`src/components/layout/Sidebar.tsx`** - Simplify CBO navigation
+2. **`src/pages/cbo/CBOOrganization.tsx`** - New organization page (create)
+3. **`src/lib/mockData.ts`** - Add CBOUser interface and mock users
+4. **`src/App.tsx`** - Update route for `/cbo/organization`
+
+## Technical Notes
+
+- The Dashboard will still contain the member roster and "Add Member" button for quick access
+- Routes for `/cbo/members` and `/cbo/add-member` will remain functional for bookmarks/direct links
+- Organization page uses existing mock CBO data plus new authorized users data
+- Follows mobile-first responsive design with card stacking on smaller screens
