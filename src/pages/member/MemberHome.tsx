@@ -701,8 +701,8 @@ export default function MemberHome() {
             <div className="flex flex-col items-center justify-center py-12 space-y-4">
               <Loader2 className="h-12 w-12 text-primary animate-spin" />
               <div className="text-center">
-                <p className="font-semibold text-lg">Creating case in Salesforce...</p>
-                <p className="text-sm text-muted-foreground">Please wait while we submit your request</p>
+                <p className="font-semibold text-lg">Submitting your request...</p>
+                <p className="text-sm text-muted-foreground">We're connecting you with our support team</p>
               </div>
             </div>
           )}
