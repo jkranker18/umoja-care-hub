@@ -12,6 +12,7 @@ import GeneralNutrition from "./pages/member/education/GeneralNutrition";
 import ReadingNutritionLabel from "./pages/member/education/ReadingNutritionLabel";
 import BudgetFriendlyMeals from "./pages/member/education/BudgetFriendlyMeals";
 import CBODashboard from "./pages/cbo/CBODashboard";
+import CBOOrganization from "./pages/cbo/CBOOrganization";
 import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
 import InternalOpsDashboard from "./pages/internal/InternalOpsDashboard";
 import Integrations from "./pages/Integrations";
@@ -45,7 +46,7 @@ function App() {
             <Route path="/cbo" element={<CBODashboard />} />
             <Route path="/cbo/members" element={<CBODashboard />} />
             <Route path="/cbo/add-member" element={<MemberSignup />} />
-            <Route path="/cbo/organization" element={<CBODashboard />} />
+            <Route path="/cbo/organization" element={<CBOOrganization />} />
             
             {/* Health Plan Portal */}
             <Route path="/healthplan" element={<HealthPlanDashboard />} />

@@ -50,9 +50,7 @@ const memberNav: NavItem[] = [
 ];
 
 const cboNav: NavItem[] = [
-  { label: 'Dashboard', path: '/cbo', icon: LayoutDashboard },
-  { label: 'Member Roster', path: '/cbo/members', icon: Users },
-  { label: 'Add Member', path: '/cbo/add-member', icon: PlusCircle },
+  { label: 'Home', path: '/cbo', icon: Home },
   { label: 'Organization', path: '/cbo/organization', icon: Building2 },
 ];
 

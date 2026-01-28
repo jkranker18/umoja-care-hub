@@ -212,6 +212,56 @@ export const programs: Program[] = [
   },
 ];
 
+// CBO Authorized Users
+export interface CBOUser {
+  id: string;
+  cboId: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'staff' | 'viewer';
+  status: 'active' | 'inactive';
+  lastLogin?: string;
+}
+
+export const cboUsers: CBOUser[] = [
+  {
+    id: 'cbo-user-001',
+    cboId: 'cbo-001',
+    name: 'Maria Garcia',
+    email: 'mgarcia@laregionalfoodbank.org',
+    role: 'admin',
+    status: 'active',
+    lastLogin: '2024-03-28',
+  },
+  {
+    id: 'cbo-user-002',
+    cboId: 'cbo-001',
+    name: 'Jose Martinez',
+    email: 'jmartinez@laregionalfoodbank.org',
+    role: 'staff',
+    status: 'active',
+    lastLogin: '2024-03-27',
+  },
+  {
+    id: 'cbo-user-003',
+    cboId: 'cbo-001',
+    name: 'Sarah Johnson',
+    email: 'sjohnson@laregionalfoodbank.org',
+    role: 'viewer',
+    status: 'inactive',
+    lastLogin: '2024-02-15',
+  },
+  {
+    id: 'cbo-user-004',
+    cboId: 'cbo-001',
+    name: 'Michael Chen',
+    email: 'mchen@laregionalfoodbank.org',
+    role: 'staff',
+    status: 'active',
+    lastLogin: '2024-03-26',
+  },
+];
+
 export const cbos: CBO[] = [
   {
     id: 'cbo-001',
