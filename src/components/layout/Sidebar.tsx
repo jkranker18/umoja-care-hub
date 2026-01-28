@@ -54,9 +54,8 @@ const healthplanNav: NavItem[] = [
 ];
 
 const internalNav: NavItem[] = [
-  { label: 'Ops Cockpit', path: '/internal', icon: LayoutDashboard },
-  { label: 'Admin Management', path: '/internal/admins', icon: Users },
-  { label: 'Service Cases', path: '/internal/cases', icon: AlertTriangle },
+  { label: 'Home', path: '/internal', icon: Home },
+  { label: 'Admins', path: '/internal/admins', icon: Users },
 ];
 
 const navByRole: Record<UserRole, NavItem[]> = {
