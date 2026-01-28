@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { KPICard } from '@/components/shared/KPICard';
 import { Users, Package, BookOpen, TrendingUp, Download, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useApp } from '@/contexts/AppContext';
 
@@ -20,42 +20,158 @@ export default function HealthPlanDashboard() {
     setCurrentRole('healthplan');
   }, [setCurrentRole]);
 
-  // Calculate KPIs
-  const eligibleCount = members.length;
-  const enrolledCount = enrollments.length;
-  const activeCount = enrollments.filter(e => e.status === 'active').length;
-  const deliveredOrders = orders.filter(o => o.shipmentStatus === 'delivered').length;
-  const totalOrders = orders.length;
+  // Filter data based on program selection
+  const filteredData = useMemo(() => {
+    const filteredEnrollments = programFilter === 'all'
+      ? enrollments
+      : enrollments.filter(e => e.programId === programFilter);
+
+    const memberIds = new Set(filteredEnrollments.map(e => e.memberId));
+
+    return {
+      enrollments: filteredEnrollments,
+      members: programFilter === 'all' ? members : members.filter(m => memberIds.has(m.id)),
+      orders: programFilter === 'all' ? orders : orders.filter(o => memberIds.has(o.memberId)),
+      contentPlans: programFilter === 'all' ? contentPlans : contentPlans.filter(cp => memberIds.has(cp.memberId)),
+    };
+  }, [programFilter]);
+
+  // Date range multiplier for trend adjustments (mock implementation)
+  const dateRangeMultiplier = useMemo(() => {
+    switch (dateRange) {
+      case '7d': return 0.25;
+      case '30d': return 1;
+      case '90d': return 3;
+      case 'ytd': return 6;
+      default: return 1;
+    }
+  }, [dateRange]);
+
+  // Calculate KPIs from filtered data
+  const eligibleCount = filteredData.members.length;
+  const enrolledCount = filteredData.enrollments.length;
+  const activeCount = filteredData.enrollments.filter(e => e.status === 'active').length;
+  const deliveredOrders = filteredData.orders.filter(o => o.shipmentStatus === 'delivered').length;
+  const totalOrders = filteredData.orders.length;
   const onTimeRate = totalOrders > 0 ? Math.round((deliveredOrders / totalOrders) * 100) : 0;
 
-  const completedModules = contentPlans.reduce((acc, cp) => 
+  const completedModules = filteredData.contentPlans.reduce((acc, cp) => 
     acc + cp.modules.filter(m => m.status === 'completed').length, 0
   );
-  const totalModules = contentPlans.reduce((acc, cp) => acc + cp.modules.length, 0);
+  const totalModules = filteredData.contentPlans.reduce((acc, cp) => acc + cp.modules.length, 0);
   const engagementRate = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
-  // Mock chart data
-  const enrollmentData = [
-    { month: 'Jan', enrolled: 12, active: 10 },
-    { month: 'Feb', enrolled: 28, active: 22 },
-    { month: 'Mar', enrolled: 50, active: 38 },
-    { month: 'Apr', enrolled: 65, active: 52 },
-    { month: 'May', enrolled: 80, active: 68 },
-    { month: 'Jun', enrolled: 95, active: 82 },
-  ];
+  // Generate chart data based on filtered enrollments
+  const enrollmentData = useMemo(() => {
+    const baseData = [
+      { month: 'Jan', enrolled: 0, active: 0 },
+      { month: 'Feb', enrolled: 0, active: 0 },
+      { month: 'Mar', enrolled: 0, active: 0 },
+      { month: 'Apr', enrolled: 0, active: 0 },
+      { month: 'May', enrolled: 0, active: 0 },
+      { month: 'Jun', enrolled: 0, active: 0 },
+    ];
 
-  const shipmentData = [
-    { week: 'W1', delivered: 45, exception: 2 },
-    { week: 'W2', delivered: 52, exception: 3 },
-    { week: 'W3', delivered: 48, exception: 1 },
-    { week: 'W4', delivered: 55, exception: 4 },
-  ];
+    // Distribute enrollments across months for visualization
+    const totalEnrolled = filteredData.enrollments.length;
+    const totalActive = filteredData.enrollments.filter(e => e.status === 'active').length;
 
-  const engagementData = [
-    { type: 'Videos', completed: 78, assigned: 100 },
-    { type: 'Articles', completed: 45, assigned: 80 },
-    { type: 'Classes', completed: 32, assigned: 60 },
-  ];
+    // Create cumulative growth pattern
+    const enrolledPerMonth = totalEnrolled / 6;
+    const activePerMonth = totalActive / 6;
+
+    let cumulativeEnrolled = 0;
+    let cumulativeActive = 0;
+
+    return baseData.map((item, index) => {
+      cumulativeEnrolled += enrolledPerMonth * (1 + index * 0.2);
+      cumulativeActive += activePerMonth * (1 + index * 0.15);
+      return {
+        ...item,
+        enrolled: Math.round(Math.min(cumulativeEnrolled, totalEnrolled)),
+        active: Math.round(Math.min(cumulativeActive, totalActive)),
+      };
+    });
+  }, [filteredData.enrollments]);
+
+  // Generate shipment data based on filtered orders
+  const shipmentData = useMemo(() => {
+    const delivered = filteredData.orders.filter(o => o.shipmentStatus === 'delivered').length;
+    const exceptions = filteredData.orders.filter(o => o.shipmentStatus === 'exception').length;
+
+    // Distribute across weeks
+    const weeklyDelivered = Math.ceil(delivered / 4);
+    const weeklyExceptions = Math.ceil(exceptions / 4);
+
+    return [
+      { week: 'W1', delivered: weeklyDelivered, exception: Math.max(0, weeklyExceptions - 1) },
+      { week: 'W2', delivered: Math.round(weeklyDelivered * 1.1), exception: weeklyExceptions },
+      { week: 'W3', delivered: Math.round(weeklyDelivered * 0.95), exception: Math.max(0, weeklyExceptions - 1) },
+      { week: 'W4', delivered: Math.round(weeklyDelivered * 1.05), exception: weeklyExceptions + 1 },
+    ];
+  }, [filteredData.orders]);
+
+  // Generate engagement data based on filtered content plans
+  const engagementData = useMemo(() => {
+    let videos = { completed: 0, assigned: 0 };
+    let articles = { completed: 0, assigned: 0 };
+    let classes = { completed: 0, assigned: 0 };
+
+    filteredData.contentPlans.forEach(cp => {
+      cp.modules.forEach(module => {
+        const type = module.type;
+        if (type === 'video') {
+          videos.assigned++;
+          if (module.status === 'completed') videos.completed++;
+        } else if (type === 'article') {
+          articles.assigned++;
+          if (module.status === 'completed') articles.completed++;
+        } else if (type === 'class') {
+          classes.assigned++;
+          if (module.status === 'completed') classes.completed++;
+        }
+      });
+    });
+
+    // Ensure at least some base values for visualization
+    if (videos.assigned === 0) videos = { completed: 0, assigned: 0 };
+    if (articles.assigned === 0) articles = { completed: 0, assigned: 0 };
+    if (classes.assigned === 0) classes = { completed: 0, assigned: 0 };
+
+    return [
+      { type: 'Videos', completed: videos.completed, assigned: videos.assigned || 1 },
+      { type: 'Articles', completed: articles.completed, assigned: articles.assigned || 1 },
+      { type: 'Classes', completed: classes.completed, assigned: classes.assigned || 1 },
+    ].filter(item => item.assigned > 1 || item.completed > 0);
+  }, [filteredData.contentPlans]);
+
+  // Filter programs for breakdown display
+  const displayedPrograms = useMemo(() => {
+    if (programFilter === 'all') return programs;
+    return programs.filter(p => p.id === programFilter);
+  }, [programFilter]);
+
+  // Filter CBOs based on program selection
+  const filteredCboStats = useMemo(() => {
+    return cbos.map(cbo => {
+      const cboEnrollments = filteredData.enrollments.filter(e => e.sourceId === cbo.id);
+      return {
+        ...cbo,
+        enrollmentCount: cboEnrollments.length,
+      };
+    }).filter(cbo => cbo.enrollmentCount > 0 || programFilter === 'all');
+  }, [filteredData.enrollments, programFilter]);
+
+  // Get date range label
+  const dateRangeLabel = useMemo(() => {
+    switch (dateRange) {
+      case '7d': return 'past week';
+      case '30d': return 'past 30 days';
+      case '90d': return 'past 90 days';
+      case 'ytd': return 'year to date';
+      default: return 'past 30 days';
+    }
+  }, [dateRange]);
 
   return (
     <DashboardLayout>
@@ -66,6 +182,16 @@ export default function HealthPlanDashboard() {
             <h1 className="text-2xl font-display font-bold">Blue Cross Dashboard</h1>
             <p className="text-muted-foreground">
               Program performance and population health outcomes
+              {programFilter !== 'all' && (
+                <span className="ml-1 text-primary font-medium">
+                  • {programs.find(p => p.id === programFilter)?.name}
+                </span>
+              )}
+              {dateRange !== '30d' && (
+                <span className="ml-1 text-muted-foreground">
+                  • {dateRangeLabel}
+                </span>
+              )}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -109,28 +235,28 @@ export default function HealthPlanDashboard() {
           <KPICard
             title="Enrolled"
             value={enrolledCount}
-            trend="up"
-            trendValue="+18%"
+            trend={enrolledCount > 0 ? "up" : undefined}
+            trendValue={enrolledCount > 0 ? `+${Math.round(18 * dateRangeMultiplier)}%` : undefined}
             icon={<TrendingUp className="h-5 w-5" />}
           />
           <KPICard
             title="Active"
             value={activeCount}
-            subtitle={`${Math.round((activeCount / enrolledCount) * 100)}% of enrolled`}
+            subtitle={enrolledCount > 0 ? `${Math.round((activeCount / enrolledCount) * 100)}% of enrolled` : 'No enrollments'}
             icon={<Users className="h-5 w-5" />}
           />
           <KPICard
             title="On-time Shipments"
-            value={`${onTimeRate}%`}
-            trend={onTimeRate > 90 ? 'up' : 'down'}
-            trendValue={onTimeRate > 90 ? '+2%' : '-3%'}
+            value={totalOrders > 0 ? `${onTimeRate}%` : 'N/A'}
+            trend={totalOrders > 0 ? (onTimeRate > 90 ? 'up' : 'down') : undefined}
+            trendValue={totalOrders > 0 ? (onTimeRate > 90 ? '+2%' : '-3%') : undefined}
             icon={<Package className="h-5 w-5" />}
           />
           <KPICard
             title="Engagement Rate"
-            value={`${engagementRate}%`}
-            trend="up"
-            trendValue="+5%"
+            value={totalModules > 0 ? `${engagementRate}%` : 'N/A'}
+            trend={totalModules > 0 ? "up" : undefined}
+            trendValue={totalModules > 0 ? `+${Math.round(5 * dateRangeMultiplier)}%` : undefined}
             icon={<BookOpen className="h-5 w-5" />}
           />
         </div>
@@ -214,22 +340,26 @@ export default function HealthPlanDashboard() {
               <CardTitle className="text-lg">By Program</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {programs.map(prog => {
-                const progEnrollments = enrollments.filter(e => e.programId === prog.id);
-                const activeInProg = progEnrollments.filter(e => e.status === 'active').length;
-                return (
-                  <div key={prog.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-sm">{prog.name}</p>
-                      <p className="text-xs text-muted-foreground">{progEnrollments.length} enrolled</p>
+              {displayedPrograms.length > 0 ? (
+                displayedPrograms.map(prog => {
+                  const progEnrollments = filteredData.enrollments.filter(e => e.programId === prog.id);
+                  const activeInProg = progEnrollments.filter(e => e.status === 'active').length;
+                  return (
+                    <div key={prog.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">{prog.name}</p>
+                        <p className="text-xs text-muted-foreground">{progEnrollments.length} enrolled</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg">{activeInProg}</p>
+                        <p className="text-xs text-muted-foreground">active</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg">{activeInProg}</p>
-                      <p className="text-xs text-muted-foreground">active</p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground">No programs found</p>
+              )}
             </CardContent>
           </Card>
 
@@ -239,21 +369,22 @@ export default function HealthPlanDashboard() {
               <CardTitle className="text-lg">By CBO Partner</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {cbos.map(cbo => {
-                const cboEnrollments = enrollments.filter(e => e.sourceId === cbo.id);
-                return (
+              {filteredCboStats.length > 0 ? (
+                filteredCboStats.map(cbo => (
                   <div key={cbo.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
                       <p className="font-medium text-sm">{cbo.name}</p>
                       <p className="text-xs text-muted-foreground">{cbo.partnerId}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lg">{cboEnrollments.length}</p>
+                      <p className="font-bold text-lg">{cbo.enrollmentCount}</p>
                       <p className="text-xs text-muted-foreground">members</p>
                     </div>
                   </div>
-                );
-              })}
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No CBO partners found for this program</p>
+              )}
             </CardContent>
           </Card>
 
@@ -263,20 +394,24 @@ export default function HealthPlanDashboard() {
               <CardTitle className="text-lg">Content Engagement</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {engagementData.map(item => (
-                <div key={item.type} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{item.type}</span>
-                    <span className="font-medium">{item.completed}/{item.assigned}</span>
+              {engagementData.length > 0 ? (
+                engagementData.map(item => (
+                  <div key={item.type} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>{item.type}</span>
+                      <span className="font-medium">{item.completed}/{item.assigned}</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary rounded-full" 
+                        style={{ width: `${(item.completed / item.assigned) * 100}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary rounded-full" 
-                      style={{ width: `${(item.completed / item.assigned) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No content data for this program</p>
+              )}
             </CardContent>
           </Card>
         </div>
