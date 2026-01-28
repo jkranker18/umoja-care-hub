@@ -14,6 +14,9 @@ import BudgetFriendlyMeals from "./pages/member/education/BudgetFriendlyMeals";
 import CBODashboard from "./pages/cbo/CBODashboard";
 import CBOOrganization from "./pages/cbo/CBOOrganization";
 import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
+import HealthPlanOutcomes from "./pages/healthplan/HealthPlanOutcomes";
+import HealthPlanMembers from "./pages/healthplan/HealthPlanMembers";
+import HealthPlanProfile from "./pages/healthplan/HealthPlanProfile";
 import InternalOpsDashboard from "./pages/internal/InternalOpsDashboard";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
@@ -50,9 +53,9 @@ function App() {
             
             {/* Health Plan Portal */}
             <Route path="/healthplan" element={<HealthPlanDashboard />} />
-            <Route path="/healthplan/outcomes" element={<HealthPlanDashboard />} />
-            <Route path="/healthplan/members" element={<HealthPlanDashboard />} />
-            <Route path="/healthplan/reports" element={<HealthPlanDashboard />} />
+            <Route path="/healthplan/outcomes" element={<HealthPlanOutcomes />} />
+            <Route path="/healthplan/members" element={<HealthPlanMembers />} />
+            <Route path="/healthplan/profile" element={<HealthPlanProfile />} />
             
             {/* Internal Ops Portal */}
             <Route path="/internal" element={<InternalOpsDashboard />} />

@@ -4,16 +4,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { KPICard } from '@/components/shared/KPICard';
-import { StatusPill } from '@/components/shared/StatusPill';
-import { Users, Package, BookOpen, TrendingUp, Download, CalendarDays, BarChart3 } from 'lucide-react';
+import { Users, Package, BookOpen, TrendingUp, Download, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useApp } from '@/contexts/AppContext';
 
 export default function HealthPlanDashboard() {
   const navigate = useNavigate();
+  const { setCurrentRole } = useApp();
   const [programFilter, setProgramFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState('30d');
+
+  useEffect(() => {
+    setCurrentRole('healthplan');
+  }, [setCurrentRole]);
 
   // Calculate KPIs
   const eligibleCount = members.length;
@@ -58,7 +63,7 @@ export default function HealthPlanDashboard() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-display font-bold">Health Plan Overview</h1>
+            <h1 className="text-2xl font-display font-bold">Blue Cross Dashboard</h1>
             <p className="text-muted-foreground">
               Program performance and population health outcomes
             </p>
@@ -276,17 +281,6 @@ export default function HealthPlanDashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => navigate('/healthplan/outcomes')}>
-            <BarChart3 className="h-4 w-4 mr-2" />
-            View Outcomes Report
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/healthplan/members')}>
-            <Users className="h-4 w-4 mr-2" />
-            Member Drilldown
-          </Button>
-        </div>
       </div>
     </DashboardLayout>
   );

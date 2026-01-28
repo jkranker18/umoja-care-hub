@@ -55,10 +55,10 @@ const cboNav: NavItem[] = [
 ];
 
 const healthplanNav: NavItem[] = [
-  { label: 'Overview', path: '/healthplan', icon: LayoutDashboard },
-  { label: 'Outcomes', path: '/healthplan/outcomes', icon: BarChart3 },
-  { label: 'Members', path: '/healthplan/members', icon: Users },
-  { label: 'Reports', path: '/healthplan/reports', icon: FileText },
+  { label: 'Home', path: '/healthplan', icon: Home },
+  { label: 'Outcomes Report', path: '/healthplan/outcomes', icon: BarChart3 },
+  { label: 'Member Drill Down', path: '/healthplan/members', icon: Users },
+  { label: 'Profile', path: '/healthplan/profile', icon: Building2 },
 ];
 
 const internalNav: NavItem[] = [
@@ -121,6 +121,11 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
               alt="LA Regional Food Bank" 
               className="h-12 object-contain"
             />
+          ) : currentRole === 'healthplan' ? (
+            <div className="flex flex-col">
+              <span className="text-lg font-display font-bold text-sidebar-foreground">Blue Cross</span>
+              <span className="text-xs text-sidebar-foreground/70">of California</span>
+            </div>
           ) : (
             <img 
               src={umojaLogoLight} 
