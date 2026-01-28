@@ -178,8 +178,8 @@ export default function MemberProfile() {
                     placeholder="Apt 4B"
                   />
                 </div>
-                <div className="grid grid-cols-6 gap-4">
-                  <div className="col-span-3 space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-6 gap-4">
+                  <div className="sm:col-span-3 space-y-2">
                     <Label htmlFor="city">City</Label>
                     <Input
                       id="city"
@@ -188,7 +188,7 @@ export default function MemberProfile() {
                       placeholder="City"
                     />
                   </div>
-                  <div className="col-span-1 space-y-2">
+                  <div className="sm:col-span-1 space-y-2">
                     <Label htmlFor="state">State</Label>
                     <Input
                       id="state"
@@ -198,7 +198,7 @@ export default function MemberProfile() {
                       maxLength={2}
                     />
                   </div>
-                  <div className="col-span-2 space-y-2">
+                  <div className="sm:col-span-2 space-y-2">
                     <Label htmlFor="zip">ZIP Code</Label>
                     <Input
                       id="zip"

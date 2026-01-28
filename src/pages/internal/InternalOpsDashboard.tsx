@@ -64,24 +64,26 @@ export default function InternalOpsDashboard() {
 
         {/* Queue Tabs */}
         <Tabs defaultValue="eligibility" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="eligibility" className="gap-2">
-              <Shield className="h-4 w-4" />
-              Eligibility ({eligibilityExceptions.length})
-            </TabsTrigger>
-            <TabsTrigger value="delivery" className="gap-2">
-              <Package className="h-4 w-4" />
-              Delivery ({deliveryExceptions.length})
-            </TabsTrigger>
-            <TabsTrigger value="highrisk" className="gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              High Risk ({highRiskMembers.length})
-            </TabsTrigger>
-            <TabsTrigger value="consents" className="gap-2">
-              <FileWarning className="h-4 w-4" />
-              Consents ({missingConsents.length})
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 pb-2">
+            <TabsList className="w-full min-w-max">
+              <TabsTrigger value="eligibility" className="gap-2">
+                <Shield className="h-4 w-4" />
+                Eligibility ({eligibilityExceptions.length})
+              </TabsTrigger>
+              <TabsTrigger value="delivery" className="gap-2">
+                <Package className="h-4 w-4" />
+                Delivery ({deliveryExceptions.length})
+              </TabsTrigger>
+              <TabsTrigger value="highrisk" className="gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                High Risk ({highRiskMembers.length})
+              </TabsTrigger>
+              <TabsTrigger value="consents" className="gap-2">
+                <FileWarning className="h-4 w-4" />
+                Consents ({missingConsents.length})
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Eligibility Exceptions */}
 

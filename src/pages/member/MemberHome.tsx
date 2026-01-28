@@ -306,12 +306,14 @@ export default function MemberHome() {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="plan">My Program</TabsTrigger>
-            <TabsTrigger value="orders">My Orders</TabsTrigger>
-            <TabsTrigger value="content">Education</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 pb-2">
+            <TabsList className="w-full min-w-max">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="plan">My Program</TabsTrigger>
+              <TabsTrigger value="orders">My Orders</TabsTrigger>
+              <TabsTrigger value="content">Education</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 lg:grid-cols-2">
@@ -464,9 +466,9 @@ export default function MemberHome() {
               <CardContent>
                 <div className="space-y-3">
                   {demoOrders.map(order => (
-                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={order.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border rounded-lg">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                           <Package className="h-5 w-5 text-primary" />
                         </div>
                         <div>
@@ -476,7 +478,7 @@ export default function MemberHome() {
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between sm:justify-end gap-3">
                         {order.shipmentStatus === 'delivered' && (
                           reportedOrders.has(order.id) ? (
                             <Button 

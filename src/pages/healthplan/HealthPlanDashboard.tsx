@@ -63,9 +63,9 @@ export default function HealthPlanDashboard() {
               Program performance and population health outcomes
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Select value={programFilter} onValueChange={setProgramFilter}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="All Programs" />
               </SelectTrigger>
               <SelectContent>
@@ -76,7 +76,7 @@ export default function HealthPlanDashboard() {
               </SelectContent>
             </Select>
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[130px]">
+              <SelectTrigger className="w-full sm:w-[130px]">
                 <CalendarDays className="h-4 w-4 mr-2" />
                 <SelectValue />
               </SelectTrigger>
@@ -87,7 +87,7 @@ export default function HealthPlanDashboard() {
                 <SelectItem value="ytd">Year to date</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" onClick={() => navigate('/healthplan/reports')}>
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => navigate('/healthplan/reports')}>
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>

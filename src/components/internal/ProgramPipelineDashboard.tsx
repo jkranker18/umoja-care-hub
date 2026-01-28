@@ -160,7 +160,7 @@ export function ProgramPipelineDashboard() {
       </div>
 
       {/* Pipeline Flow Indicator */}
-      <div className="flex items-center justify-center gap-2 py-3 px-4 bg-muted/50 rounded-lg">
+      <div className="flex flex-wrap items-center justify-center gap-2 py-3 px-4 bg-muted/50 rounded-lg text-center">
         <span className="text-sm font-medium text-muted-foreground">Enrolled</span>
         <ArrowRight className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-medium text-muted-foreground">Authorized</span>
