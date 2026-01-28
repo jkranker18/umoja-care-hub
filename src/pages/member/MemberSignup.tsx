@@ -121,10 +121,7 @@ export default function MemberSignup() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-2xl font-display font-bold">Member Intake Form</h1>
-            <IntegrationBadge type="Healthie" />
-          </div>
+          <h1 className="text-2xl font-display font-bold">Member Intake Form</h1>
           <p className="text-muted-foreground">
             Complete your enrollment to start receiving nutritious meals.
           </p>
@@ -137,12 +134,6 @@ export default function MemberSignup() {
             <span className="font-medium">{steps[currentStep - 1].name}</span>
           </div>
           <Progress value={(currentStep / steps.length) * 100} />
-        </div>
-
-        {/* Healthie Sync Indicator */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-lg">
-          <RefreshCw className="h-3 w-3 animate-spin" />
-          <span>Imported from Healthie • Last sync: Just now</span>
         </div>
 
         {/* Form Card */}
