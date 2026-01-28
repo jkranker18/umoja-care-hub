@@ -12,11 +12,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { cbos, cboUsers } from '@/lib/mockData';
 import { Building2, Copy, Mail, Phone, MapPin, Check } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
+import { useApp } from '@/contexts/AppContext';
 
 export default function CBOOrganization() {
   const [copied, setCopied] = useState(false);
+  const { setCurrentRole } = useApp();
+
+  useEffect(() => {
+    setCurrentRole('cbo');
+  }, [setCurrentRole]);
   
   // Use the first CBO for demo purposes
   const cbo = cbos[0];
