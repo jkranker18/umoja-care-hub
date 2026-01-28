@@ -9,11 +9,17 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Users, UserPlus, Building2, TrendingUp, Search, Filter, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useApp } from '@/contexts/AppContext';
 
 export default function CBODashboard() {
   const navigate = useNavigate();
+  const { setCurrentRole } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    setCurrentRole('cbo');
+  }, [setCurrentRole]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [programFilter, setProgramFilter] = useState<string>('all');
 
