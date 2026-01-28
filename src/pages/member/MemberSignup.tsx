@@ -416,8 +416,6 @@ export default function MemberSignup() {
                     </p>
                   </div>
                 </label>
-
-                <SourceOfTruth source="Healthie" description="Consent Management" />
               </>
             )}
           </CardContent>
