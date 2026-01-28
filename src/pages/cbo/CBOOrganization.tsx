@@ -11,13 +11,24 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { cbos, cboUsers } from '@/lib/mockData';
-import { Building2, Copy, Mail, Phone, MapPin, Check } from 'lucide-react';
+import { Building2, Copy, Mail, Phone, MapPin, Check, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { useApp } from '@/contexts/AppContext';
+import { SupportDialog } from '@/components/shared/SupportDialog';
+
+const CBO_SUPPORT_OPTIONS = [
+  { value: 'member_enrollment', label: 'Member Enrollment' },
+  { value: 'portal_access', label: 'Portal Access' },
+  { value: 'referral_tracking', label: 'Referral Tracking' },
+  { value: 'reporting_issue', label: 'Reporting Issue' },
+  { value: 'technical_support', label: 'Technical Support' },
+  { value: 'other', label: 'Other' },
+];
 
 export default function CBOOrganization() {
   const [copied, setCopied] = useState(false);
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
   const { setCurrentRole } = useApp();
 
   useEffect(() => {
@@ -186,6 +197,29 @@ export default function CBOOrganization() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Support Card */}
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="flex items-center justify-between py-4">
+            <div>
+              <h3 className="font-semibold">Need Help?</h3>
+              <p className="text-sm text-muted-foreground">
+                Our support team is here to assist you.
+              </p>
+            </div>
+            <Button onClick={() => setSupportModalOpen(true)}>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Contact Support
+            </Button>
+          </CardContent>
+        </Card>
+
+        <SupportDialog
+          open={supportModalOpen}
+          onOpenChange={setSupportModalOpen}
+          subjectOptions={CBO_SUPPORT_OPTIONS}
+          portalContext="CBO"
+        />
       </div>
     </DashboardLayout>
   );

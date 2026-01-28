@@ -3,12 +3,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Mail, Phone, MapPin, Users } from 'lucide-react';
-import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Building2, Mail, Phone, MapPin, Users, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { healthPlans, healthPlanUsers } from '@/lib/mockData';
+import { SupportDialog } from '@/components/shared/SupportDialog';
+
+const HEALTH_PLAN_SUPPORT_OPTIONS = [
+  { value: 'member_data', label: 'Member Data Inquiry' },
+  { value: 'outcomes_reporting', label: 'Outcomes Reporting' },
+  { value: 'contract_billing', label: 'Contract / Billing' },
+  { value: 'portal_access', label: 'Portal Access' },
+  { value: 'technical_support', label: 'Technical Support' },
+  { value: 'other', label: 'Other' },
+];
 
 export default function HealthPlanProfile() {
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
   const { setCurrentRole } = useApp();
 
   useEffect(() => {
@@ -132,6 +144,29 @@ export default function HealthPlanProfile() {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Support Card */}
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="flex items-center justify-between py-4">
+            <div>
+              <h3 className="font-semibold">Need Help?</h3>
+              <p className="text-sm text-muted-foreground">
+                Our support team is here to assist you.
+              </p>
+            </div>
+            <Button onClick={() => setSupportModalOpen(true)}>
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Contact Support
+            </Button>
+          </CardContent>
+        </Card>
+
+        <SupportDialog
+          open={supportModalOpen}
+          onOpenChange={setSupportModalOpen}
+          subjectOptions={HEALTH_PLAN_SUPPORT_OPTIONS}
+          portalContext="Health Plan"
+        />
       </div>
     </DashboardLayout>
   );
