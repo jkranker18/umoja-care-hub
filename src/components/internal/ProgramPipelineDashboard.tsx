@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
-import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { programs, enrollments, rulesDecisions, orders, billingRecords } from '@/lib/mockData';
 import { Users, ClipboardCheck, Package, CreditCard, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,7 +12,6 @@ interface PillarData {
   color: string;
   bgColor: string;
   borderColor: string;
-  source: 'Healthie' | 'NetSuite';
   statuses: { label: string; count: number; color: string }[];
   total: number;
 }
@@ -72,7 +70,6 @@ export function ProgramPipelineDashboard() {
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
         borderColor: 'border-l-blue-500',
-        source: 'Healthie',
         statuses: [
           { label: 'Pending', count: enrollmentStats.pending, color: 'bg-yellow-100 text-yellow-700' },
           { label: 'Active', count: enrollmentStats.active, color: 'bg-green-100 text-green-700' },
@@ -87,7 +84,6 @@ export function ProgramPipelineDashboard() {
         color: 'text-purple-600',
         bgColor: 'bg-purple-50',
         borderColor: 'border-l-purple-500',
-        source: 'NetSuite',
         statuses: [
           { label: 'Pending Review', count: eligibilityStats.pending_review, color: 'bg-yellow-100 text-yellow-700' },
           { label: 'Approved', count: eligibilityStats.approved, color: 'bg-green-100 text-green-700' },
@@ -101,7 +97,6 @@ export function ProgramPipelineDashboard() {
         color: 'text-orange-600',
         bgColor: 'bg-orange-50',
         borderColor: 'border-l-orange-500',
-        source: 'NetSuite',
         statuses: [
           { label: 'Processing', count: fulfillmentStats.processing, color: 'bg-gray-100 text-gray-700' },
           { label: 'Shipped', count: fulfillmentStats.shipped, color: 'bg-blue-100 text-blue-700' },
@@ -117,7 +112,6 @@ export function ProgramPipelineDashboard() {
         color: 'text-green-600',
         bgColor: 'bg-green-50',
         borderColor: 'border-l-green-500',
-        source: 'NetSuite',
         statuses: [
           { label: 'Pending', count: billingStats.pending, color: 'bg-yellow-100 text-yellow-700' },
           { label: 'Submitted', count: billingStats.submitted, color: 'bg-blue-100 text-blue-700' },
@@ -175,14 +169,11 @@ export function ProgramPipelineDashboard() {
         {pipelineData.pillars.map(pillar => (
           <Card key={pillar.title} className={cn('border-l-4', pillar.borderColor)}>
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={cn('p-2 rounded-lg', pillar.bgColor, pillar.color)}>
-                    {pillar.icon}
-                  </div>
-                  <CardTitle className="text-base">{pillar.title}</CardTitle>
+              <div className="flex items-center gap-2">
+                <div className={cn('p-2 rounded-lg', pillar.bgColor, pillar.color)}>
+                  {pillar.icon}
                 </div>
-                <IntegrationBadge type={pillar.source} />
+                <CardTitle className="text-base">{pillar.title}</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
