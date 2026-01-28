@@ -1,45 +1,45 @@
 
 
-# Make Contact Support Loading Modal More User-Friendly
+# Update Sidebar Logo for Better Contrast
 
 ## Overview
-Update the loading state message in the Contact Support modal to remove the Salesforce reference and replace it with warmer, more member-friendly language.
+Replace the current Umoja logo in the sidebar with the new 2-color version that has white text, ensuring proper contrast against the dark sidebar background.
 
 ## Current State
-When a member submits a support request, they see:
-- **Title:** "Creating case in Salesforce..."
-- **Subtitle:** "Please wait while we submit your request"
+- The sidebar uses `umoja-food-for-health-logo.webp` which appears to have dark text
+- This causes contrast issues on the dark `bg-sidebar` background
+- CBO portal uses LA Food Bank logo (will remain unchanged)
 
-This exposes internal system details that members don't need to know about.
+## Implementation
 
-## Proposed Changes
+### Step 1: Copy New Logo to Assets
+Copy the uploaded logo to the project assets folder:
+- **Source:** `user-uploads://Umoja-FoodForHealth_Logo-2C.png`
+- **Destination:** `src/assets/umoja-logo-light.png`
 
-**File:** `src/pages/member/MemberHome.tsx` (lines 703-706)
+### Step 2: Update Sidebar Component
+**File:** `src/components/layout/Sidebar.tsx`
 
-Replace the technical language with friendly, reassuring messaging:
-
-| Current | New |
-|---------|-----|
-| "Creating case in Salesforce..." | "Submitting your request..." |
-| "Please wait while we submit your request" | "We're connecting you with our support team" |
-
-## Updated Code
+Update the import and usage:
 
 ```tsx
-{supportSubmitting && (
-  <div className="flex flex-col items-center justify-center py-12 space-y-4">
-    <Loader2 className="h-12 w-12 text-primary animate-spin" />
-    <div className="text-center">
-      <p className="font-semibold text-lg">Submitting your request...</p>
-      <p className="text-sm text-muted-foreground">We're connecting you with our support team</p>
-    </div>
-  </div>
-)}
+// Update import
+import umojaLogoLight from '@/assets/umoja-logo-light.png';
+
+// In the logo area (lines 126-131)
+<img 
+  src={umojaLogoLight} 
+  alt="Umoja Food For Health" 
+  className="h-10 object-contain"
+/>
 ```
 
-## Summary
-A small but impactful change that:
-- Removes technical/internal system references
-- Uses warmer, people-focused language
-- Maintains the same visual structure and animation
+## Files to Modify
+1. Copy `user-uploads://Umoja-FoodForHealth_Logo-2C.png` to `src/assets/umoja-logo-light.png`
+2. `src/components/layout/Sidebar.tsx` - Update logo import and reference
+
+## Result
+- Member, Health Plan, and Internal Ops portals will display the new light-colored logo
+- CBO portal continues to show the LA Food Bank logo
+- Proper contrast on the dark sidebar background
 
