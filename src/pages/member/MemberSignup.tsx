@@ -18,8 +18,38 @@ import { toast } from 'sonner';
 const steps = [
   { id: 1, name: 'Identity' },
   { id: 2, name: 'Address' },
-  { id: 3, name: 'Health Goals' },
+  { id: 3, name: 'Health Information' },
   { id: 4, name: 'Consent' },
+];
+
+const chronicConditionsList = [
+  'Type 2 Diabetes',
+  'Hypertension (High Blood Pressure)',
+  'Heart Disease',
+  'Chronic Kidney Disease',
+  'COPD (Chronic Obstructive Pulmonary Disease)',
+  'Asthma',
+  'Cancer',
+  'Stroke',
+  'Arthritis',
+  'Obesity',
+  'Depression',
+  'Anxiety',
+  'Alzheimer\'s/Dementia',
+  'Osteoporosis',
+  'Liver Disease',
+];
+
+const fdaAllergens = [
+  'Milk',
+  'Eggs',
+  'Fish',
+  'Shellfish (e.g., crab, lobster, shrimp)',
+  'Tree Nuts (e.g., almonds, walnuts, pecans)',
+  'Peanuts',
+  'Wheat',
+  'Soybeans',
+  'Sesame',
 ];
 
 export default function MemberSignup() {
@@ -38,10 +68,11 @@ export default function MemberSignup() {
     state: 'CA',
     zip: '',
     county: '',
-    healthGoals: [] as string[],
+    healthInsuranceProvider: '',
+    chronicConditions: [] as string[],
+    chronicConditionsOther: '',
     dietaryPreferences: [] as string[],
-    barriers: [] as string[],
-    programId: 'prog-001',
+    allergens: [] as string[],
     consent: false,
   });
 
@@ -85,11 +116,11 @@ export default function MemberSignup() {
       createdAt: new Date().toISOString().split('T')[0],
     };
 
-    // Create enrollment
+    // Create enrollment (program will be assigned later based on health info)
     const newEnrollment: Enrollment = {
       id: `enr-${String(enrollments.length + 1).padStart(3, '0')}`,
       memberId: newMemberId,
-      programId: formData.programId,
+      programId: 'prog-001', // Default program, to be assigned during triage
       status: 'pending',
       enrollmentSource: 'Self',
       enrollmentDate: new Date().toISOString().split('T')[0],
@@ -107,7 +138,7 @@ export default function MemberSignup() {
     setFormData({ ...formData, [field]: value });
   };
 
-  const toggleArrayField = (field: 'healthGoals' | 'dietaryPreferences' | 'barriers', value: string) => {
+  const toggleArrayField = (field: 'chronicConditions' | 'dietaryPreferences' | 'allergens', value: string) => {
     const arr = formData[field];
     if (arr.includes(value)) {
       updateFormData(field, arr.filter(v => v !== value));
@@ -270,42 +301,52 @@ export default function MemberSignup() {
               </>
             )}
 
-            {/* Step 3: Health Goals */}
+            {/* Step 3: Health Information */}
             {currentStep === 3 && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="program">Select Program</Label>
-                  <Select
-                    value={formData.programId}
-                    onValueChange={(v) => updateFormData('programId', v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {programs.map(prog => (
-                        <SelectItem key={prog.id} value={prog.id}>{prog.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="healthInsurance">Health Insurance Provider</Label>
+                  <Input
+                    id="healthInsurance"
+                    value={formData.healthInsuranceProvider}
+                    onChange={(e) => updateFormData('healthInsuranceProvider', e.target.value)}
+                    placeholder="e.g., Kaiser Permanente, Blue Shield, Medi-Cal"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Health Goals (select all that apply)</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {['Manage blood sugar', 'Lower cholesterol', 'Lose weight', 'Eat healthier'].map(goal => (
+                  <Label>Chronic Conditions (select all that apply)</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {chronicConditionsList.map(condition => (
                       <label
-                        key={goal}
+                        key={condition}
                         className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-muted/50"
                       >
                         <Checkbox
-                          checked={formData.healthGoals.includes(goal)}
-                          onCheckedChange={() => toggleArrayField('healthGoals', goal)}
+                          checked={formData.chronicConditions.includes(condition)}
+                          onCheckedChange={() => toggleArrayField('chronicConditions', condition)}
                         />
-                        <span className="text-sm">{goal}</span>
+                        <span className="text-sm">{condition}</span>
                       </label>
                     ))}
+                    <label
+                      className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-muted/50"
+                    >
+                      <Checkbox
+                        checked={formData.chronicConditions.includes('Other')}
+                        onCheckedChange={() => toggleArrayField('chronicConditions', 'Other')}
+                      />
+                      <span className="text-sm">Other</span>
+                    </label>
                   </div>
+                  {formData.chronicConditions.includes('Other') && (
+                    <Input
+                      placeholder="Please specify other chronic condition(s)"
+                      value={formData.chronicConditionsOther}
+                      onChange={(e) => updateFormData('chronicConditionsOther', e.target.value)}
+                      className="mt-2"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -327,18 +368,18 @@ export default function MemberSignup() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Barriers to Healthy Eating</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {['Cost', 'Transportation', 'Cooking skills', 'Time'].map(barrier => (
+                  <Label>FDA Major Food Allergens</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {fdaAllergens.map(allergen => (
                       <label
-                        key={barrier}
+                        key={allergen}
                         className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-muted/50"
                       >
                         <Checkbox
-                          checked={formData.barriers.includes(barrier)}
-                          onCheckedChange={() => toggleArrayField('barriers', barrier)}
+                          checked={formData.allergens.includes(allergen)}
+                          onCheckedChange={() => toggleArrayField('allergens', allergen)}
                         />
-                        <span className="text-sm">{barrier}</span>
+                        <span className="text-sm">{allergen}</span>
                       </label>
                     ))}
                   </div>
