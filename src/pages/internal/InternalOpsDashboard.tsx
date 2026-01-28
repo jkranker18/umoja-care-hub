@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { members, enrollments, rulesDecisions, orders, serviceCases, programs } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { ProgramPipelineDashboard } from '@/components/internal/ProgramPipelineDashboard';
+import { useApp } from '@/contexts/AppContext';
 import { 
   AlertTriangle, 
   Package, 
@@ -21,7 +22,13 @@ import {
 import { toast } from 'sonner';
 
 export default function InternalOpsDashboard() {
+  const { setCurrentRole } = useApp();
   const [processingId, setProcessingId] = useState<string | null>(null);
+
+  // Ensure sidebar renders the correct nav on refresh / direct URL access
+  useEffect(() => {
+    setCurrentRole('internal');
+  }, [setCurrentRole]);
 
   // Calculate exception counts
   const eligibilityExceptions = rulesDecisions.filter(r => r.exceptions.length > 0 || r.eligibilityResult === 'pending_review');
