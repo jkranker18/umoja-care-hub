@@ -1,45 +1,101 @@
 
 
-# Update Sidebar Logo for Better Contrast
+# Update Member Intake Form - Health Information Fields
 
 ## Overview
-Replace the current Umoja logo in the sidebar with the new 2-color version that has white text, ensuring proper contrast against the dark sidebar background.
+Modify Step 3 (Health Goals) of the member intake form to collect more clinically relevant information: health insurance provider, chronic conditions, and food allergens.
 
-## Current State
-- The sidebar uses `umoja-food-for-health-logo.webp` which appears to have dark text
-- This causes contrast issues on the dark `bg-sidebar` background
-- CBO portal uses LA Food Bank logo (will remain unchanged)
+## Changes Summary
 
-## Implementation
+| Current Field | New Field |
+|--------------|-----------|
+| Select Program (dropdown) | Health Insurance Provider (text input) |
+| Health Goals (4 checkboxes) | Chronic Conditions (15 checkboxes + Other with text input) |
+| Barriers to Healthy Eating (4 checkboxes) | Allergens (FDA Big 9 checkboxes) |
 
-### Step 1: Copy New Logo to Assets
-Copy the uploaded logo to the project assets folder:
-- **Source:** `user-uploads://Umoja-FoodForHealth_Logo-2C.png`
-- **Destination:** `src/assets/umoja-logo-light.png`
+---
 
-### Step 2: Update Sidebar Component
-**File:** `src/components/layout/Sidebar.tsx`
+## 1. Health Insurance Provider
 
-Update the import and usage:
+Replace the program dropdown with a simple text input for the member's health insurance provider.
 
-```tsx
-// Update import
-import umojaLogoLight from '@/assets/umoja-logo-light.png';
+**New Field:**
+- Label: "Health Insurance Provider"
+- Type: Text input
+- Placeholder: "e.g., Kaiser Permanente, Blue Shield, Medi-Cal"
 
-// In the logo area (lines 126-131)
-<img 
-  src={umojaLogoLight} 
-  alt="Umoja Food For Health" 
-  className="h-10 object-contain"
-/>
-```
+---
 
-## Files to Modify
-1. Copy `user-uploads://Umoja-FoodForHealth_Logo-2C.png` to `src/assets/umoja-logo-light.png`
-2. `src/components/layout/Sidebar.tsx` - Update logo import and reference
+## 2. Chronic Conditions (Top 15)
 
-## Result
-- Member, Health Plan, and Internal Ops portals will display the new light-colored logo
-- CBO portal continues to show the LA Food Bank logo
-- Proper contrast on the dark sidebar background
+Replace the 4 health goals with the top 15 chronic conditions as checkboxes, plus an "Other" option with a text field.
+
+**Chronic Conditions List:**
+1. Type 2 Diabetes
+2. Hypertension (High Blood Pressure)
+3. Heart Disease
+4. Chronic Kidney Disease
+5. COPD (Chronic Obstructive Pulmonary Disease)
+6. Asthma
+7. Cancer
+8. Stroke
+9. Arthritis
+10. Obesity
+11. Depression
+12. Anxiety
+13. Alzheimer's/Dementia
+14. Osteoporosis
+15. Liver Disease
+16. Other (with text input)
+
+---
+
+## 3. FDA Major Food Allergens (Big 9)
+
+Replace "Barriers to Healthy Eating" with the FDA-recognized major allergens.
+
+**FDA Big 9 Allergens:**
+1. Milk
+2. Eggs
+3. Fish
+4. Shellfish (e.g., crab, lobster, shrimp)
+5. Tree Nuts (e.g., almonds, walnuts, pecans)
+6. Peanuts
+7. Wheat
+8. Soybeans
+9. Sesame
+
+---
+
+## Technical Implementation
+
+### File: `src/pages/member/MemberSignup.tsx`
+
+**Form State Updates (line 29-46):**
+- Add `healthInsuranceProvider: ''` field
+- Rename `healthGoals` to `chronicConditions`
+- Add `chronicConditionsOther: ''` for the "Other" text input
+- Rename `barriers` to `allergens`
+- Remove `programId` (no longer selecting a program here)
+
+**Step 3 Content Updates (lines 274-346):**
+- Replace program dropdown with text input
+- Replace health goals with chronic conditions checkboxes (3-column grid for better layout)
+- Add "Other" checkbox with conditional text input
+- Replace barriers with allergens checkboxes
+
+**Toggle Function Update (line 110):**
+- Update field names from `healthGoals` and `barriers` to `chronicConditions` and `allergens`
+
+### Updated Step Name
+- Rename step from "Health Goals" to "Health Information" to better reflect the content
+
+---
+
+## Visual Layout
+
+The form will use a responsive grid:
+- Chronic Conditions: 3 columns on desktop, 2 on tablet, 1 on mobile
+- Allergens: 3 columns on desktop, 2 on tablet, 1 on mobile
+- "Other" text input appears below checkboxes when "Other" is selected
 
