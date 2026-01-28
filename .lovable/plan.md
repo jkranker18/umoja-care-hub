@@ -1,214 +1,106 @@
 
 
-# Update Health Plan Portal - Blue Cross
+# Make Program Dropdown and Date Selector Functional
 
 ## Overview
-Restructure the Health Plan portal with "Blue Cross" branding, fix sidebar navigation, create dedicated pages for outcomes and member drill-down, and add a Profile page for managing authorized users.
+The Health Plan Dashboard has program and date range dropdowns that update state but don't actually filter the displayed data. This plan will make these filters functional across all KPIs, charts, and breakdowns.
+
+## Current State
+- `programFilter` state exists but is not used to filter data
+- `dateRange` state exists but is not used to filter data
+- All metrics show unfiltered totals regardless of dropdown selection
 
 ## Changes Summary
 
-| Current Nav Item | New Nav Item | Action |
-|-----------------|--------------|--------|
-| Overview | Home | Rename, keep pointing to dashboard |
-| Outcomes | Outcomes Report | Keep, create dedicated page |
-| Members | Member Drill Down | Keep, create dedicated page |
-| Reports | Remove | Not needed |
-| - | Profile | Add new - authorized users management |
-
----
-
-## 1. Sidebar Navigation Update
-
-**File:** `src/components/layout/Sidebar.tsx`
-
-Update `healthplanNav` array:
-```tsx
-const healthplanNav: NavItem[] = [
-  { label: 'Home', path: '/healthplan', icon: Home },
-  { label: 'Outcomes Report', path: '/healthplan/outcomes', icon: BarChart3 },
-  { label: 'Member Drill Down', path: '/healthplan/members', icon: Users },
-  { label: 'Profile', path: '/healthplan/profile', icon: Building2 },
-];
-```
-
-Update sidebar logo area to show "Blue Cross" text when role is `healthplan`:
-- Display "Blue Cross" as styled text instead of an image (no logo asset available)
-
----
-
-## 2. Dashboard Branding Update
-
 **File:** `src/pages/healthplan/HealthPlanDashboard.tsx`
 
-- Add `useEffect` to set `currentRole` to `'healthplan'` on mount (fix sidebar issue)
-- Update header title from "Health Plan Overview" to "Blue Cross Dashboard"
-- Remove "View Outcomes Report" and "Member Drilldown" quick action buttons (now in sidebar)
+### 1. Add Filtering Logic for Program Selection
 
----
+Filter all data based on the selected program:
 
-## 3. New Outcomes Report Page
-
-**File:** `src/pages/healthplan/HealthPlanOutcomes.tsx` (new file)
-
-Create a dedicated outcomes report page with:
-- Clinical outcomes metrics (HbA1c improvements, blood pressure changes)
-- Program completion rates
-- Cost savings analysis
-- Member satisfaction scores
-- Exportable report functionality
-- Add `useEffect` to set `currentRole` to `'healthplan'`
-
----
-
-## 4. New Member Drill Down Page
-
-**File:** `src/pages/healthplan/HealthPlanMembers.tsx` (new file)
-
-Create a member drill-down page with:
-- Searchable/filterable member table
-- Member demographics and program status
-- Risk stratification view
-- Click-through to member detail
-- Add `useEffect` to set `currentRole` to `'healthplan'`
-
----
-
-## 5. New Profile Page (Authorized Users)
-
-**File:** `src/pages/healthplan/HealthPlanProfile.tsx` (new file)
-
-Create a profile page similar to CBO Organization page:
-- **Organization Card**: Blue Cross name, Plan ID, contact information
-- **Authorized Users Table**: Staff with portal access (name, email, role, status, last login)
-
----
-
-## 6. Mock Data Update
-
-**File:** `src/lib/mockData.ts`
-
-Add health plan organization and authorized users:
-
-```typescript
-export interface HealthPlan {
-  id: string;
-  name: string;
-  planId: string;
-  contactName: string;
-  contactEmail: string;
-  phone: string;
-  address: string;
-  memberCount: number;
-}
-
-export interface HealthPlanUser {
-  id: string;
-  healthPlanId: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'analyst' | 'viewer';
-  status: 'active' | 'inactive';
-  lastLogin?: string;
-}
-
-export const healthPlans: HealthPlan[] = [
-  {
-    id: 'hp-001',
-    name: 'Blue Cross of California',
-    planId: 'BCCA-2024',
-    contactName: 'Jennifer Adams',
-    contactEmail: 'jadams@bluecross.com',
-    phone: '(800) 555-BLUE',
-    address: '21555 Oxnard St, Woodland Hills, CA 91367',
-    memberCount: 50,
-  },
-];
-
-export const healthPlanUsers: HealthPlanUser[] = [
-  {
-    id: 'hp-user-001',
-    healthPlanId: 'hp-001',
-    name: 'Jennifer Adams',
-    email: 'jadams@bluecross.com',
-    role: 'admin',
-    status: 'active',
-    lastLogin: '2024-03-28',
-  },
-  // ... more users
-];
-```
-
----
-
-## 7. Route Updates
-
-**File:** `src/App.tsx`
-
-Update health plan routes:
 ```tsx
-{/* Health Plan Portal */}
-<Route path="/healthplan" element={<HealthPlanDashboard />} />
-<Route path="/healthplan/outcomes" element={<HealthPlanOutcomes />} />
-<Route path="/healthplan/members" element={<HealthPlanMembers />} />
-<Route path="/healthplan/profile" element={<HealthPlanProfile />} />
+// Filter enrollments by program
+const filteredEnrollments = programFilter === 'all' 
+  ? enrollments 
+  : enrollments.filter(e => e.programId === programFilter);
+
+// Get member IDs for filtered enrollments
+const filteredMemberIds = new Set(filteredEnrollments.map(e => e.memberId));
+
+// Filter related data
+const filteredMembers = members.filter(m => filteredMemberIds.has(m.id));
+const filteredOrders = orders.filter(o => filteredMemberIds.has(o.memberId));
+const filteredContentPlans = contentPlans.filter(cp => filteredMemberIds.has(cp.memberId));
+```
+
+### 2. Update KPIs to Use Filtered Data
+
+Update all KPI calculations to use filtered data:
+
+| KPI | Current | Updated |
+|-----|---------|---------|
+| Eligible Members | `members.length` | `filteredMembers.length` or total eligible count |
+| Enrolled | `enrollments.length` | `filteredEnrollments.length` |
+| Active | Count from all enrollments | Count from `filteredEnrollments` |
+| On-time Shipments | From all orders | From `filteredOrders` |
+| Engagement Rate | From all content plans | From `filteredContentPlans` |
+
+### 3. Update Charts to Use Filtered Data
+
+The chart data is currently static mock data. Update to reflect program selection:
+- Enrollment Over Time: Generate data based on filtered enrollments
+- Shipment Performance: Generate data based on filtered orders
+- Content Engagement: Generate data based on filtered content plans
+
+### 4. Update Program Breakdown Cards
+
+- "By Program" card: When a specific program is selected, only show that program's stats
+- "By CBO Partner" card: Filter by members in the selected program
+- "Content Engagement" card: Filter by members in the selected program
+
+### 5. Add Date Range Filtering (Mock Implementation)
+
+Since the mock data doesn't have sufficient date granularity for real filtering, we'll:
+- Add visual feedback showing the selected range
+- Prepare the filtering structure for future real data integration
+- Adjust displayed trend values based on range selection
+
+### 6. Add useMemo for Performance
+
+Wrap filtering logic in `useMemo` to prevent unnecessary recalculations:
+
+```tsx
+const filteredData = useMemo(() => {
+  const filteredEnrollments = programFilter === 'all'
+    ? enrollments
+    : enrollments.filter(e => e.programId === programFilter);
+  
+  const memberIds = new Set(filteredEnrollments.map(e => e.memberId));
+  
+  return {
+    enrollments: filteredEnrollments,
+    members: members.filter(m => memberIds.has(m.id)),
+    orders: orders.filter(o => memberIds.has(o.memberId)),
+    contentPlans: contentPlans.filter(cp => memberIds.has(cp.memberId)),
+  };
+}, [programFilter]);
 ```
 
 ---
 
-## Visual Design
-
-### Sidebar Logo for Health Plan
-```text
-┌─────────────────────────────┐
-│  🏥 Blue Cross              │
-│  of California              │
-└─────────────────────────────┘
-```
-
-### Profile Page Layout
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  Organization Profile                                       │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Blue Cross of California                            │   │
-│  │  Plan ID: BCCA-2024                                  │   │
-│  │                                                       │   │
-│  │  Contact: Jennifer Adams                              │   │
-│  │  Email: jadams@bluecross.com                         │   │
-│  │  Phone: (800) 555-BLUE                               │   │
-│  └─────────────────────────────────────────────────────┘   │
-│                                                             │
-│  Authorized Users                                           │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Name            │ Email          │ Role    │ Status │   │
-│  │  Jennifer Adams  │ jadams@...     │ Admin   │ Active │   │
-│  │  Michael Torres  │ mtorres@...    │ Analyst │ Active │   │
-│  │  Sarah Kim       │ skim@...       │ Viewer  │ Active │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Files to Create/Modify
+## File to Modify
 
 | File | Action |
 |------|--------|
-| `src/components/layout/Sidebar.tsx` | Modify - update nav and logo |
-| `src/pages/healthplan/HealthPlanDashboard.tsx` | Modify - add role fix, update branding |
-| `src/pages/healthplan/HealthPlanOutcomes.tsx` | Create - outcomes report page |
-| `src/pages/healthplan/HealthPlanMembers.tsx` | Create - member drill-down page |
-| `src/pages/healthplan/HealthPlanProfile.tsx` | Create - authorized users page |
-| `src/lib/mockData.ts` | Modify - add health plan data |
-| `src/App.tsx` | Modify - update routes |
+| `src/pages/healthplan/HealthPlanDashboard.tsx` | Modify - add filtering logic |
 
 ---
 
 ## Technical Notes
 
-- Each health plan page will include `useEffect` to set `currentRole('healthplan')` ensuring correct sidebar navigation
-- Profile page follows the same pattern as CBO Organization for consistency
-- Member drill-down uses existing mock member data
-- Outcomes report uses mock metrics for demo purposes
+- Uses `useMemo` for efficient recalculation only when filter changes
+- Maintains cascade filtering: program selection filters enrollments, which filters orders, content, etc.
+- Date range filtering is prepared structurally but uses mock adjustment since underlying data lacks timestamps
+- The "By Program" breakdown will conditionally render only the selected program when filtered
+- All existing chart components remain unchanged, only their data inputs are filtered
 
