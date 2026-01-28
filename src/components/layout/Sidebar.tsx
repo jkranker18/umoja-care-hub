@@ -3,7 +3,7 @@ import { UserRole } from '@/lib/mockData';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import laFoodBankLogo from '@/assets/la-food-bank-logo.png';
-import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
+import umojaLogoLight from '@/assets/umoja-logo-light.png';
 import {
   Home,
   User,
@@ -125,7 +125,7 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
             />
           ) : (
             <img 
-              src={umojaLogo} 
+              src={umojaLogoLight} 
               alt="Umoja Food For Health" 
               className="h-10 object-contain"
             />
