@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useApp } from '@/contexts/AppContext';
-import { programs, enrollments, orders, contentPlans, assessments } from '@/lib/mockData';
+import { programs, enrollments, orders, contentPlans, assessments, getPhaseInfo } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -68,14 +68,26 @@ export default function MemberHome() {
   const [supportCaseNumber, setSupportCaseNumber] = useState('');
   const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
+  // Get phase info for the current member
+  const phaseInfo = program ? getPhaseInfo(program, enrollment?.currentWeek || 1) : null;
+
   // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming (fixed dates for consistent demo)
+  // Meal plan reflects current phase
+  const getMealPlanLabel = () => {
+    if (!phaseInfo) return 'Medically Tailored Meals';
+    if (phaseInfo.phase === 'Produce') return 'Produce Box (15 lbs)';
+    return phaseInfo.phase === 'MTM' ? 'Medically Tailored Meals (MTM)' : 'Medically Tailored Groceries (MTG)';
+  };
+
+  const mealPlanLabel = getMealPlanLabel();
+
   const demoOrders = [
     // 3 Delivered orders
     {
       id: 'ORD-001',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834521',
       estimatedDelivery: 'Jan 6, 2025',
@@ -83,8 +95,8 @@ export default function MemberHome() {
     {
       id: 'ORD-002',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834522',
       estimatedDelivery: 'Jan 13, 2025',
@@ -92,8 +104,8 @@ export default function MemberHome() {
     {
       id: 'ORD-003',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'delivered' as const,
       trackingNumber: 'TRK-8834523',
       estimatedDelivery: 'Jan 20, 2025',
@@ -102,8 +114,8 @@ export default function MemberHome() {
     {
       id: 'ORD-004',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'in_transit' as const,
       trackingNumber: 'TRK-8834524',
       estimatedDelivery: 'Jan 27, 2025',
@@ -112,8 +124,8 @@ export default function MemberHome() {
     {
       id: 'ORD-005',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834525',
       estimatedDelivery: 'Feb 3, 2025',
@@ -121,8 +133,8 @@ export default function MemberHome() {
     {
       id: 'ORD-006',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834526',
       estimatedDelivery: 'Feb 10, 2025',
@@ -130,8 +142,8 @@ export default function MemberHome() {
     {
       id: 'ORD-007',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834527',
       estimatedDelivery: 'Feb 17, 2025',
@@ -139,8 +151,8 @@ export default function MemberHome() {
     {
       id: 'ORD-008',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834528',
       estimatedDelivery: 'Feb 24, 2025',
@@ -148,8 +160,8 @@ export default function MemberHome() {
     {
       id: 'ORD-009',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834529',
       estimatedDelivery: 'Mar 3, 2025',
@@ -157,8 +169,8 @@ export default function MemberHome() {
     {
       id: 'ORD-010',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834530',
       estimatedDelivery: 'Mar 10, 2025',
@@ -166,8 +178,8 @@ export default function MemberHome() {
     {
       id: 'ORD-011',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834531',
       estimatedDelivery: 'Mar 17, 2025',
@@ -175,8 +187,8 @@ export default function MemberHome() {
     {
       id: 'ORD-012',
       memberId: member?.id,
-      mealPlan: 'Cardiac Friendly',
-      mealsCount: 14,
+      mealPlan: mealPlanLabel,
+      mealsCount: program?.tier === 3 ? 0 : 14,
       shipmentStatus: 'processing' as const,
       trackingNumber: 'TRK-8834532',
       estimatedDelivery: 'Mar 24, 2025',
@@ -279,9 +291,9 @@ export default function MemberHome() {
         {/* Status Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <KPICard
-            title="Enrollment Status"
-            value={enrollment?.status === 'active' ? 'Active' : 'Pending'}
-            subtitle={program?.name}
+            title="Program Tier"
+            value={program?.tier ? `Tier ${program.tier}` : 'Pending'}
+            subtitle={program?.riskLevel ? `${program.riskLevel.charAt(0).toUpperCase() + program.riskLevel.slice(1)} Risk` : ''}
             icon={<Heart className="h-5 w-5" />}
           />
           <KPICard
@@ -291,9 +303,9 @@ export default function MemberHome() {
             icon={<Package className="h-5 w-5" />}
           />
           <KPICard
-            title="Benefit Level"
-            value="12 weeks"
-            subtitle="Weekly | 14 meals/week"
+            title="Current Phase"
+            value={phaseInfo?.phase || 'MTM'}
+            subtitle={phaseInfo ? `Week ${phaseInfo.phaseWeek} of ${phaseInfo.phaseTotal} • ${program?.tier === 3 ? '15 lbs produce' : '14 meals/week'}` : ''}
             icon={<Utensils className="h-5 w-5" />}
           />
           <KPICard
@@ -326,10 +338,69 @@ export default function MemberHome() {
                     <StatusPill status={enrollment?.status || 'pending'} />
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-3 pt-0">
+                <CardContent className="space-y-4 pt-0">
                   <div>
                     <h3 className="font-semibold">{program?.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{program?.description}</p>
                   </div>
+                  
+                  {/* Phase Progress */}
+                  {program && phaseInfo && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Phase Progress</span>
+                        <span className="font-medium">Week {enrollment?.currentWeek} of 12</span>
+                      </div>
+                      {program.tier !== 3 ? (
+                        <div className="flex gap-1">
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className={enrollment?.currentPhase === 'MTM' ? 'font-medium text-primary' : 'text-muted-foreground'}>
+                                MTM (Weeks 1-{program.mtmWeeks})
+                              </span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full transition-all" 
+                                style={{ 
+                                  width: `${Math.min(100, ((enrollment?.currentWeek || 1) / program.mtmWeeks) * 100)}%` 
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className={enrollment?.currentPhase === 'MTG' ? 'font-medium text-primary' : 'text-muted-foreground'}>
+                                MTG (Weeks {program.mtmWeeks + 1}-12)
+                              </span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary rounded-full transition-all" 
+                                style={{ 
+                                  width: `${Math.max(0, (((enrollment?.currentWeek || 1) - program.mtmWeeks) / program.mtgWeeks) * 100)}%` 
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-medium text-primary">Produce Box (Bi-weekly)</span>
+                            <span className="text-muted-foreground">Distribution {phaseInfo.phaseWeek} of 6</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary rounded-full transition-all" 
+                              style={{ width: `${(phaseInfo.phaseWeek / 6) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-3 gap-3 text-sm">
                     <div>
                       <span className="text-muted-foreground text-xs">Enrolled</span>
@@ -337,11 +408,11 @@ export default function MemberHome() {
                     </div>
                     <div>
                       <span className="text-muted-foreground text-xs">Frequency</span>
-                      <p className="font-medium">Weekly</p>
+                      <p className="font-medium">{program?.tier === 3 ? 'Bi-weekly' : 'Weekly'}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground text-xs">Duration</span>
-                      <p className="font-medium">12 weeks</p>
+                      <p className="font-medium">{program?.duration || '12 weeks'}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -433,20 +504,26 @@ export default function MemberHome() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                    <h3 className="font-semibold mb-2">Cardiac Friendly Meal Plan</h3>
+                    <h3 className="font-semibold mb-2">{phaseInfo?.phaseName || 'Medically Tailored Meals'}</h3>
                     <p className="text-sm text-muted-foreground">
-                      Heart-healthy meals low in sodium and saturated fat, designed to support cardiovascular health. 
-                      Each delivery includes 14 meals with balanced macronutrients.
+                      {program?.tier === 3 
+                        ? 'Fresh produce boxes delivered bi-weekly to support diet quality improvement and inflammation reduction through increased plant-based intake. Each box contains 15 lbs of fresh fruits and vegetables.'
+                        : phaseInfo?.phase === 'MTM'
+                          ? 'Fully prepared, heat-and-eat meals designed for your specific health conditions. Each delivery includes 14 medically tailored meals with balanced macronutrients.'
+                          : 'Transition to cooking with medically tailored groceries. Each delivery includes ingredients and recipes for 14 meals, helping you build sustainable healthy eating habits.'
+                      }
                     </p>
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium text-sm text-muted-foreground">Weekly Meals</h4>
-                      <p className="text-2xl font-bold">14</p>
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {program?.tier === 3 ? 'Produce Weight' : 'Weekly Meals'}
+                      </h4>
+                      <p className="text-2xl font-bold">{program?.tier === 3 ? '15 lbs' : '14'}</p>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-medium text-sm text-muted-foreground">Deliveries Remaining</h4>
-                      <p className="text-2xl font-bold">8</p>
+                      <p className="text-2xl font-bold">{12 - (enrollment?.currentWeek || 1)}</p>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <h4 className="font-medium text-sm text-muted-foreground">Next Delivery</h4>
