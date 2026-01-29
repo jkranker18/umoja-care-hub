@@ -72,128 +72,44 @@ export default function MemberHome() {
   const phaseInfo = program ? getPhaseInfo(program, enrollment?.currentWeek || 1) : null;
 
   // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming (fixed dates for consistent demo)
-  // Meal plan reflects current phase
-  const getMealPlanLabel = () => {
-    if (!phaseInfo) return 'Medically Tailored Meals';
-    if (phaseInfo.phase === 'Produce') return 'Produce Box (15 lbs)';
-    return phaseInfo.phase === 'MTM' ? 'Medically Tailored Meals (MTM)' : 'Medically Tailored Groceries (MTG)';
+  // Helper function to get the meal plan label based on week number
+  const getMealPlanLabelForWeek = (weekNumber: number): string => {
+    if (!program) return 'Medically Tailored Meals';
+    if (program.tier === 3) return 'Produce Box (15 lbs)';
+    
+    // For Tier 1: MTM weeks 1-8, MTG weeks 9-12
+    // For Tier 2: MTM weeks 1-4, MTG weeks 5-12
+    const mtmWeeks = program.mtmWeeks;
+    
+    if (weekNumber <= mtmWeeks) {
+      return 'Medically Tailored Meals (MTM)';
+    } else {
+      return 'Medically Tailored Groceries (MTG)';
+    }
   };
 
-  const mealPlanLabel = getMealPlanLabel();
-
-  const demoOrders = [
-    // 3 Delivered orders
-    {
-      id: 'ORD-001',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'delivered' as const,
-      trackingNumber: 'TRK-8834521',
-      estimatedDelivery: 'Jan 6, 2025',
-    },
-    {
-      id: 'ORD-002',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'delivered' as const,
-      trackingNumber: 'TRK-8834522',
-      estimatedDelivery: 'Jan 13, 2025',
-    },
-    {
-      id: 'ORD-003',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'delivered' as const,
-      trackingNumber: 'TRK-8834523',
-      estimatedDelivery: 'Jan 20, 2025',
-    },
-    // 1 In transit
-    {
-      id: 'ORD-004',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'in_transit' as const,
-      trackingNumber: 'TRK-8834524',
-      estimatedDelivery: 'Jan 27, 2025',
-    },
-    // 8 Upcoming orders
-    {
-      id: 'ORD-005',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834525',
-      estimatedDelivery: 'Feb 3, 2025',
-    },
-    {
-      id: 'ORD-006',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834526',
-      estimatedDelivery: 'Feb 10, 2025',
-    },
-    {
-      id: 'ORD-007',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834527',
-      estimatedDelivery: 'Feb 17, 2025',
-    },
-    {
-      id: 'ORD-008',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834528',
-      estimatedDelivery: 'Feb 24, 2025',
-    },
-    {
-      id: 'ORD-009',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834529',
-      estimatedDelivery: 'Mar 3, 2025',
-    },
-    {
-      id: 'ORD-010',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834530',
-      estimatedDelivery: 'Mar 10, 2025',
-    },
-    {
-      id: 'ORD-011',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834531',
-      estimatedDelivery: 'Mar 17, 2025',
-    },
-    {
-      id: 'ORD-012',
-      memberId: member?.id,
-      mealPlan: mealPlanLabel,
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: 'processing' as const,
-      trackingNumber: 'TRK-8834532',
-      estimatedDelivery: 'Mar 24, 2025',
-    },
+  const orderDates = [
+    'Jan 6, 2025', 'Jan 13, 2025', 'Jan 20, 2025', 'Jan 27, 2025',
+    'Feb 3, 2025', 'Feb 10, 2025', 'Feb 17, 2025', 'Feb 24, 2025',
+    'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025'
   ];
+
+  const demoOrders = Array.from({ length: 12 }, (_, index) => {
+    const weekNumber = index + 1;
+    const isDelivered = weekNumber <= 3;
+    const isInTransit = weekNumber === 4;
+    
+    return {
+      id: `ORD-${String(weekNumber).padStart(3, '0')}`,
+      memberId: member?.id,
+      weekNumber,
+      mealPlan: getMealPlanLabelForWeek(weekNumber),
+      mealsCount: program?.tier === 3 ? 0 : 14,
+      shipmentStatus: isDelivered ? 'delivered' as const : isInTransit ? 'in_transit' as const : 'processing' as const,
+      trackingNumber: `TRK-883452${weekNumber}`,
+      estimatedDelivery: orderDates[index],
+    };
+  });
 
   // Find the next shipment: prioritize in-transit that hasn't passed, then processing
   const nextShipment = demoOrders.find(order => {
@@ -550,9 +466,11 @@ export default function MemberHome() {
                           <Package className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-medium">{order.mealPlan}</p>
+                          <p className="font-medium">
+                            <span className="text-muted-foreground">Week {order.weekNumber}</span> • {order.mealPlan}
+                          </p>
                           <p className="text-sm text-muted-foreground">
-                            {order.mealsCount} meals • Order #{order.id}
+                            {program?.tier === 3 ? '15 lbs produce' : `${order.mealsCount} meals`} • Order #{order.id}
                           </p>
                         </div>
                       </div>
