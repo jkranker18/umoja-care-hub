@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, split } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import * as ActionCable from '@rails/actioncable';
 import ActionCableLink from 'graphql-ruby-client/subscriptions/ActionCableLink';
 import { HealthieProvider } from '@healthie/chat';
+import { Loader2 } from 'lucide-react';
 
 interface HealthieChatWrapperProps {
-  apiKey: string;
   userId?: string;
   children: React.ReactNode;
 }
@@ -14,8 +14,34 @@ interface HealthieChatWrapperProps {
 // Edge function URL for Healthie proxy
 const HEALTHIE_PROXY_URL = 'https://snpcoicphiammfentdxl.supabase.co/functions/v1/healthie-proxy';
 
-export function HealthieChatWrapper({ apiKey, userId, children }: HealthieChatWrapperProps) {
+export function HealthieChatWrapper({ userId, children }: HealthieChatWrapperProps) {
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch API key from edge function on mount
+  useEffect(() => {
+    async function fetchApiKey() {
+      try {
+        const response = await fetch(HEALTHIE_PROXY_URL);
+        if (!response.ok) {
+          throw new Error('Failed to fetch API configuration');
+        }
+        const data = await response.json();
+        setApiKey(data.apiKey);
+      } catch (err) {
+        console.error('Failed to fetch Healthie config:', err);
+        setError('Unable to connect to messaging service');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchApiKey();
+  }, []);
+
   const client = useMemo(() => {
+    if (!apiKey) return null;
+
     // HTTP link for queries and mutations - using edge function proxy to bypass CORS
     const httpLink = new HttpLink({
       uri: HEALTHIE_PROXY_URL,
@@ -48,6 +74,23 @@ export function HealthieChatWrapper({ apiKey, userId, children }: HealthieChatWr
       cache: new InMemoryCache(),
     });
   }, [apiKey]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+        <p>Connecting to messaging...</p>
+      </div>
+    );
+  }
+
+  if (error || !apiKey) {
+    return (
+      <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+        <p>{error || 'Unable to connect to messaging service'}</p>
+      </div>
+    );
+  }
 
   if (!userId) {
     return (

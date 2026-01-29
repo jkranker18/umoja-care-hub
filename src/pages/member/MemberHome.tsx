@@ -623,10 +623,7 @@ export default function MemberHome() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <HealthieChatWrapper 
-                  apiKey={import.meta.env.VITE_HEALTHIE_API_KEY || ''}
-                  userId={member?.healthieUserId}
-                >
+                <HealthieChatWrapper userId={member?.healthieUserId}>
                   <HealthieChat />
                 </HealthieChatWrapper>
                 <p className="text-sm text-muted-foreground mt-4 text-center">
