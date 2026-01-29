@@ -12,7 +12,7 @@ interface HealthieChatWrapperProps {
 }
 
 // Edge function URL for Healthie proxy
-const HEALTHIE_PROXY_URL = 'https://bfcpaxjwfddoqfpjynrs.supabase.co/functions/v1/healthie-proxy';
+const HEALTHIE_PROXY_URL = 'https://snpcoicphiammfentdxl.supabase.co/functions/v1/healthie-proxy';
 
 export function HealthieChatWrapper({ apiKey, userId, children }: HealthieChatWrapperProps) {
   const client = useMemo(() => {
