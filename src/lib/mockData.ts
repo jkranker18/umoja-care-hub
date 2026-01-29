@@ -398,7 +398,7 @@ export const members: Member[] = [
     consentDate: '2024-01-20',
     riskFlags: ['High A1C', 'Food Insecurity'],
     createdAt: '2024-01-20',
-    healthieUserId: '', // Set this to the member's Healthie user ID for chat
+    healthieUserId: '13159857', // Linked Healthie user ID for chat
   },
   {
     id: 'mem-002',
