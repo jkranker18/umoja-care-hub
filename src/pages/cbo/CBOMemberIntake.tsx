@@ -76,6 +76,9 @@ interface CBOIntakeFormData {
   // Mental Health PHQ-2 (Q23-Q24)
   littleInterest: string;
   feelingDown: string;
+  
+  // Consent
+  consent: boolean;
 }
 
 const initialFormData: CBOIntakeFormData = {
@@ -114,6 +117,7 @@ const initialFormData: CBOIntakeFormData = {
   illegalDrugUse: '',
   littleInterest: '',
   feelingDown: '',
+  consent: false,
 };
 
 const STEP_TITLES = [
@@ -164,7 +168,7 @@ export default function CBOMemberIntake() {
 
   const progress = (currentStep / 6) * 100;
 
-  const updateField = (field: keyof CBOIntakeFormData, value: string | string[]) => {
+  const updateField = (field: keyof CBOIntakeFormData, value: string | string[] | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -190,6 +194,15 @@ export default function CBOMemberIntake() {
   };
 
   const handleSubmit = () => {
+    if (!formData.consent) {
+      toast({
+        title: 'Consent Required',
+        description: 'Please confirm member consent before enrolling.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     toast({
       title: 'Member Enrolled',
       description: `${formData.firstName} ${formData.lastName} has been successfully enrolled.`,
@@ -815,8 +828,6 @@ export default function CBOMemberIntake() {
   );
 
   const renderStep6 = () => {
-    const riskFlags = calculateRiskFlags();
-    
     return (
       <div className="space-y-6">
         <div className="bg-muted/50 rounded-lg p-4">
@@ -838,34 +849,46 @@ export default function CBOMemberIntake() {
           </p>
         </div>
 
-        {riskFlags.length > 0 ? (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-              <h3 className="font-semibold text-destructive">Identified Risk Flags ({riskFlags.length})</h3>
-            </div>
-            <ul className="space-y-1">
-              {riskFlags.map((flag, index) => (
-                <li key={index} className="text-sm flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
-                  {flag}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <Check className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-primary">No Risk Flags Identified</h3>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">Screening did not identify any immediate social needs.</p>
-          </div>
-        )}
+        <div className="bg-muted/50 rounded-lg p-6">
+          <h3 className="font-semibold mb-3">Program Participation Agreement</h3>
+          <p className="text-sm mb-3">
+            By enrolling in the Umoja Health nutrition program, I understand and agree to:
+          </p>
+          <ul className="text-sm space-y-2 text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              Receive medically tailored meals and nutrition education
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              Share my health information with program partners for care coordination
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              Participate in assessments and surveys to measure outcomes
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              Be contacted by phone, email, or text about my program
+            </li>
+          </ul>
+        </div>
 
-        <p className="text-sm text-muted-foreground">
-          By clicking "Enroll Member", you confirm that this information was collected directly from the member and that they consent to enrollment in the Umoja Health program.
-        </p>
+        <div className="flex items-start gap-3 p-4 border rounded-lg">
+          <Checkbox
+            id="consent"
+            checked={formData.consent}
+            onCheckedChange={(checked) => updateField('consent', checked === true)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <Label htmlFor="consent" className="font-medium cursor-pointer">
+              I consent to participate
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              I have read and agree to the terms above.
+            </p>
+          </div>
+        </div>
       </div>
     );
   };
