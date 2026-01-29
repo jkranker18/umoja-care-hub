@@ -20,6 +20,7 @@ export interface Member {
   consentDate?: string;
   riskFlags: string[];
   createdAt: string;
+  healthieUserId?: string; // Healthie user ID for chat integration
 }
 
 export interface Program {
@@ -397,6 +398,7 @@ export const members: Member[] = [
     consentDate: '2024-01-20',
     riskFlags: ['High A1C', 'Food Insecurity'],
     createdAt: '2024-01-20',
+    healthieUserId: '', // Set this to the member's Healthie user ID for chat
   },
   {
     id: 'mem-002',
