@@ -344,11 +344,19 @@ export default function HealthPlanDashboard() {
                 displayedPrograms.map(prog => {
                   const progEnrollments = filteredData.enrollments.filter(e => e.programId === prog.id);
                   const activeInProg = progEnrollments.filter(e => e.status === 'active').length;
+                  const mtmCount = progEnrollments.filter(e => e.currentPhase === 'MTM').length;
+                  const mtgCount = progEnrollments.filter(e => e.currentPhase === 'MTG').length;
+                  const produceCount = progEnrollments.filter(e => e.currentPhase === 'Produce').length;
+                  
                   return (
                     <div key={prog.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                       <div>
                         <p className="font-medium text-sm">{prog.name}</p>
-                        <p className="text-xs text-muted-foreground">{progEnrollments.length} enrolled</p>
+                        <p className="text-xs text-muted-foreground">
+                          {progEnrollments.length} enrolled
+                          {prog.tier !== 3 && ` • ${mtmCount} MTM, ${mtgCount} MTG`}
+                          {prog.tier === 3 && ` • ${produceCount} Produce`}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-lg">{activeInProg}</p>

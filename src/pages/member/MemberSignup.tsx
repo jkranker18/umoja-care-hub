@@ -120,11 +120,13 @@ export default function MemberSignup() {
     const newEnrollment: Enrollment = {
       id: `enr-${String(enrollments.length + 1).padStart(3, '0')}`,
       memberId: newMemberId,
-      programId: 'prog-001', // Default program, to be assigned during triage
+      programId: 'prog-tier1', // Default to Tier 1, to be assigned during triage
       status: 'pending',
       enrollmentSource: 'Self',
       enrollmentDate: new Date().toISOString().split('T')[0],
-      benefitLevel: '12 weeks',
+      currentWeek: 1,
+      currentPhase: 'MTM',
+      benefitLevel: 'Tier 1 - Week 1',
     };
 
     setMembers([...members, newMember]);

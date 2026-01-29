@@ -168,7 +168,16 @@ export default function CBODashboard() {
                           <p className="text-sm text-muted-foreground">{member.email}</p>
                         </div>
                       </TableCell>
-                      <TableCell>{program?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="text-sm">{program?.name || 'N/A'}</p>
+                          {enrollment?.currentPhase && (
+                            <p className="text-xs text-muted-foreground">
+                              {enrollment.currentPhase} • Week {enrollment.currentWeek}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{enrollment?.enrollmentDate}</TableCell>
                       <TableCell>
                         <StatusPill status={enrollment?.status || 'pending'} />

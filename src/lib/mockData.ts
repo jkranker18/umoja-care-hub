@@ -25,12 +25,17 @@ export interface Member {
 export interface Program {
   id: string;
   name: string;
+  tier: 1 | 2 | 3;
+  riskLevel: 'high' | 'medium' | 'preventive';
   description: string;
   startDate: string;
   endDate: string;
   eligibilityRules: string;
-  benefitsFrequency: string;
-  benefitsDuration: string;
+  duration: string; // "12 weeks"
+  mealsPerWeek: number;
+  mtmWeeks: number; // Medically Tailored Meals phase
+  mtgWeeks: number; // Medically Tailored Groceries phase
+  clinicalSupport: string; // "3 months"
   status: 'active' | 'inactive' | 'planning';
 }
 
@@ -49,6 +54,7 @@ export interface CBO {
 
 export type EnrollmentStatus = 'pending' | 'active' | 'paused' | 'complete';
 export type EnrollmentSource = 'CBO' | 'HP Outreach' | 'Provider' | 'Self';
+export type FoodPhase = 'MTM' | 'MTG' | 'Produce';
 
 export interface Enrollment {
   id: string;
@@ -58,7 +64,9 @@ export interface Enrollment {
   enrollmentSource: EnrollmentSource;
   sourceId?: string;
   enrollmentDate: string;
-  benefitLevel: string;
+  currentWeek: number; // 1-12
+  currentPhase: FoodPhase; // Current food protocol phase
+  benefitLevel: string; // e.g., "Tier 1 - Week 4"
   nextShipmentDate?: string;
 }
 
@@ -186,31 +194,100 @@ export interface BillingRecord {
   source: 'NetSuite';
 }
 
-// Demo data
+// Demo data - HCSC SOW Tier-based Programs
 export const programs: Program[] = [
   {
-    id: 'prog-001',
-    name: 'Cardiac Support – Medicaid',
-    description: 'Comprehensive nutrition program for Medicaid members with cardiovascular conditions',
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    eligibilityRules: 'Medicaid eligible, Cardiac diagnosis (ICD-10: I25.x), County in [Los Angeles, Orange, San Diego]',
-    benefitsFrequency: 'Weekly',
-    benefitsDuration: '12 weeks',
+    id: 'prog-tier1',
+    name: 'Tier 1: High Risk & Comorbidity',
+    tier: 1,
+    riskLevel: 'high',
+    description: 'Intensive 12-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
+    startDate: '2025-01-01',
+    endDate: '2025-12-31',
+    eligibilityRules: 'High risk score, multiple chronic conditions, comorbidity present',
+    duration: '12 weeks',
+    mealsPerWeek: 14,
+    mtmWeeks: 8, // Weeks 1-8: Medically Tailored Meals
+    mtgWeeks: 4, // Weeks 9-12: Medically Tailored Groceries
+    clinicalSupport: '3 months',
     status: 'active',
   },
   {
-    id: 'prog-002',
-    name: 'Heart Health – Medicare Advantage',
-    description: 'Medically tailored meals for members with cardiovascular conditions',
-    startDate: '2024-03-01',
-    endDate: '2025-02-28',
-    eligibilityRules: 'Medicare Advantage, CHF or CAD diagnosis, SDOH risk score > 3',
-    benefitsFrequency: 'Bi-weekly',
-    benefitsDuration: '16 weeks',
+    id: 'prog-tier2',
+    name: 'Tier 2: Medium Risk',
+    tier: 2,
+    riskLevel: 'medium',
+    description: '12-week step-down program for members with chronic conditions who have some capacity for self-preparation',
+    startDate: '2025-01-01',
+    endDate: '2025-12-31',
+    eligibilityRules: 'Medium risk score, chronic condition diagnosis, capacity for meal preparation',
+    duration: '12 weeks',
+    mealsPerWeek: 14,
+    mtmWeeks: 4, // Weeks 1-4: Medically Tailored Meals
+    mtgWeeks: 8, // Weeks 5-12: Medically Tailored Groceries
+    clinicalSupport: '3 months',
+    status: 'active',
+  },
+  {
+    id: 'prog-tier3',
+    name: 'Tier 3: Diet Quality & Preventive',
+    tier: 3,
+    riskLevel: 'preventive',
+    description: 'Preventive program for diet quality improvement and inflammation reduction via increased plant-based intake',
+    startDate: '2025-01-01',
+    endDate: '2025-12-31',
+    eligibilityRules: 'Preventive care, diet quality improvement, inflammation reduction goals',
+    duration: '12 weeks',
+    mealsPerWeek: 0, // Uses produce boxes instead
+    mtmWeeks: 0,
+    mtgWeeks: 0,
+    clinicalSupport: '3 months',
     status: 'active',
   },
 ];
+
+// Helper function to calculate phase based on tier and week
+export function calculatePhase(tier: 1 | 2 | 3, currentWeek: number): FoodPhase {
+  if (tier === 3) return 'Produce';
+  if (tier === 1) {
+    return currentWeek <= 8 ? 'MTM' : 'MTG';
+  }
+  // Tier 2
+  return currentWeek <= 4 ? 'MTM' : 'MTG';
+}
+
+// Helper to get phase week info
+export function getPhaseInfo(program: Program, currentWeek: number): { 
+  phase: FoodPhase; 
+  phaseWeek: number; 
+  phaseTotal: number;
+  phaseName: string;
+} {
+  if (program.tier === 3) {
+    const distribution = Math.ceil(currentWeek / 2); // Bi-weekly
+    return { 
+      phase: 'Produce', 
+      phaseWeek: distribution, 
+      phaseTotal: 6,
+      phaseName: 'Produce Box'
+    };
+  }
+  
+  const phase = calculatePhase(program.tier, currentWeek);
+  
+  if (program.tier === 1) {
+    if (phase === 'MTM') {
+      return { phase, phaseWeek: currentWeek, phaseTotal: 8, phaseName: 'Medically Tailored Meals' };
+    }
+    return { phase, phaseWeek: currentWeek - 8, phaseTotal: 4, phaseName: 'Medically Tailored Groceries' };
+  }
+  
+  // Tier 2
+  if (phase === 'MTM') {
+    return { phase, phaseWeek: currentWeek, phaseTotal: 4, phaseName: 'Medically Tailored Meals' };
+  }
+  return { phase, phaseWeek: currentWeek - 4, phaseTotal: 8, phaseName: 'Medically Tailored Groceries' };
+}
 
 // CBO Authorized Users
 export interface CBOUser {
@@ -439,21 +516,48 @@ for (let i = 6; i <= 50; i++) {
   });
 }
 
+// Assign members to tiers: 40% Tier 1, 40% Tier 2, 20% Tier 3
+const programIds = ['prog-tier1', 'prog-tier2', 'prog-tier3'];
+
 export const enrollments: Enrollment[] = members.map((member, idx) => {
   const statuses: Enrollment['status'][] = ['active', 'active', 'active', 'pending', 'paused', 'complete'];
   const sources: EnrollmentSource[] = ['CBO', 'CBO', 'HP Outreach', 'Provider', 'Self'];
   const status = statuses[Math.floor(Math.random() * statuses.length)];
   
+  // Distribute across tiers: 40% Tier 1, 40% Tier 2, 20% Tier 3
+  let programId: string;
+  const tierRoll = Math.random();
+  if (tierRoll < 0.4) {
+    programId = 'prog-tier1';
+  } else if (tierRoll < 0.8) {
+    programId = 'prog-tier2';
+  } else {
+    programId = 'prog-tier3';
+  }
+  
+  // First member (demo member) is always Tier 1, Week 3
+  if (idx === 0) {
+    programId = 'prog-tier1';
+  }
+  
+  const program = programs.find(p => p.id === programId)!;
+  
+  // Calculate current week (1-12), demo member is week 3
+  const currentWeek = idx === 0 ? 3 : Math.floor(Math.random() * 12) + 1;
+  const currentPhase = calculatePhase(program.tier, currentWeek);
+  
   return {
     id: `enr-${String(idx + 1).padStart(3, '0')}`,
     memberId: member.id,
-    programId: Math.random() > 0.4 ? 'prog-001' : 'prog-002',
+    programId,
     status,
     enrollmentSource: sources[Math.floor(Math.random() * sources.length)],
     sourceId: Math.random() > 0.5 ? cbos[Math.floor(Math.random() * cbos.length)].id : undefined,
     enrollmentDate: member.createdAt,
-    benefitLevel: Math.random() > 0.3 ? '12 weeks' : '8 weeks',
-    nextShipmentDate: status === 'active' ? `2024-04-${String(Math.floor(Math.random() * 15) + 1).padStart(2, '0')}` : undefined,
+    currentWeek,
+    currentPhase,
+    benefitLevel: `Tier ${program.tier} - Week ${currentWeek}`,
+    nextShipmentDate: status === 'active' ? `2025-02-${String(Math.floor(Math.random() * 15) + 1).padStart(2, '0')}` : undefined,
   };
 });
 
@@ -484,15 +588,25 @@ export const rulesDecisions: RulesDecision[] = enrollments.slice(0, 35).map((enr
 
 export const orders: Order[] = enrollments.filter(e => e.status === 'active').slice(0, 25).flatMap((enrollment, idx) => {
   const statuses: Order['shipmentStatus'][] = ['delivered', 'delivered', 'in_transit', 'shipped', 'processing', 'exception'];
+  const program = programs.find(p => p.id === enrollment.programId);
+  
+  // Set meal plan based on phase
+  let mealPlan = 'Medically Tailored Meals (MTM)';
+  if (enrollment.currentPhase === 'MTG') {
+    mealPlan = 'Medically Tailored Groceries (MTG)';
+  } else if (enrollment.currentPhase === 'Produce') {
+    mealPlan = 'Produce Box (15 lbs)';
+  }
+  
   return [{
     id: `ord-${String(idx + 1).padStart(3, '0')}`,
     memberId: enrollment.memberId,
     enrollmentId: enrollment.id,
-    mealPlan: Math.random() > 0.5 ? 'Diabetes-Friendly' : 'Heart Healthy',
-    mealsCount: Math.random() > 0.5 ? 14 : 21,
+    mealPlan,
+    mealsCount: program?.tier === 3 ? 0 : 14,
     shipmentStatus: statuses[Math.floor(Math.random() * statuses.length)],
     trackingNumber: `TRK${Math.floor(Math.random() * 900000) + 100000}`,
-    estimatedDelivery: `2024-04-${String(Math.floor(Math.random() * 10) + 5).padStart(2, '0')}`,
+    estimatedDelivery: `2025-02-${String(Math.floor(Math.random() * 10) + 5).padStart(2, '0')}`,
     deliveryExceptions: Math.random() > 0.9 ? ['Address not found', 'Recipient unavailable'] : undefined,
     createdAt: enrollment.enrollmentDate,
     source: 'NetSuite',
@@ -511,8 +625,8 @@ export const billingRecords: BillingRecord[] = orders.map((order, idx) => {
     orderId: order.id,
     status,
     amount: Math.floor(Math.random() * 200) + 100,
-    submittedAt: status !== 'pending' ? `2024-04-${String(Math.floor(Math.random() * 10) + 1).padStart(2, '0')}` : undefined,
-    paidAt: status === 'paid' ? `2024-04-${String(Math.floor(Math.random() * 10) + 10).padStart(2, '0')}` : undefined,
+    submittedAt: status !== 'pending' ? `2025-02-${String(Math.floor(Math.random() * 10) + 1).padStart(2, '0')}` : undefined,
+    paidAt: status === 'paid' ? `2025-02-${String(Math.floor(Math.random() * 10) + 10).padStart(2, '0')}` : undefined,
     source: 'NetSuite',
   };
 });
@@ -520,9 +634,9 @@ export const billingRecords: BillingRecord[] = orders.map((order, idx) => {
 export const campaigns: Campaign[] = [
   {
     id: 'camp-001',
-    name: 'Q1 Diabetes Program Launch',
-    segment: 'New Medicaid enrollees with diabetes',
-    programId: 'prog-001',
+    name: 'Tier 1 High Risk Onboarding',
+    segment: 'New enrollees with high-risk comorbidities',
+    programId: 'prog-tier1',
     touchCount: 156,
     smsCount: 312,
     emailCount: 156,
@@ -533,9 +647,9 @@ export const campaigns: Campaign[] = [
   },
   {
     id: 'camp-002',
-    name: 'Heart Health Awareness',
-    segment: 'Medicare Advantage with CHF diagnosis',
-    programId: 'prog-002',
+    name: 'Tier 2 MTG Transition',
+    segment: 'Members transitioning from MTM to MTG phase',
+    programId: 'prog-tier2',
     touchCount: 89,
     smsCount: 178,
     emailCount: 89,
@@ -546,8 +660,9 @@ export const campaigns: Campaign[] = [
   },
   {
     id: 'camp-003',
-    name: 'Re-engagement Campaign',
-    segment: 'Paused members - all programs',
+    name: 'Tier 3 Produce Box Reminder',
+    segment: 'Preventive program members - produce delivery',
+    programId: 'prog-tier3',
     touchCount: 34,
     smsCount: 68,
     emailCount: 34,
@@ -566,7 +681,7 @@ export const serviceCases: ServiceCase[] = [
     description: 'Member needs to update delivery address due to recent move.',
     status: 'open',
     priority: 'medium',
-    createdAt: '2024-03-15',
+    createdAt: '2025-01-15',
     source: 'Salesforce',
   },
   {
@@ -576,7 +691,7 @@ export const serviceCases: ServiceCase[] = [
     description: 'Member reports shipment marked delivered but not received.',
     status: 'in_progress',
     priority: 'high',
-    createdAt: '2024-03-18',
+    createdAt: '2025-01-18',
     source: 'Salesforce',
   },
   {
@@ -586,8 +701,8 @@ export const serviceCases: ServiceCase[] = [
     description: 'Member requesting change to vegetarian meal options.',
     status: 'resolved',
     priority: 'low',
-    createdAt: '2024-03-10',
-    resolvedAt: '2024-03-12',
+    createdAt: '2025-01-10',
+    resolvedAt: '2025-01-12',
     source: 'Salesforce',
   },
 ];
@@ -601,7 +716,7 @@ export const contentPlans: ContentPlan[] = members.slice(0, 20).map((member, idx
       title: 'Understanding Your Condition',
       type: 'video',
       status: Math.random() > 0.5 ? 'completed' : 'assigned',
-      completedAt: Math.random() > 0.5 ? '2024-03-05' : undefined,
+      completedAt: Math.random() > 0.5 ? '2025-01-05' : undefined,
       engagementScore: Math.floor(Math.random() * 40) + 60,
     },
     {
@@ -609,7 +724,7 @@ export const contentPlans: ContentPlan[] = members.slice(0, 20).map((member, idx
       title: 'Healthy Meal Preparation',
       type: 'class',
       status: Math.random() > 0.7 ? 'completed' : 'in_progress',
-      completedAt: Math.random() > 0.7 ? '2024-03-12' : undefined,
+      completedAt: Math.random() > 0.7 ? '2025-01-12' : undefined,
       engagementScore: Math.floor(Math.random() * 30) + 70,
     },
     {
@@ -625,13 +740,13 @@ export const contentPlans: ContentPlan[] = members.slice(0, 20).map((member, idx
 
 export const timelineEvents: TimelineEvent[] = [
   // Member 1 timeline
-  { id: 'evt-001', memberId: 'mem-001', timestamp: '2024-01-20 09:00', eventType: 'Intake Submitted', description: 'Member completed Healthie intake form', source: 'Healthie' },
-  { id: 'evt-002', memberId: 'mem-001', timestamp: '2024-01-20 09:15', eventType: 'Eligibility Approved', description: 'NetSuite rules engine approved eligibility for Diabetes Support program', source: 'NetSuite' },
-  { id: 'evt-003', memberId: 'mem-001', timestamp: '2024-01-20 10:00', eventType: 'Content Assigned', description: 'Nudge assigned 3 educational modules', source: 'Nudge' },
-  { id: 'evt-004', memberId: 'mem-001', timestamp: '2024-01-22 14:00', eventType: 'First Shipment', description: 'Order #ORD-001 shipped - 14 meals', source: 'NetSuite' },
-  { id: 'evt-005', memberId: 'mem-001', timestamp: '2024-01-25 11:00', eventType: 'Delivery Confirmed', description: 'Shipment delivered successfully', source: 'NetSuite' },
-  { id: 'evt-006', memberId: 'mem-001', timestamp: '2024-02-01 10:00', eventType: 'Campaign Touch', description: 'Received Q1 engagement email', source: 'Salesforce' },
-  { id: 'evt-007', memberId: 'mem-001', timestamp: '2024-02-05 16:00', eventType: 'Module Completed', description: 'Completed "Understanding Your Condition" video', source: 'Nudge' },
+  { id: 'evt-001', memberId: 'mem-001', timestamp: '2025-01-06 09:00', eventType: 'Intake Submitted', description: 'Member completed Healthie intake form', source: 'Healthie' },
+  { id: 'evt-002', memberId: 'mem-001', timestamp: '2025-01-06 09:15', eventType: 'Eligibility Approved', description: 'Approved for Tier 1: High Risk & Comorbidity program', source: 'NetSuite' },
+  { id: 'evt-003', memberId: 'mem-001', timestamp: '2025-01-06 10:00', eventType: 'Content Assigned', description: 'Nudge assigned 3 educational modules', source: 'Nudge' },
+  { id: 'evt-004', memberId: 'mem-001', timestamp: '2025-01-08 14:00', eventType: 'First MTM Shipment', description: 'Order #ORD-001 shipped - 14 Medically Tailored Meals', source: 'NetSuite' },
+  { id: 'evt-005', memberId: 'mem-001', timestamp: '2025-01-11 11:00', eventType: 'Delivery Confirmed', description: 'Week 1 MTM shipment delivered successfully', source: 'NetSuite' },
+  { id: 'evt-006', memberId: 'mem-001', timestamp: '2025-01-15 10:00', eventType: 'Health Coach Session', description: 'Completed first health coach consultation', source: 'Healthie' },
+  { id: 'evt-007', memberId: 'mem-001', timestamp: '2025-01-20 16:00', eventType: 'Module Completed', description: 'Completed "Understanding Your Condition" video', source: 'Nudge' },
 ];
 
 export const integrations: IntegrationStatus[] = [
@@ -640,7 +755,7 @@ export const integrations: IntegrationStatus[] = [
     name: 'Healthie',
     type: 'Healthie',
     status: 'connected',
-    lastSync: '2024-03-20 14:32:00',
+    lastSync: '2025-01-29 14:32:00',
     recordsProcessed: 1247,
     description: 'Forms & Assessments Ingestion',
   },
@@ -649,7 +764,7 @@ export const integrations: IntegrationStatus[] = [
     name: 'NetSuite',
     type: 'NetSuite',
     status: 'connected',
-    lastSync: '2024-03-20 14:30:00',
+    lastSync: '2025-01-29 14:30:00',
     recordsProcessed: 3891,
     description: 'Rules Engine & Fulfillment',
   },
@@ -658,7 +773,7 @@ export const integrations: IntegrationStatus[] = [
     name: 'Salesforce',
     type: 'Salesforce',
     status: 'syncing',
-    lastSync: '2024-03-20 14:28:00',
+    lastSync: '2025-01-29 14:28:00',
     recordsProcessed: 892,
     description: 'CRM & Service Cases',
   },
@@ -667,7 +782,7 @@ export const integrations: IntegrationStatus[] = [
     name: 'Nudge',
     type: 'Nudge',
     status: 'connected',
-    lastSync: '2024-03-20 14:25:00',
+    lastSync: '2025-01-29 14:25:00',
     recordsProcessed: 456,
     description: 'Content & Education',
   },
@@ -676,33 +791,33 @@ export const integrations: IntegrationStatus[] = [
 export const rules: Rule[] = [
   {
     id: 'rule-001',
-    name: 'Diabetes Support Eligibility',
-    condition: 'program = "Diabetes Support" AND member_county IN ["Los Angeles", "San Diego", "Orange"] AND consent = true',
-    action: 'benefit = 12 weeks, frequency = weekly, meal_plan = "Diabetes-Friendly"',
+    name: 'Tier 1 High Risk Eligibility',
+    condition: 'program = "Tier 1" AND risk_score >= 7 AND comorbidity_count >= 2 AND consent = true',
+    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-8), phase_2 = MTG (weeks 9-12), meals = 14/week',
     version: 'v2.3',
     status: 'published',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-02-15',
+    createdAt: '2025-01-01',
+    updatedAt: '2025-01-15',
   },
   {
     id: 'rule-002',
-    name: 'Heart Health Eligibility',
-    condition: 'program = "Heart Health" AND (diagnosis_code STARTS_WITH "I50" OR diagnosis_code STARTS_WITH "I25") AND consent = true',
-    action: 'benefit = 16 weeks, frequency = bi-weekly, meal_plan = "Heart Healthy"',
+    name: 'Tier 2 Medium Risk Eligibility',
+    condition: 'program = "Tier 2" AND risk_score >= 4 AND risk_score < 7 AND chronic_condition = true AND consent = true',
+    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-4), phase_2 = MTG (weeks 5-12), meals = 14/week',
     version: 'v1.2',
     status: 'published',
-    createdAt: '2024-03-01',
-    updatedAt: '2024-03-01',
+    createdAt: '2025-01-01',
+    updatedAt: '2025-01-01',
   },
   {
     id: 'rule-003',
-    name: 'High Risk Override',
-    condition: 'risk_score > 8 AND any_active_enrollment = true',
-    action: 'escalate_to_care_manager = true, priority = "high"',
+    name: 'Tier 3 Preventive Eligibility',
+    condition: 'program = "Tier 3" AND diet_quality_goal = true AND consent = true',
+    action: 'benefit = 12 weeks, produce_box = bi-weekly (6 distributions), produce_weight = 15lbs',
     version: 'v1.0',
-    status: 'draft',
-    createdAt: '2024-03-15',
-    updatedAt: '2024-03-15',
+    status: 'published',
+    createdAt: '2025-01-01',
+    updatedAt: '2025-01-01',
   },
 ];
 
@@ -749,7 +864,7 @@ export const healthPlanUsers: HealthPlanUser[] = [
     email: 'jadams@bluecross.com',
     role: 'admin',
     status: 'active',
-    lastLogin: '2024-03-28',
+    lastLogin: '2025-01-28',
   },
   {
     id: 'hp-user-002',
@@ -758,7 +873,7 @@ export const healthPlanUsers: HealthPlanUser[] = [
     email: 'mtorres@bluecross.com',
     role: 'analyst',
     status: 'active',
-    lastLogin: '2024-03-27',
+    lastLogin: '2025-01-27',
   },
   {
     id: 'hp-user-003',
@@ -767,7 +882,7 @@ export const healthPlanUsers: HealthPlanUser[] = [
     email: 'skim@bluecross.com',
     role: 'viewer',
     status: 'active',
-    lastLogin: '2024-03-25',
+    lastLogin: '2025-01-25',
   },
   {
     id: 'hp-user-004',
@@ -776,7 +891,7 @@ export const healthPlanUsers: HealthPlanUser[] = [
     email: 'dlee@bluecross.com',
     role: 'analyst',
     status: 'inactive',
-    lastLogin: '2024-02-10',
+    lastLogin: '2024-12-10',
   },
 ];
 
