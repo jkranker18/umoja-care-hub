@@ -2,9 +2,27 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version, x-healthie-user-token',
   'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
+
+const HEALTHIE_GRAPHQL_URL = 'https://api.gethealthie.com/graphql';
+
+// GraphQL mutation to sign in and get per-user API token
+const SIGN_IN_MUTATION = `
+  mutation signIn($input: signInInput!) {
+    signIn(input: $input) {
+      user {
+        id
+        api_key
+      }
+      messages {
+        field
+        message
+      }
+    }
+  }
+`;
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -22,9 +40,7 @@ serve(async (req) => {
     );
   }
 
-  const url = new URL(req.url);
-  
-  // GET request - return API key for WebSocket connection
+  // GET request - return API key for WebSocket connection (admin key for now, will be replaced by per-user flow)
   if (req.method === 'GET') {
     return new Response(
       JSON.stringify({ apiKey: HEALTHIE_API_KEY }),
@@ -33,15 +49,101 @@ serve(async (req) => {
   }
 
   try {
-    // POST - Forward GraphQL request to Healthie
     const body = await req.json();
+    
+    // Check if this is an authentication request
+    if (body.path === 'auth') {
+      console.log('Processing Healthie authentication request');
+      
+      const { email, password } = body;
+      
+      if (!email || !password) {
+        return new Response(
+          JSON.stringify({ error: 'Email and password are required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Call Healthie signIn mutation to get per-user API token
+      const authResponse = await fetch(HEALTHIE_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': `Basic ${HEALTHIE_API_KEY}`,
+          'authorizationsource': 'API',
+        },
+        body: JSON.stringify({
+          query: SIGN_IN_MUTATION,
+          variables: {
+            input: {
+              email,
+              password,
+              generate_api_token: true,
+            },
+          },
+        }),
+      });
+
+      const authData = await authResponse.json();
+      console.log('Healthie auth response status:', authResponse.status);
+      
+      if (authData.errors) {
+        console.error('Healthie auth GraphQL errors:', JSON.stringify(authData.errors));
+        return new Response(
+          JSON.stringify({ error: 'Authentication failed', details: authData.errors }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const signInResult = authData.data?.signIn;
+      
+      if (signInResult?.messages && signInResult.messages.length > 0) {
+        console.error('Healthie signIn messages:', JSON.stringify(signInResult.messages));
+        return new Response(
+          JSON.stringify({ error: 'Authentication failed', messages: signInResult.messages }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const user = signInResult?.user;
+      
+      if (!user?.id || !user?.api_key) {
+        console.error('No user data returned from Healthie signIn');
+        return new Response(
+          JSON.stringify({ error: 'Authentication failed - no user data returned' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('Healthie auth successful for user:', user.id);
+      
+      return new Response(
+        JSON.stringify({
+          userId: user.id,
+          apiToken: user.api_key,
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Regular GraphQL proxy request
     console.log('Proxying GraphQL request to Healthie:', JSON.stringify(body.operationName || 'unknown'));
     
-    const response = await fetch('https://api.gethealthie.com/graphql', {
+    // Check for per-user token in header, fall back to admin key
+    const userToken = req.headers.get('x-healthie-user-token');
+    const authToken = userToken || HEALTHIE_API_KEY;
+    
+    if (userToken) {
+      console.log('Using per-user token for request');
+    } else {
+      console.log('Using admin API key for request');
+    }
+    
+    const response = await fetch(HEALTHIE_GRAPHQL_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `Basic ${HEALTHIE_API_KEY}`,
+        'authorization': `Basic ${authToken}`,
         'authorizationsource': 'API',
       },
       body: JSON.stringify(body),
