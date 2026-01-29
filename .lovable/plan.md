@@ -1,128 +1,143 @@
 
-# Update CBO Intake Form Step 6: Remove Risk Flags, Add Consent
+# Add Health Coach Section to Member Portal
 
 ## Overview
-Modify Step 6 (Review & Submit) of the CBO Member Intake form to remove the automated risk flags display and add the consent section from the member signup flow instead.
+Add a new "Health Coach" section to the member portal that allows members to book coaching sessions through an embedded Healthie calendar. This will be accessible both from the sidebar navigation and the tabs.
 
 ---
 
-## Current Step 6 Structure
-```
-- Member Information summary
-- Address summary  
-- Identified Risk Flags (with AlertTriangle icon) ← REMOVE
-- Brief text about confirming consent
-```
+## Changes Summary
 
-## New Step 6 Structure
-```
-- Member Information summary
-- Address summary
-- Program Participation Agreement box ← ADD
-- Consent checkbox ← ADD
-```
+| File | Action |
+|------|--------|
+| `src/components/layout/Sidebar.tsx` | Add "Health Coach" nav item to memberNav array |
+| `src/pages/member/MemberHome.tsx` | Add "Health Coach" tab trigger and content with Healthie iframe |
 
 ---
 
-## Changes
+## Implementation Details
 
-**File:** `src/pages/cbo/CBOMemberIntake.tsx`
+### 1. Update Sidebar Navigation
 
-### 1. Add consent field to form data interface and initial state
+**File:** `src/components/layout/Sidebar.tsx`
 
-Add to `CBOIntakeFormData` interface:
+Add a new nav item to the `memberNav` array with a calendar/coach icon:
+
 ```typescript
-consent: boolean;
+const memberNav: NavItem[] = [
+  { label: 'Home', path: '/member', icon: Home, tabId: 'overview' },
+  { label: 'My Program', path: '/member', icon: ClipboardList, tabId: 'plan' },
+  { label: 'My Orders', path: '/member', icon: Package, tabId: 'orders' },
+  { label: 'Education', path: '/member', icon: FileText, tabId: 'content' },
+  { label: 'Health Coach', path: '/member', icon: CalendarCheck, tabId: 'coach' },  // NEW
+  { label: 'Profile', path: '/member/profile', icon: User },
+];
 ```
 
-Add to `initialFormData`:
-```typescript
-consent: false,
+Import the `CalendarCheck` icon from lucide-react (represents scheduling/coaching appointments).
+
+---
+
+### 2. Update Member Home Tabs
+
+**File:** `src/pages/member/MemberHome.tsx`
+
+#### Add Tab Trigger
+
+Add a new tab trigger in the TabsList (after "Education"):
+
+```tsx
+<TabsTrigger value="coach">Health Coach</TabsTrigger>
 ```
 
-### 2. Update renderStep6() function
+#### Add Tab Content
 
-Replace the risk flags section with the consent section from MemberSignup:
+Add a new TabsContent section that embeds the Healthie calendar:
 
-| Remove | Add |
-|--------|-----|
-| Risk flags calculation display | Program Participation Agreement box |
-| AlertTriangle icon section | Consent checkbox with label |
-| "No Risk Flags Identified" section | — |
-
-The consent section will include:
-- A muted background box with the Program Participation Agreement
-- Bullet points explaining what the member agrees to
-- A checkbox for "I consent to participate"
-
-### 3. Update handleSubmit() to validate consent
-
-Add check to ensure consent is given before enrolling:
-```typescript
-if (!formData.consent) {
-  toast({
-    title: "Consent Required",
-    description: "Please confirm member consent before enrolling.",
-    variant: "destructive",
-  });
-  return;
-}
+```tsx
+<TabsContent value="coach">
+  <Card>
+    <CardHeader>
+      <CardTitle>Health Coach</CardTitle>
+      <CardDescription>
+        Book a session with one of our certified health coaches.
+      </CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
+        <iframe 
+          src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B8869243,8962005,9151476,11170106,11976136,12000025%5D&appt_type_ids=%5B466786,466787,466788%5D&org_level=true" 
+          style={{ width: '100%', height: '600px', border: 'none' }}
+          title="Book Health Coach Appointment"
+        />
+      </div>
+      <p className="text-sm text-muted-foreground mt-4 text-center">
+        Booking provided by{' '}
+        <a 
+          href="https://gethealthie.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-primary hover:underline"
+        >
+          Healthie
+        </a>
+      </p>
+    </CardContent>
+  </Card>
+</TabsContent>
 ```
 
 ---
 
 ## Visual Preview
 
-**Step 6 will now look like:**
-
+**Sidebar (Member):**
 ```
-┌─────────────────────────────────────────────┐
-│ Member Information                          │
-│ Name: John Smith    DOB: 01/15/1960        │
-│ Phone: (555) 123-4567  Email: john@...     │
-└─────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────┐
-│ Address                                     │
-│ 123 Main St                                │
-│ Los Angeles, CA 90001                      │
-└─────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────┐
-│ Program Participation Agreement             │
-│                                             │
-│ By enrolling in the Umoja Health nutrition  │
-│ program, I understand and agree to:         │
-│                                             │
-│ • Receive medically tailored meals and      │
-│   nutrition education                       │
-│ • Share my health information with program  │
-│   partners for care coordination            │
-│ • Participate in assessments and surveys    │
-│   to measure outcomes                       │
-│ • Be contacted by phone, email, or text     │
-│   about my program                          │
-└─────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────┐
-│ [✓] I consent to participate                │
-│     I have read and agree to the terms      │
-│     above.                                  │
-└─────────────────────────────────────────────┘
+┌─────────────────────────┐
+│ [Umoja Logo]            │
+├─────────────────────────┤
+│ 🏠 Home                 │
+│ 📋 My Program           │
+│ 📦 My Orders            │
+│ 📄 Education            │
+│ 📅 Health Coach   ← NEW │
+│ 👤 Profile              │
+└─────────────────────────┘
 ```
 
----
+**Tab Bar:**
+```
+┌──────────┬────────────┬───────────┬───────────┬──────────────┐
+│ Overview │ My Program │ My Orders │ Education │ Health Coach │
+└──────────┴────────────┴───────────┴───────────┴──────────────┘
+                                                      ↑ NEW
+```
 
-## Files Modified
-
-| File | Changes |
-|------|---------|
-| `src/pages/cbo/CBOMemberIntake.tsx` | Add consent field, replace risk flags with consent UI, add validation |
+**Health Coach Tab Content:**
+```
+┌─────────────────────────────────────────────────────────┐
+│ Health Coach                                            │
+│ Book a session with one of our certified health coaches │
+├─────────────────────────────────────────────────────────┤
+│ ┌─────────────────────────────────────────────────────┐ │
+│ │                                                     │ │
+│ │        [Healthie Calendar Embed]                    │ │
+│ │                                                     │ │
+│ │  Select a provider, appointment type, and time...   │ │
+│ │                                                     │ │
+│ └─────────────────────────────────────────────────────┘ │
+│                                                         │
+│         Booking provided by Healthie                    │
+└─────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Technical Notes
 
-- The `calculateRiskFlags()` function can remain in the code (risk data is still captured in form responses) but will no longer be displayed to the CBO staff on the review screen
-- The consent checkbox uses the same styling as MemberSignup for consistency
-- Validation ensures consent is required before enrollment can proceed
+- The iframe uses the exact URL and parameters provided by the user
+- The `CalendarCheck` icon from lucide-react represents appointment scheduling
+- The iframe has `min-h-[600px]` to match the requested minimum height
+- A border and rounded corners are added around the iframe for visual consistency
+- The Healthie attribution link opens in a new tab with proper security attributes
+- The tab ID `coach` is used consistently in both the sidebar and tabs for synchronized navigation
