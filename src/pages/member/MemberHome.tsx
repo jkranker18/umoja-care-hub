@@ -19,6 +19,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEducationProgress, ModuleId } from '@/hooks/useEducationProgress';
 import { useSupportCases } from '@/hooks/useSupportCases';
+import { HealthieChatWrapper } from '@/components/healthie/HealthieChatWrapper';
+import { HealthieChat } from '@/components/healthie/HealthieChat';
 
 export default function MemberHome() {
   const { members } = useApp();
@@ -578,7 +580,8 @@ export default function MemberHome() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="coach">
+          <TabsContent value="coach" className="space-y-6">
+            {/* Booking Section */}
             <Card>
               <CardHeader>
                 <CardTitle>Health Coach</CardTitle>
@@ -596,6 +599,38 @@ export default function MemberHome() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-4 text-center">
                   Booking provided by{' '}
+                  <a 
+                    href="https://gethealthie.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Healthie
+                  </a>
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Chat Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  Message Your Coach
+                </CardTitle>
+                <CardDescription>
+                  Chat directly with your health coach between sessions.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <HealthieChatWrapper 
+                  apiKey={import.meta.env.VITE_HEALTHIE_API_KEY || ''}
+                  userId={member?.healthieUserId}
+                >
+                  <HealthieChat />
+                </HealthieChatWrapper>
+                <p className="text-sm text-muted-foreground mt-4 text-center">
+                  Messaging powered by{' '}
                   <a 
                     href="https://gethealthie.com" 
                     target="_blank" 
