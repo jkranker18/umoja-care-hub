@@ -12,11 +12,9 @@ const HEALTHIE_GRAPHQL_URL = 'https://api.gethealthie.com/graphql';
 const SIGN_IN_MUTATION = `
   mutation signIn($input: signInInput!) {
     signIn(input: $input) {
+      api_key
       user {
         id
-        api_keys {
-          api_key
-        }
       }
       messages {
         field
@@ -108,10 +106,10 @@ serve(async (req) => {
       }
 
       const user = signInResult?.user;
-      const apiKey = user?.api_keys?.[0]?.api_key;
+      const apiKey = signInResult?.api_key;
       
       if (!user?.id || !apiKey) {
-        console.error('No user data or API key returned from Healthie signIn');
+        console.error('No user data or api_key returned from Healthie signIn');
         return new Response(
           JSON.stringify({ error: 'Authentication failed - no user data returned' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
