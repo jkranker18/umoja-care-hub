@@ -3,7 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 };
 
 serve(async (req) => {
@@ -12,18 +12,28 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
-    const HEALTHIE_API_KEY = Deno.env.get('HEALTHIE_API_KEY');
-    
-    if (!HEALTHIE_API_KEY) {
-      console.error('HEALTHIE_API_KEY not configured');
-      return new Response(
-        JSON.stringify({ error: 'API key not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+  const HEALTHIE_API_KEY = Deno.env.get('HEALTHIE_API_KEY');
+  
+  if (!HEALTHIE_API_KEY) {
+    console.error('HEALTHIE_API_KEY not configured');
+    return new Response(
+      JSON.stringify({ error: 'API key not configured' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
 
-    // Forward request to Healthie
+  const url = new URL(req.url);
+  
+  // GET request - return API key for WebSocket connection
+  if (req.method === 'GET') {
+    return new Response(
+      JSON.stringify({ apiKey: HEALTHIE_API_KEY }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  try {
+    // POST - Forward GraphQL request to Healthie
     const body = await req.json();
     console.log('Proxying GraphQL request to Healthie:', JSON.stringify(body.operationName || 'unknown'));
     
