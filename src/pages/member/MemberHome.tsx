@@ -220,7 +220,7 @@ export default function MemberHome() {
           />
           <KPICard
             title="Current Phase"
-            value={phaseInfo?.phase || 'MTM'}
+            value={phaseInfo?.phase === 'MTM' ? 'Meals' : phaseInfo?.phase === 'MTG' ? 'Groceries' : phaseInfo?.phase || 'Meals'}
             subtitle={phaseInfo ? `Week ${phaseInfo.phaseWeek} of ${phaseInfo.phaseTotal} • ${program?.tier === 3 ? '15 lbs produce' : '14 meals/week'}` : ''}
             icon={<Utensils className="h-5 w-5" />}
           />
