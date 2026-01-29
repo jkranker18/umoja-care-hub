@@ -11,18 +11,19 @@ interface HealthieChatWrapperProps {
   children: React.ReactNode;
 }
 
+// Edge function URL for Healthie proxy
+const HEALTHIE_PROXY_URL = 'https://bfcpaxjwfddoqfpjynrs.supabase.co/functions/v1/healthie-proxy';
+
 export function HealthieChatWrapper({ apiKey, userId, children }: HealthieChatWrapperProps) {
   const client = useMemo(() => {
-    // HTTP link for queries and mutations
+    // HTTP link for queries and mutations - using edge function proxy to bypass CORS
     const httpLink = new HttpLink({
-      uri: 'https://api.gethealthie.com/graphql',
-      headers: {
-        authorization: `Basic ${apiKey}`,
-        authorizationsource: 'API',
-      },
+      uri: HEALTHIE_PROXY_URL,
+      // No auth headers needed - the edge function handles Healthie authentication
     });
 
     // WebSocket link via ActionCable for subscriptions
+    // WebSocket connections are not subject to CORS, so direct connection should work
     const cable = ActionCable.createConsumer(
       `wss://ws.gethealthie.com/subscriptions?token=${apiKey}`
     );

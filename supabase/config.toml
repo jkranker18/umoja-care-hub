@@ -1,0 +1,4 @@
+project_id = "764df87d-4942-4d7e-9b86-8dc182dcc8ce"
+
+[functions.healthie-proxy]
+verify_jwt = false
