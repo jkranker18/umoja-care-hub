@@ -1,260 +1,133 @@
 
 
-# Update Demo Programs to Reflect HCSC SOW Tiers
+# Update My Orders to Show MTM vs MTG by Week
 
 ## Overview
-Update all mock data and UI surfaces to reflect the real-world HCSC program structure with three tiers based on the SOW document. This will replace generic program names with specific tier-based programs that accurately reflect the food protocols, clinical support, and timing from the proposal.
+Update the "My Orders" tab to display the correct food protocol (MTM vs MTG) for each order based on which week of the program it represents, rather than showing the same label for all orders.
 
 ---
 
-## Tier Structure from SOW
+## Current Behavior
+All 12 orders display the same meal plan label based on the member's current phase:
+- Orders 1-12 all show "Medically Tailored Meals (MTM)" if member is in weeks 1-8
+- Or all show "Medically Tailored Groceries (MTG)" if member is in weeks 9-12
 
-Based on the parsed PDF document, here are the three program tiers:
+## New Behavior
+Each order will show the correct label based on its position in the 12-week program:
 
-| Tier | Name | Risk Level | Duration | Food Protocol | Clinical Support |
-|------|------|------------|----------|---------------|------------------|
-| **Tier 1** | High Risk & Comorbidity | High Risk | 12 weeks | Weeks 1-8: MTM (14 meals/week), Weeks 9-12: MTG (14 meals/week) | 3 months |
-| **Tier 2** | Medium Risk | Medium Risk | 12 weeks | Weeks 1-4: MTM (14 meals/week), Weeks 5-12: MTG (14 meals/week) | 3 months |
-| **Tier 3** | Diet Quality & Preventive | Preventive | 12 weeks | Produce Box: Bi-weekly (6 distributions), 15lbs fresh produce | 3 months |
+**For Tier 1 (MTM weeks 1-8, MTG weeks 9-12):**
+- Orders 1-8: "Medically Tailored Meals (MTM)"
+- Orders 9-12: "Medically Tailored Groceries (MTG)"
 
-**Key Terms:**
-- **MTM** = Medically Tailored Meals (prepared, heat & eat)
-- **MTG** = Medically Tailored Groceries (cooking & preparation)
+**For Tier 2 (MTM weeks 1-4, MTG weeks 5-12):**
+- Orders 1-4: "Medically Tailored Meals (MTM)"
+- Orders 5-12: "Medically Tailored Groceries (MTG)"
+
+**For Tier 3:**
+- All orders: "Produce Box (15 lbs)"
 
 ---
 
-## Files to Modify
+## Implementation
+
+### File: `src/pages/member/MemberHome.tsx`
+
+**Change 1: Create helper function to get meal plan label by week**
+
+Add a function that takes the week number and returns the appropriate label:
+
+```typescript
+const getMealPlanLabelForWeek = (weekNumber: number): string => {
+  if (!program) return 'Medically Tailored Meals';
+  if (program.tier === 3) return 'Produce Box (15 lbs)';
+  
+  // For Tier 1: MTM weeks 1-8, MTG weeks 9-12
+  // For Tier 2: MTM weeks 1-4, MTG weeks 5-12
+  const mtmWeeks = program.mtmWeeks;
+  
+  if (weekNumber <= mtmWeeks) {
+    return 'Medically Tailored Meals (MTM)';
+  } else {
+    return 'Medically Tailored Groceries (MTG)';
+  }
+};
+```
+
+**Change 2: Update demo orders array to use week-specific labels**
+
+Instead of using the same `mealPlanLabel` for all orders, assign each order its week number and calculate the label:
+
+```typescript
+const demoOrders = Array.from({ length: 12 }, (_, index) => {
+  const weekNumber = index + 1;
+  const isDelivered = weekNumber <= 3;
+  const isInTransit = weekNumber === 4;
+  
+  return {
+    id: `ORD-${String(weekNumber).padStart(3, '0')}`,
+    memberId: member?.id,
+    weekNumber,
+    mealPlan: getMealPlanLabelForWeek(weekNumber),
+    mealsCount: program?.tier === 3 ? 0 : 14,
+    shipmentStatus: isDelivered ? 'delivered' : isInTransit ? 'in_transit' : 'processing',
+    trackingNumber: `TRK-883452${weekNumber}`,
+    estimatedDelivery: // calculated date based on week
+  };
+});
+```
+
+**Change 3: Update order display in "My Orders" tab**
+
+Add week number to the order display:
+```
+Week 3 • Medically Tailored Meals (MTM)
+14 meals • Order #ORD-003
+```
+
+---
+
+## Visual Preview
+
+**My Orders tab (Tier 1 member):**
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Order History                                                │
+│ Track all your meal shipments. 12 total orders.              │
+├──────────────────────────────────────────────────────────────┤
+│ [📦] Week 1 • Medically Tailored Meals (MTM)     [Delivered] │
+│      14 meals • Order #ORD-001                   Jan 6, 2025 │
+├──────────────────────────────────────────────────────────────┤
+│ [📦] Week 2 • Medically Tailored Meals (MTM)     [Delivered] │
+│      14 meals • Order #ORD-002                   Jan 13, 2025│
+├──────────────────────────────────────────────────────────────┤
+│ ... (weeks 3-8 all MTM) ...                                  │
+├──────────────────────────────────────────────────────────────┤
+│ [📦] Week 9 • Medically Tailored Groceries (MTG) [Processing]│
+│      14 meals • Order #ORD-009                   Mar 3, 2025 │
+├──────────────────────────────────────────────────────────────┤
+│ [📦] Week 10 • Medically Tailored Groceries (MTG)[Processing]│
+│      14 meals • Order #ORD-010                   Mar 10, 2025│
+├──────────────────────────────────────────────────────────────┤
+│ ... (weeks 11-12 all MTG) ...                                │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Files Modified
 
 | File | Changes |
 |------|---------|
-| `src/lib/mockData.ts` | Update `programs` array with 3 tiers, update `Program` interface, update enrollment benefit levels |
-| `src/pages/member/MemberHome.tsx` | Update program display to show tier info, phase progress (MTM vs MTG), meal counts |
-| `src/pages/healthplan/HealthPlanDashboard.tsx` | Update to display tier-based programs in dropdowns and breakdowns |
-| `src/pages/cbo/CBODashboard.tsx` | Update program filter to show tier names |
-| `src/pages/internal/InternalOpsDashboard.tsx` | Update program references in exception queues |
-| `src/components/internal/ProgramPipelineDashboard.tsx` | Update program selector with tier names |
-
----
-
-## Detailed Changes
-
-### 1. Update Mock Data (`src/lib/mockData.ts`)
-
-**Update Program Interface:**
-```typescript
-export interface Program {
-  id: string;
-  name: string;
-  tier: 1 | 2 | 3;
-  riskLevel: 'high' | 'medium' | 'preventive';
-  description: string;
-  startDate: string;
-  endDate: string;
-  eligibilityRules: string;
-  duration: string; // "12 weeks"
-  mealsPerWeek: number;
-  mtmWeeks: number; // Medically Tailored Meals phase
-  mtgWeeks: number; // Medically Tailored Groceries phase
-  clinicalSupport: string; // "3 months"
-  status: 'active' | 'inactive' | 'planning';
-}
-```
-
-**Replace programs array:**
-```typescript
-export const programs: Program[] = [
-  {
-    id: 'prog-tier1',
-    name: 'Tier 1: High Risk & Comorbidity',
-    tier: 1,
-    riskLevel: 'high',
-    description: 'Intensive 12-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
-    eligibilityRules: 'High risk score, multiple chronic conditions, comorbidity present',
-    duration: '12 weeks',
-    mealsPerWeek: 14,
-    mtmWeeks: 8, // Weeks 1-8: Medically Tailored Meals
-    mtgWeeks: 4, // Weeks 9-12: Medically Tailored Groceries
-    clinicalSupport: '3 months',
-    status: 'active',
-  },
-  {
-    id: 'prog-tier2',
-    name: 'Tier 2: Medium Risk',
-    tier: 2,
-    riskLevel: 'medium',
-    description: '12-week step-down program for members with chronic conditions who have some capacity for self-preparation',
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
-    eligibilityRules: 'Medium risk score, chronic condition diagnosis, capacity for meal preparation',
-    duration: '12 weeks',
-    mealsPerWeek: 14,
-    mtmWeeks: 4, // Weeks 1-4: Medically Tailored Meals
-    mtgWeeks: 8, // Weeks 5-12: Medically Tailored Groceries
-    clinicalSupport: '3 months',
-    status: 'active',
-  },
-  {
-    id: 'prog-tier3',
-    name: 'Tier 3: Diet Quality & Preventive',
-    tier: 3,
-    riskLevel: 'preventive',
-    description: 'Preventive program for diet quality improvement and inflammation reduction via increased plant-based intake',
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
-    eligibilityRules: 'Preventive care, diet quality improvement, inflammation reduction goals',
-    duration: '12 weeks',
-    mealsPerWeek: 0, // Uses produce boxes instead
-    mtmWeeks: 0,
-    mtgWeeks: 0,
-    clinicalSupport: '3 months',
-    status: 'active',
-  },
-];
-```
-
-**Update Enrollment interface to include phase tracking:**
-```typescript
-export interface Enrollment {
-  id: string;
-  memberId: string;
-  programId: string;
-  status: EnrollmentStatus;
-  enrollmentSource: EnrollmentSource;
-  sourceId?: string;
-  enrollmentDate: string;
-  currentWeek: number; // 1-12
-  currentPhase: 'MTM' | 'MTG' | 'Produce'; // Current food protocol phase
-  benefitLevel: string; // e.g., "Tier 1 - Week 4"
-  nextShipmentDate?: string;
-}
-```
-
-**Update enrollment generation to assign tiers and phases:**
-- Distribute members across 3 tiers (40% Tier 1, 40% Tier 2, 20% Tier 3)
-- Calculate currentWeek (1-12) and currentPhase based on tier and week
-- Update benefitLevel to show tier and phase info
-
----
-
-### 2. Update Member Home (`src/pages/member/MemberHome.tsx`)
-
-**Changes to Overview tab:**
-- Display tier name and phase prominently
-- Show "Phase: MTM (Weeks 1-8)" or "Phase: MTG (Weeks 9-12)" 
-- Update Benefit Level card to show phase progress
-- Update demo orders to reflect MTM vs MTG meal types
-
-**Update the KPI cards section:**
-```
-Current values:
-- "Benefit Level: 12 weeks"
-- "Weekly | 14 meals/week"
-
-New values for Tier 1 member in Week 3:
-- "Benefit Level: Tier 1"  
-- "MTM Phase (Week 3 of 8) | 14 meals/week"
-```
-
-**Update the "Current Program" card:**
-- Show tier name
-- Show phase timeline with MTM → MTG progression
-- Display current week in program
-
-**Update demo orders:**
-- Change meal plan from "Cardiac Friendly" to reflect phase:
-  - Weeks 1-8: "Medically Tailored Meals (MTM)"
-  - Weeks 9-12: "Medically Tailored Groceries (MTG)"
-
----
-
-### 3. Update Health Plan Dashboard (`src/pages/healthplan/HealthPlanDashboard.tsx`)
-
-**Changes:**
-- Update program dropdown to show tier names
-- Update "By Program" breakdown to show tier enrollment counts
-- Show phase distribution within each tier
-
----
-
-### 4. Update CBO Dashboard (`src/pages/cbo/CBODashboard.tsx`)
-
-**Changes:**
-- Update program filter dropdown with tier names
-- Update member table to show tier assignment
-- Show phase info in member rows
-
----
-
-### 5. Update Internal Ops Dashboard (`src/pages/internal/InternalOpsDashboard.tsx`)
-
-**Changes:**
-- Update program references in exception queues
-- Show tier in member exception rows
-
----
-
-### 6. Update Pipeline Dashboard (`src/components/internal/ProgramPipelineDashboard.tsx`)
-
-**Changes:**
-- Update program selector with tier names
-- Optionally add phase breakdown view
-
----
-
-## Member Portal - Visual Design
-
-**Program Status Card (Overview tab):**
-```
-┌─────────────────────────────────────────────────────┐
-│ Current Program                         [Active]    │
-├─────────────────────────────────────────────────────┤
-│ Tier 1: High Risk & Comorbidity                    │
-│                                                     │
-│ Phase Progress                                      │
-│ ┌─────────────────────────────────────────────────┐ │
-│ │ MTM (Weeks 1-8)              MTG (Weeks 9-12)   │ │
-│ │ ████████████████░░░░░░░░░░░  ░░░░░░░░░░░░░░░░░  │ │
-│ │      Week 3 of 12                               │ │
-│ └─────────────────────────────────────────────────┘ │
-│                                                     │
-│ ┌───────────┐ ┌───────────┐ ┌───────────┐          │
-│ │ Enrolled  │ │ Frequency │ │ Duration  │          │
-│ │ Jan 6     │ │ Weekly    │ │ 12 weeks  │          │
-│ └───────────┘ └───────────┘ └───────────┘          │
-└─────────────────────────────────────────────────────┘
-```
-
-**Updated Benefit Level KPI Card:**
-```
-┌────────────────────────┐
-│ 🍽️  Current Phase       │
-│                        │
-│ MTM                    │
-│ Week 3 of 8            │
-│ 14 meals/week          │
-└────────────────────────┘
-```
+| `src/pages/member/MemberHome.tsx` | Add `getMealPlanLabelForWeek()` helper, refactor `demoOrders` array to assign week numbers and week-specific labels, update order rendering to show week number |
 
 ---
 
 ## Technical Notes
 
-- The `Program` interface is extended but remains backward compatible
-- Existing program IDs are changed from `prog-001`/`prog-002` to `prog-tier1`/`prog-tier2`/`prog-tier3`
-- Enrollment objects get new fields (`currentWeek`, `currentPhase`) to track progression
-- Demo member (first member) will be assigned to Tier 1, Week 3 for demonstration
-- Orders will be labeled with MTM or MTG based on the member's current phase
-- All portal views (member, CBO, health plan, internal) will display consistent tier information
-
----
-
-## Affected Interfaces
-
-The following TypeScript interfaces will be updated:
-1. `Program` - Add tier, riskLevel, mtmWeeks, mtgWeeks, clinicalSupport fields
-2. `Enrollment` - Add currentWeek, currentPhase fields
-
-All components importing from `mockData.ts` will automatically pick up the new program structure.
+- The transition point (MTM to MTG) uses `program.mtmWeeks` which is 8 for Tier 1 and 4 for Tier 2
+- Tier 3 members see "Produce Box (15 lbs)" for all orders
+- Order dates remain sequential (weekly) starting from Jan 6, 2025
+- The order display now includes "Week X" prefix for clarity
+- This change only affects the demo orders; the actual `orders` from mockData are not modified
 
