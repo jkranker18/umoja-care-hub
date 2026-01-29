@@ -403,8 +403,8 @@ export const members: Member[] = [
     createdAt: '2024-01-20',
     healthieUserId: '13159857', // Linked Healthie user ID for chat
     // TODO: Replace with actual Healthie credentials for John TestSmith
-    healthieEmail: '', // e.g., 'johntestsmith@example.com'
-    healthiePassword: '', // e.g., 'password123'
+    healthieEmail: 'jason@wellchemy.ai',
+    healthiePassword: 'Tightlines2026..',
     healthieConversationId: '17976028', // Conversation with health coach
   },
   {
