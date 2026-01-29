@@ -14,7 +14,9 @@ const SIGN_IN_MUTATION = `
     signIn(input: $input) {
       user {
         id
-        api_key
+        api_keys {
+          api_key
+        }
       }
       messages {
         field
@@ -106,9 +108,10 @@ serve(async (req) => {
       }
 
       const user = signInResult?.user;
+      const apiKey = user?.api_keys?.[0]?.api_key;
       
-      if (!user?.id || !user?.api_key) {
-        console.error('No user data returned from Healthie signIn');
+      if (!user?.id || !apiKey) {
+        console.error('No user data or API key returned from Healthie signIn');
         return new Response(
           JSON.stringify({ error: 'Authentication failed - no user data returned' }),
           { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -120,7 +123,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           userId: user.id,
-          apiToken: user.api_key,
+          apiToken: apiKey,
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
