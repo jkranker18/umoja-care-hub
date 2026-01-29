@@ -1,10 +1,14 @@
 import { Chat } from '@healthie/chat';
 import '@healthie/chat/dist/styles/index.css';
 
-export function HealthieChat() {
+interface HealthieChatProps {
+  conversationId?: string;
+}
+
+export function HealthieChat({ conversationId }: HealthieChatProps) {
   return (
     <div className="h-[500px] border rounded-lg overflow-hidden bg-background">
-      <Chat />
+      <Chat conversationId={conversationId} />
     </div>
   );
 }

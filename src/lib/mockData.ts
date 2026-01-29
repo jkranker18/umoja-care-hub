@@ -21,6 +21,9 @@ export interface Member {
   riskFlags: string[];
   createdAt: string;
   healthieUserId?: string; // Healthie user ID for chat integration
+  healthieEmail?: string; // Healthie email for authentication
+  healthiePassword?: string; // Healthie password for authentication (demo only)
+  healthieConversationId?: string; // Specific conversation ID for chat
 }
 
 export interface Program {
@@ -399,6 +402,10 @@ export const members: Member[] = [
     riskFlags: ['High A1C', 'Food Insecurity'],
     createdAt: '2024-01-20',
     healthieUserId: '13159857', // Linked Healthie user ID for chat
+    // TODO: Replace with actual Healthie credentials for John TestSmith
+    healthieEmail: '', // e.g., 'johntestsmith@example.com'
+    healthiePassword: '', // e.g., 'password123'
+    healthieConversationId: '17976028', // Conversation with health coach
   },
   {
     id: 'mem-002',

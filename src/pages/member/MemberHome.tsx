@@ -623,8 +623,12 @@ export default function MemberHome() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <HealthieChatWrapper userId={member?.healthieUserId}>
-                  <HealthieChat />
+              <HealthieChatWrapper 
+                  userId={member?.healthieUserId}
+                  email={member?.healthieEmail}
+                  password={member?.healthiePassword}
+                >
+                  <HealthieChat conversationId={member?.healthieConversationId} />
                 </HealthieChatWrapper>
                 <p className="text-sm text-muted-foreground mt-4 text-center">
                   Messaging powered by{' '}
