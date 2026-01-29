@@ -594,7 +594,7 @@ export default function MemberHome() {
               <CardContent>
                 <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
                   <iframe 
-                    src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B8869243,8962005,9151476,11170106,11976136,12000025%5D&appt_type_ids=%5B466786,466787,466788%5D&org_level=true" 
+                    src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D" 
                     style={{ width: '100%', height: '600px', border: 'none' }}
                     title="Book Health Coach Appointment"
                   />
