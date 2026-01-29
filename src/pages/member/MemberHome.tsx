@@ -312,6 +312,7 @@ export default function MemberHome() {
               <TabsTrigger value="plan">My Program</TabsTrigger>
               <TabsTrigger value="orders">My Orders</TabsTrigger>
               <TabsTrigger value="content">Education</TabsTrigger>
+              <TabsTrigger value="coach">Health Coach</TabsTrigger>
             </TabsList>
           </div>
 
@@ -578,6 +579,37 @@ export default function MemberHome() {
                     <StatusPill status={isComplete('budget-friendly-meals') ? 'completed' : 'pending'} />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="coach">
+            <Card>
+              <CardHeader>
+                <CardTitle>Health Coach</CardTitle>
+                <CardDescription>
+                  Book a session with one of our certified health coaches.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
+                  <iframe 
+                    src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B8869243,8962005,9151476,11170106,11976136,12000025%5D&appt_type_ids=%5B466786,466787,466788%5D&org_level=true" 
+                    style={{ width: '100%', height: '600px', border: 'none' }}
+                    title="Book Health Coach Appointment"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mt-4 text-center">
+                  Booking provided by{' '}
+                  <a 
+                    href="https://gethealthie.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Healthie
+                  </a>
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

@@ -16,6 +16,7 @@ import {
   FileText,
   AlertTriangle,
   X,
+  CalendarCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -38,6 +39,7 @@ const memberNav: NavItem[] = [
   { label: 'My Program', path: '/member', icon: ClipboardList, tabId: 'plan' },
   { label: 'My Orders', path: '/member', icon: Package, tabId: 'orders' },
   { label: 'Education', path: '/member', icon: FileText, tabId: 'content' },
+  { label: 'Health Coach', path: '/member', icon: CalendarCheck, tabId: 'coach' },
   { label: 'Profile', path: '/member/profile', icon: User },
 ];
 
