@@ -552,7 +552,9 @@ const programIds = ['prog-tier1', 'prog-tier2', 'prog-tier3'];
 export const enrollments: Enrollment[] = members.map((member, idx) => {
   const statuses: Enrollment['status'][] = ['active', 'active', 'active', 'pending', 'paused', 'complete'];
   const sources: EnrollmentSource[] = ['CBO', 'CBO', 'HP Outreach', 'Provider', 'Self'];
-  const status = statuses[Math.floor(Math.random() * statuses.length)];
+  
+  // First member (demo member) is always active in Tier 1
+  const status = idx === 0 ? 'active' : statuses[Math.floor(Math.random() * statuses.length)];
   
   // Distribute across tiers: 40% Tier 1, 40% Tier 2, 20% Tier 3
   let programId: string;
@@ -581,8 +583,8 @@ export const enrollments: Enrollment[] = members.map((member, idx) => {
     memberId: member.id,
     programId,
     status,
-    enrollmentSource: sources[Math.floor(Math.random() * sources.length)],
-    sourceId: Math.random() > 0.5 ? cbos[Math.floor(Math.random() * cbos.length)].id : undefined,
+    enrollmentSource: idx === 0 ? 'CBO' : sources[Math.floor(Math.random() * sources.length)],
+    sourceId: idx === 0 ? 'cbo-001' : (Math.random() > 0.5 ? cbos[Math.floor(Math.random() * cbos.length)].id : undefined),
     enrollmentDate: member.createdAt,
     currentWeek,
     currentPhase,
