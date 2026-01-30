@@ -3,7 +3,7 @@ import { HealthieAppointment, AppointmentsQueryResult } from '@/types/healthie';
 
 const GET_USER_APPOINTMENTS = gql`
   query GetUserAppointments($user_id: ID!, $is_upcoming: Boolean) {
-    appointments(user_id: $user_id, is_upcoming: $is_upcoming, order_by: "DATE_ASC") {
+    appointments(user_id: $user_id, is_upcoming: $is_upcoming) {
       id
       date
       start
@@ -50,12 +50,14 @@ export function useHealthieAppointments({ userId, isUpcoming = true }: UseHealth
     }
   );
 
-  // Transform the response to flatten nested objects
-  const appointments: TransformedAppointment[] = (data?.appointments || []).map((apt) => ({
-    ...apt,
-    appointment_type: apt.appointment_type?.name || apt.appointment_label || 'Appointment',
-    provider_name: apt.provider?.name || 'Health Coach',
-  }));
+  // Transform the response to flatten nested objects and sort chronologically
+  const appointments: TransformedAppointment[] = (data?.appointments || [])
+    .map((apt) => ({
+      ...apt,
+      appointment_type: apt.appointment_type?.name || apt.appointment_label || 'Appointment',
+      provider_name: apt.provider?.name || 'Health Coach',
+    }))
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
   return {
     appointments,
