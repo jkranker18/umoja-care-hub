@@ -1,65 +1,92 @@
 
 
-# Fix Appointments Loading Error
+# Pre-populate Healthie Booking Form with Member Info
 
-## Problem
+## Overview
 
-The GraphQL query is failing because `order_by: "DATE_ASC"` is not a valid value for the `AppointmentOrderKeys` enum in the Healthie API.
+This is fully supported! Healthie's embed iframe accepts URL parameters to pre-populate the "Share your information" step. We already have the member's info available, so we just need to add these parameters to the iframe URL.
 
-**Error**: `Argument 'order_by' on Field 'appointments' has an invalid value ("DATE_ASC"). Expected type 'AppointmentOrderKeys'.`
+## Healthie URL Parameters Available
 
-## Solution
+Based on their documentation, these parameters can be appended to the embed URL:
 
-Remove the `order_by` parameter from the GraphQL query. The API will return appointments in its default order, and since we're filtering with `is_upcoming: true`, they should come back in chronological order. If needed, we can add client-side sorting as a fallback.
+| Parameter | Description | Member Field |
+|-----------|-------------|--------------|
+| `first_name` | Pre-fills first name field | `member.firstName` |
+| `last_name` | Pre-fills last name field | `member.lastName` |
+| `email` | Pre-fills email address | `member.email` |
+| `phone_number` | Pre-fills phone number | `member.phone` |
+| `read_only` | Makes pre-filled fields non-editable | Set to `true` |
+
+## Implementation
+
+Update the iframe src in `MemberHome.tsx` to dynamically include member information as URL parameters.
+
+### Current URL
+
+```
+https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D
+```
+
+### Updated URL
+
+```
+https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D&first_name=Maria&last_name=Santos&email=maria.santos@email.com&phone_number=555-123-4567&read_only=true
+```
 
 ## File to Modify
 
 | File | Change |
 |------|--------|
-| `src/hooks/useHealthieAppointments.ts` | Remove `order_by: "DATE_ASC"` from the query, add client-side sorting |
+| `src/pages/member/MemberHome.tsx` | Build iframe URL dynamically with member info parameters |
 
-## Updated Query
+## Code Changes
 
-```graphql
-query GetUserAppointments($user_id: ID!, $is_upcoming: Boolean) {
-  appointments(user_id: $user_id, is_upcoming: $is_upcoming) {
-    id
-    date
-    start
-    end
-    length
-    appointment_type {
-      name
-    }
-    appointment_label
-    contact_type
-    provider {
-      id
-      name
-    }
-    zoom_join_url
-    external_videochat_url
-    zoom_dial_in_info
-    pm_status
-    can_client_cancel
-    can_client_reschedule
-  }
-}
-```
-
-## Additional Change
-
-Add client-side sorting to ensure appointments display in chronological order:
+Create a helper function to build the URL with encoded parameters:
 
 ```typescript
-const appointments = (data?.appointments || [])
-  .map((apt) => ({
-    ...apt,
-    appointment_type: apt.appointment_type?.name || apt.appointment_label || 'Appointment',
-    provider_name: apt.provider?.name || 'Health Coach',
-  }))
-  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+// Build Healthie booking URL with pre-filled member info
+const buildHealthieBookingUrl = () => {
+  const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
+  const params = new URLSearchParams({
+    dietitian_id: '11976136',
+    provider_ids: '[11976136]',
+    appt_type_ids: '[466786,466787,466788]',
+  });
+  
+  // Pre-populate member information
+  if (member?.firstName) params.append('first_name', member.firstName);
+  if (member?.lastName) params.append('last_name', member.lastName);
+  if (member?.email) params.append('email', member.email);
+  if (member?.phone) params.append('phone_number', member.phone);
+  
+  // Make pre-filled fields read-only (optional - remove if you want them editable)
+  params.append('read_only', 'true');
+  
+  return `${baseUrl}?${params.toString()}`;
+};
 ```
 
-This ensures appointments are always displayed soonest-first regardless of API return order.
+Then update the iframe:
+
+```tsx
+<iframe 
+  src={buildHealthieBookingUrl()}
+  style={{ width: '100%', height: '600px', border: 'none' }}
+  title="Book Health Coach Appointment"
+/>
+```
+
+## User Experience
+
+When a member reaches the "Share your information" step:
+
+1. First Name, Last Name, Email, and Phone Number will be pre-filled
+2. With `read_only=true`, these fields cannot be edited (ensuring data consistency)
+3. The member only needs to fill in the "Reason for Appointment" field
+4. This reduces friction and prevents data entry errors
+
+## Optional Enhancement
+
+If you'd prefer members to be able to edit their info, simply remove the `read_only=true` parameter.
 
