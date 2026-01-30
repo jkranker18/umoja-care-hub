@@ -604,7 +604,20 @@ export default function MemberHome() {
                 <CardContent>
                   <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
                     <iframe 
-                      src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D" 
+                      src={(() => {
+                        const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
+                        const params = new URLSearchParams({
+                          dietitian_id: '11976136',
+                          provider_ids: '[11976136]',
+                          appt_type_ids: '[466786,466787,466788]',
+                        });
+                        if (member?.firstName) params.append('first_name', member.firstName);
+                        if (member?.lastName) params.append('last_name', member.lastName);
+                        if (member?.email) params.append('email', member.email);
+                        if (member?.phone) params.append('phone_number', member.phone);
+                        params.append('read_only', 'true');
+                        return `${baseUrl}?${params.toString()}`;
+                      })()}
                       style={{ width: '100%', height: '600px', border: 'none' }}
                       title="Book Health Coach Appointment"
                     />
