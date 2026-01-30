@@ -1,92 +1,81 @@
 
 
-# Pre-populate Healthie Booking Form with Member Info
+# Make Video Call Button Clickable with Zoom Link
 
-## Overview
+## Current State
 
-This is fully supported! Healthie's embed iframe accepts URL parameters to pre-populate the "Share your information" step. We already have the member's info available, so we just need to add these parameters to the iframe URL.
+The MyAppointments component already has logic to handle video calls, but there's a potential issue with how it detects video appointments.
 
-## Healthie URL Parameters Available
-
-Based on their documentation, these parameters can be appended to the embed URL:
-
-| Parameter | Description | Member Field |
-|-----------|-------------|--------------|
-| `first_name` | Pre-fills first name field | `member.firstName` |
-| `last_name` | Pre-fills last name field | `member.lastName` |
-| `email` | Pre-fills email address | `member.email` |
-| `phone_number` | Pre-fills phone number | `member.phone` |
-| `read_only` | Makes pre-filled fields non-editable | Set to `true` |
-
-## Implementation
-
-Update the iframe src in `MemberHome.tsx` to dynamically include member information as URL parameters.
-
-### Current URL
-
-```
-https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D
+The current code checks:
+```typescript
+const isVideo = appointment.contact_type?.toLowerCase().includes('video');
+const hasVideoLink = appointment.zoom_join_url || appointment.external_videochat_url;
 ```
 
-### Updated URL
-
+And only shows the button if both are true:
+```typescript
+{isVideo && hasVideoLink && (
+  <Button onClick={() => handleJoinCall(appointment)}>Join Call</Button>
+)}
 ```
-https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D&first_name=Maria&last_name=Santos&email=maria.santos@email.com&phone_number=555-123-4567&read_only=true
-```
 
-## File to Modify
+## The Issue
 
-| File | Change |
-|------|--------|
-| `src/pages/member/MemberHome.tsx` | Build iframe URL dynamically with member info parameters |
+Looking at the UI, the contact type shows as "Healthie Video Call" in the appointment info row, but the "Join Call" button may not be appearing because:
 
-## Code Changes
+1. The `zoom_join_url` or `external_videochat_url` fields might not be populated in the API response (API not returning them, or the GraphQL query doesn't include them)
+2. The button shows but is disabled because `canJoin` is false (appointment is more than 15 min away)
 
-Create a helper function to build the URL with encoded parameters:
+## Solution
+
+Make the contact type badge itself clickable when there's a video link, so users have a clear visual cue that they can join.
+
+### Changes to `src/components/healthie/MyAppointments.tsx`
+
+1. **Make the contact type badge clickable** when it's a video appointment with a link:
 
 ```typescript
-// Build Healthie booking URL with pre-filled member info
-const buildHealthieBookingUrl = () => {
-  const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
-  const params = new URLSearchParams({
-    dietitian_id: '11976136',
-    provider_ids: '[11976136]',
-    appt_type_ids: '[466786,466787,466788]',
-  });
-  
-  // Pre-populate member information
-  if (member?.firstName) params.append('first_name', member.firstName);
-  if (member?.lastName) params.append('last_name', member.lastName);
-  if (member?.email) params.append('email', member.email);
-  if (member?.phone) params.append('phone_number', member.phone);
-  
-  // Make pre-filled fields read-only (optional - remove if you want them editable)
-  params.append('read_only', 'true');
-  
-  return `${baseUrl}?${params.toString()}`;
-};
+{/* Contact Type - clickable for video calls */}
+{isVideo && hasVideoLink ? (
+  <button 
+    onClick={() => handleJoinCall(appointment)}
+    className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer"
+  >
+    <Video className="h-3.5 w-3.5" />
+    {appointment.contact_type}
+    <ExternalLink className="h-3 w-3" />
+  </button>
+) : (
+  <span className="flex items-center gap-1.5">
+    {getContactIcon(appointment.contact_type)}
+    {appointment.contact_type}
+  </span>
+)}
 ```
 
-Then update the iframe:
+2. **Also update the Join Call button** to always show (not just when joinable), but indicate timing:
 
-```tsx
-<iframe 
-  src={buildHealthieBookingUrl()}
-  style={{ width: '100%', height: '600px', border: 'none' }}
-  title="Book Health Coach Appointment"
-/>
+```typescript
+{isVideo && hasVideoLink && (
+  <Button 
+    size="sm" 
+    onClick={() => handleJoinCall(appointment)}
+    className="gap-1.5"
+  >
+    <Video className="h-4 w-4" />
+    Join Call
+    <ExternalLink className="h-3.5 w-3.5" />
+  </Button>
+)}
 ```
 
-## User Experience
+This removes the `disabled` state so users can always click to join (Zoom/video platforms handle early joins gracefully).
 
-When a member reaches the "Share your information" step:
+## Summary of Changes
 
-1. First Name, Last Name, Email, and Phone Number will be pre-filled
-2. With `read_only=true`, these fields cannot be edited (ensuring data consistency)
-3. The member only needs to fill in the "Reason for Appointment" field
-4. This reduces friction and prevents data entry errors
-
-## Optional Enhancement
-
-If you'd prefer members to be able to edit their info, simply remove the `read_only=true` parameter.
+| Element | Before | After |
+|---------|--------|-------|
+| Contact type text | Static text | Clickable link for video calls |
+| Join Call button | Disabled if > 15 min before start | Always clickable |
+| Visual feedback | None | External link icon, hover underline |
 
