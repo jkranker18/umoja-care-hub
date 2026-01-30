@@ -125,6 +125,10 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
     );
   }
 
+  // Check if error is due to token expiration
+  const isTokenExpired = error?.toLowerCase().includes('invalid') || 
+                         error?.toLowerCase().includes('api key');
+
   if (error) {
     return (
       <Card>
@@ -137,11 +141,20 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-muted-foreground gap-2">
             <AlertCircle className="h-8 w-8 text-destructive" />
-            <p className="font-medium">Unable to load appointments</p>
-            <p className="text-sm">{error}</p>
-            <Button variant="outline" size="sm" onClick={handleRefresh} className="mt-2">
+            <p className="font-medium">
+              {isTokenExpired ? 'Session Expired' : 'Unable to load appointments'}
+            </p>
+            <p className="text-sm">
+              {isTokenExpired ? 'Your session has expired. Please reconnect to continue.' : error}
+            </p>
+            <Button 
+              variant={isTokenExpired ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => isTokenExpired ? window.location.reload() : handleRefresh} 
+              className="mt-2"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
+              {isTokenExpired ? 'Reconnect' : 'Try Again'}
             </Button>
           </div>
         </CardContent>
