@@ -1,81 +1,91 @@
 
 
-# Make Video Call Button Clickable with Zoom Link
+# Fix: Re-authenticate on Token Expiration
 
-## Current State
+## Root Cause
 
-The MyAppointments component already has logic to handle video calls, but there's a potential issue with how it detects video appointments.
-
-The current code checks:
-```typescript
-const isVideo = appointment.contact_type?.toLowerCase().includes('video');
-const hasVideoLink = appointment.zoom_join_url || appointment.external_videochat_url;
-```
-
-And only shows the button if both are true:
-```typescript
-{isVideo && hasVideoLink && (
-  <Button onClick={() => handleJoinCall(appointment)}>Join Call</Button>
-)}
-```
-
-## The Issue
-
-Looking at the UI, the contact type shows as "Healthie Video Call" in the appointment info row, but the "Join Call" button may not be appearing because:
-
-1. The `zoom_join_url` or `external_videochat_url` fields might not be populated in the API response (API not returning them, or the GraphQL query doesn't include them)
-2. The button shows but is disabled because `canJoin` is false (appointment is more than 15 min away)
+The Healthie per-user API token obtained during initial authentication has expired. When the "My Appointments" component tries to refetch data, it uses the stale token stored in `authState`, resulting in "API Key is Invalid" error.
 
 ## Solution
 
-Make the contact type badge itself clickable when there's a video link, so users have a clear visual cue that they can join.
+Detect token expiration errors and trigger re-authentication.
+
+### Changes to `src/components/healthie/HealthieChatWrapper.tsx`
+
+Add a method to re-authenticate that can be called when API errors occur, and pass it down through context:
+
+1. **Create a context** to expose the `reauthenticate` function to child components
+2. **Wrap the error handling** to detect "API Key is Invalid" and trigger re-auth
 
 ### Changes to `src/components/healthie/MyAppointments.tsx`
 
-1. **Make the contact type badge clickable** when it's a video appointment with a link:
+1. **Detect the specific error** "API Key is Invalid"
+2. **Show a "Session Expired" message** with a "Reconnect" button that triggers re-authentication
+
+## Implementation Details
+
+### 1. Create Healthie Auth Context
 
 ```typescript
-{/* Contact Type - clickable for video calls */}
-{isVideo && hasVideoLink ? (
-  <button 
-    onClick={() => handleJoinCall(appointment)}
-    className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer"
-  >
-    <Video className="h-3.5 w-3.5" />
-    {appointment.contact_type}
-    <ExternalLink className="h-3 w-3" />
-  </button>
-) : (
-  <span className="flex items-center gap-1.5">
-    {getContactIcon(appointment.contact_type)}
-    {appointment.contact_type}
-  </span>
-)}
+// New context to expose re-auth capability
+const HealthieAuthContext = React.createContext<{
+  userId: string;
+  reauthenticate: () => Promise<void>;
+} | null>(null);
+
+export function useHealthieAuth() {
+  return useContext(HealthieAuthContext);
+}
 ```
 
-2. **Also update the Join Call button** to always show (not just when joinable), but indicate timing:
+### 2. Add Re-authenticate Function in Wrapper
 
 ```typescript
-{isVideo && hasVideoLink && (
-  <Button 
-    size="sm" 
-    onClick={() => handleJoinCall(appointment)}
-    className="gap-1.5"
-  >
-    <Video className="h-4 w-4" />
-    Join Call
-    <ExternalLink className="h-3.5 w-3.5" />
-  </Button>
-)}
+const reauthenticate = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+  await authenticateUser(); // Re-run the auth flow
+}, [email, password]);
 ```
 
-This removes the `disabled` state so users can always click to join (Zoom/video platforms handle early joins gracefully).
+### 3. Update Error Display in MyAppointments
 
-## Summary of Changes
+When the error contains "API Key is Invalid" or "Invalid", show a specific reconnect option:
 
-| Element | Before | After |
-|---------|--------|-------|
-| Contact type text | Static text | Clickable link for video calls |
-| Join Call button | Disabled if > 15 min before start | Always clickable |
-| Visual feedback | None | External link icon, hover underline |
+```typescript
+if (error?.toLowerCase().includes('invalid')) {
+  return (
+    <Card>
+      <CardContent>
+        <p>Session expired</p>
+        <Button onClick={onReconnect}>Reconnect</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `src/components/healthie/HealthieChatWrapper.tsx` | Add context provider with `reauthenticate` function |
+| `src/components/healthie/MyAppointments.tsx` | Consume context and handle token expiration errors |
+
+## Quick Alternative
+
+For the demo, a simpler approach: **refresh the entire page** when the token expires. This forces a complete re-authentication.
+
+```typescript
+// In MyAppointments error handling
+if (error?.toLowerCase().includes('invalid')) {
+  return (
+    <Button onClick={() => window.location.reload()}>
+      Session Expired - Click to Reconnect
+    </Button>
+  );
+}
+```
+
+This is less elegant but works immediately without needing to refactor the context architecture.
 
