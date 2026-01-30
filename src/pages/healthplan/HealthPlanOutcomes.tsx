@@ -11,8 +11,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { memberClinicalData, members, enrollments, CLINICAL_SAVINGS, MemberClinicalData } from '@/lib/mockData';
 
 export default function HealthPlanOutcomes() {
-  const { setCurrentRole } = useApp();
   const [membersExpanded, setMembersExpanded] = useState(false);
+  const { setCurrentRole } = useApp();
 
   useEffect(() => {
     setCurrentRole('healthplan');
