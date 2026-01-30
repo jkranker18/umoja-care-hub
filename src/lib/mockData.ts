@@ -596,7 +596,14 @@ export const rulesDecisions: RulesDecision[] = enrollments.slice(0, 35).map((enr
 }));
 
 export const orders: Order[] = enrollments.filter(e => e.status === 'active').slice(0, 25).flatMap((enrollment, idx) => {
-  const statuses: Order['shipmentStatus'][] = ['delivered', 'delivered', 'in_transit', 'shipped', 'processing', 'exception'];
+  // Heavily weight toward 'delivered' for ~98% on-time rate
+  const getStatus = (): Order['shipmentStatus'] => {
+    const rand = Math.random();
+    if (rand < 0.98) return 'delivered';
+    if (rand < 0.99) return 'in_transit';
+    return 'exception';
+  };
+  
   const program = programs.find(p => p.id === enrollment.programId);
   
   // Set meal plan based on phase
@@ -613,10 +620,10 @@ export const orders: Order[] = enrollments.filter(e => e.status === 'active').sl
     enrollmentId: enrollment.id,
     mealPlan,
     mealsCount: program?.tier === 3 ? 0 : 14,
-    shipmentStatus: statuses[Math.floor(Math.random() * statuses.length)],
+    shipmentStatus: getStatus(),
     trackingNumber: `TRK${Math.floor(Math.random() * 900000) + 100000}`,
     estimatedDelivery: `2025-02-${String(Math.floor(Math.random() * 10) + 5).padStart(2, '0')}`,
-    deliveryExceptions: Math.random() > 0.9 ? ['Address not found', 'Recipient unavailable'] : undefined,
+    deliveryExceptions: Math.random() > 0.98 ? ['Address not found'] : undefined,
     createdAt: enrollment.enrollmentDate,
     source: 'NetSuite',
   }];
