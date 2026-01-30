@@ -216,10 +216,21 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
                         <User className="h-3.5 w-3.5" />
                         {appointment.provider_name}
                       </span>
-                      <span className="flex items-center gap-1.5">
-                        {getContactIcon(appointment.contact_type)}
-                        {appointment.contact_type}
-                      </span>
+                      {isVideo && hasVideoLink ? (
+                        <button 
+                          onClick={() => handleJoinCall(appointment)}
+                          className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer"
+                        >
+                          <Video className="h-3.5 w-3.5" />
+                          {appointment.contact_type}
+                          <ExternalLink className="h-3 w-3" />
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-1.5">
+                          {getContactIcon(appointment.contact_type)}
+                          {appointment.contact_type}
+                        </span>
+                      )}
                     </div>
 
                     {/* Actions */}
@@ -228,11 +239,11 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
                         <Button 
                           size="sm" 
                           onClick={() => handleJoinCall(appointment)}
-                          disabled={!canJoin}
                           className="gap-1.5"
                         >
                           <Video className="h-4 w-4" />
-                          {canJoin ? 'Join Call' : 'Join available 15 min before'}
+                          Join Call
+                          <ExternalLink className="h-3.5 w-3.5" />
                         </Button>
                       )}
                       
