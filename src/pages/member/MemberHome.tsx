@@ -21,6 +21,7 @@ import { useEducationProgress, ModuleId } from '@/hooks/useEducationProgress';
 import { useSupportCases } from '@/hooks/useSupportCases';
 import { HealthieChatWrapper } from '@/components/healthie/HealthieChatWrapper';
 import { HealthieChat } from '@/components/healthie/HealthieChat';
+import { MyAppointments } from '@/components/healthie/MyAppointments';
 
 export default function MemberHome() {
   const { members } = useApp();
@@ -581,68 +582,74 @@ export default function MemberHome() {
           </TabsContent>
 
           <TabsContent value="coach" className="space-y-6">
-            {/* Booking Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Health Coach</CardTitle>
-                <CardDescription>
-                  Book a session with one of our certified health coaches.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
-                  <iframe 
-                    src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D" 
-                    style={{ width: '100%', height: '600px', border: 'none' }}
-                    title="Book Health Coach Appointment"
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground mt-4 text-center">
-                  Booking provided by{' '}
-                  <a 
-                    href="https://gethealthie.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Healthie
-                  </a>
-                </p>
-              </CardContent>
-            </Card>
+            {/* Wrap all Healthie components in the authenticated provider */}
+            <HealthieChatWrapper 
+              userId={member?.healthieUserId}
+              email={member?.healthieEmail}
+              password={member?.healthiePassword}
+            >
+              {/* My Appointments Section */}
+              {member?.healthieUserId && (
+                <MyAppointments userId={member.healthieUserId} />
+              )}
 
-            {/* Chat Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Message Your Coach
-                </CardTitle>
-                <CardDescription>
-                  Chat directly with your health coach between sessions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-              <HealthieChatWrapper 
-                  userId={member?.healthieUserId}
-                  email={member?.healthieEmail}
-                  password={member?.healthiePassword}
-                >
+              {/* Booking Section */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Book an Appointment</CardTitle>
+                  <CardDescription>
+                    Schedule a session with one of our certified health coaches.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
+                    <iframe 
+                      src="https://secure.gethealthie.com/appointments/embed_appt?dietitian_id=11976136&provider_ids=%5B11976136%5D&appt_type_ids=%5B466786,466787,466788%5D" 
+                      style={{ width: '100%', height: '600px', border: 'none' }}
+                      title="Book Health Coach Appointment"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-4 text-center">
+                    Booking provided by{' '}
+                    <a 
+                      href="https://gethealthie.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      Healthie
+                    </a>
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Chat Section */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    Message Your Coach
+                  </CardTitle>
+                  <CardDescription>
+                    Chat directly with your health coach between sessions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   <HealthieChat conversationId={member?.healthieConversationId} />
-                </HealthieChatWrapper>
-                <p className="text-sm text-muted-foreground mt-4 text-center">
-                  Messaging powered by{' '}
-                  <a 
-                    href="https://gethealthie.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Healthie
-                  </a>
-                </p>
-              </CardContent>
-            </Card>
+                  <p className="text-sm text-muted-foreground mt-4 text-center">
+                    Messaging powered by{' '}
+                    <a 
+                      href="https://gethealthie.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      Healthie
+                    </a>
+                  </p>
+                </CardContent>
+              </Card>
+            </HealthieChatWrapper>
           </TabsContent>
         </Tabs>
 
