@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { format, parseISO, differenceInMinutes, isPast } from 'date-fns';
+import { format, parseISO, differenceInMinutes, isPast, isValid } from 'date-fns';
 import { useHealthieAppointments } from '@/hooks/useHealthieAppointments';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,12 +54,25 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
     setDialInOpen(true);
   };
 
+  const safeParseDate = (dateStr: string | undefined | null): Date | null => {
+    if (!dateStr) return null;
+    try {
+      const parsed = parseISO(dateStr);
+      return isValid(parsed) ? parsed : null;
+    } catch {
+      return null;
+    }
+  };
+
   const isJoinable = (appointment: typeof appointments[0]) => {
-    const startTime = parseISO(appointment.start);
+    const startTime = safeParseDate(appointment.start);
+    const endTime = safeParseDate(appointment.end);
+    if (!startTime || !endTime) return false;
+    
     const now = new Date();
     const minutesUntilStart = differenceInMinutes(startTime, now);
     // Allow joining 15 minutes before until end time
-    return minutesUntilStart <= 15 && !isPast(parseISO(appointment.end));
+    return minutesUntilStart <= 15 && !isPast(endTime);
   };
 
   const getStatusBadge = (status: string) => {
@@ -168,12 +181,16 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
           ) : (
             <div className="space-y-3">
               {appointments.map((appointment) => {
-                const startTime = parseISO(appointment.start);
+                const startTime = safeParseDate(appointment.start);
                 const canJoin = isJoinable(appointment);
                 const isVideo = appointment.contact_type?.toLowerCase().includes('video');
                 const isPhone = appointment.contact_type?.toLowerCase().includes('phone');
                 const hasVideoLink = appointment.zoom_join_url || appointment.external_videochat_url;
                 const hasDialIn = appointment.zoom_dial_in_info;
+
+                const formattedDate = startTime 
+                  ? `${format(startTime, 'EEEE, MMMM d')} at ${format(startTime, 'h:mm a')}`
+                  : 'Date unavailable';
 
                 return (
                   <div 
@@ -184,7 +201,7 @@ export function MyAppointments({ userId }: MyAppointmentsProps) {
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <p className="font-medium">
-                          {format(startTime, 'EEEE, MMMM d')} at {format(startTime, 'h:mm a')}
+                          {formattedDate}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {appointment.appointment_type} ({appointment.length} min)
