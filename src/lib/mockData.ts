@@ -165,6 +165,27 @@ export interface TimelineEvent {
   metadata?: Record<string, any>;
 }
 
+// Clinical data for outcomes tracking (pre/post measurements)
+export interface MemberClinicalData {
+  id: string;
+  memberId: string;
+  measurementDate: string;
+  measurementType: 'baseline' | 'current';
+  a1c?: number;              // e.g., 8.5 -> 7.2
+  systolicBP?: number;       // e.g., 148 -> 126
+  diastolicBP?: number;      // e.g., 92 -> 78
+  bmi?: number;              // e.g., 32.5 -> 30.1
+  hospitalAdmissions?: number; // Count in past 12 months
+}
+
+// Financial value constants based on HCSC proposal (using higher values)
+export const CLINICAL_SAVINGS = {
+  A1C_PER_PERCENT: 736,          // $736 per 1% reduction per member
+  READMISSION_AVOIDED: 13000,    // $13,000 per avoided readmission
+  BP_CONTROL_ACHIEVED: 500,      // $500 per member achieving BP control
+  BMI_PER_POINT: 250,            // $250 per point reduction per member
+};
+
 export interface IntegrationStatus {
   id: string;
   name: string;
@@ -910,6 +931,74 @@ export const healthPlanUsers: HealthPlanUser[] = [
     lastLogin: '2024-12-10',
   },
 ];
+
+// Generate clinical data for members with active/complete enrollments
+// This simulates pre/post measurements for outcomes tracking
+function generateClinicalData(): MemberClinicalData[] {
+  const clinicalData: MemberClinicalData[] = [];
+  
+  // Get members with active or complete enrollments (those who would have pre/post data)
+  const eligibleEnrollments = enrollments.filter(e => 
+    e.status === 'active' || e.status === 'complete'
+  );
+  
+  // Take a subset (~80% of eligible members have clinical data)
+  const membersWithClinicalData = eligibleEnrollments
+    .filter(() => Math.random() > 0.2)
+    .slice(0, 45); // Cap at 45 members for realistic numbers
+  
+  membersWithClinicalData.forEach((enrollment, idx) => {
+    const memberId = enrollment.memberId;
+    const baseDate = new Date('2024-01-01');
+    baseDate.setDate(baseDate.getDate() + Math.floor(Math.random() * 60));
+    
+    // Generate baseline measurements
+    const baselineA1c = 7.5 + Math.random() * 3; // 7.5-10.5
+    const baselineSystolic = 140 + Math.floor(Math.random() * 20); // 140-160
+    const baselineDiastolic = 85 + Math.floor(Math.random() * 15); // 85-100
+    const baselineBmi = 28 + Math.random() * 10; // 28-38
+    const baselineAdmissions = Math.floor(Math.random() * 3) + 1; // 1-3
+    
+    // Baseline measurement
+    clinicalData.push({
+      id: `clin-base-${String(idx + 1).padStart(3, '0')}`,
+      memberId,
+      measurementDate: baseDate.toISOString().split('T')[0],
+      measurementType: 'baseline',
+      a1c: Math.round(baselineA1c * 10) / 10,
+      systolicBP: baselineSystolic,
+      diastolicBP: baselineDiastolic,
+      bmi: Math.round(baselineBmi * 10) / 10,
+      hospitalAdmissions: baselineAdmissions,
+    });
+    
+    // Current measurement (showing improvement)
+    const currentDate = new Date(baseDate);
+    currentDate.setMonth(currentDate.getMonth() + 3 + Math.floor(Math.random() * 3));
+    
+    const a1cReduction = 0.5 + Math.random() * 1.5; // 0.5-2.0 reduction
+    const systolicReduction = 12 + Math.floor(Math.random() * 18); // 12-30 reduction
+    const diastolicReduction = 8 + Math.floor(Math.random() * 12); // 8-20 reduction
+    const bmiReduction = 1 + Math.random() * 3; // 1-4 reduction
+    const admissionReduction = Math.min(baselineAdmissions, Math.floor(Math.random() * 2) + 1); // Reduce by 1-2, not below 0
+    
+    clinicalData.push({
+      id: `clin-curr-${String(idx + 1).padStart(3, '0')}`,
+      memberId,
+      measurementDate: currentDate.toISOString().split('T')[0],
+      measurementType: 'current',
+      a1c: Math.round((baselineA1c - a1cReduction) * 10) / 10,
+      systolicBP: baselineSystolic - systolicReduction,
+      diastolicBP: baselineDiastolic - diastolicReduction,
+      bmi: Math.round((baselineBmi - bmiReduction) * 10) / 10,
+      hospitalAdmissions: Math.max(0, baselineAdmissions - admissionReduction),
+    });
+  });
+  
+  return clinicalData;
+}
+
+export const memberClinicalData: MemberClinicalData[] = generateClinicalData();
 
 
 export const demoSteps = [
