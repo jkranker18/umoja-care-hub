@@ -1,29 +1,37 @@
 
 
-# Add 4 New Education Modules
+# Add Trackers Tab (Food Diary & Activity Tracker)
 
 ## Overview
 
-Add 4 new education modules from uploaded PDF content:
-1. **Mindful Eating & Stress Management** - Mindfulness techniques and stress management resources
-2. **Meal Planning & Portion Control** - Combined module with plate model and weekly planning worksheets
-3. **Hydration & Gastrointestinal Health** - Fluid balance, dehydration risks, and managing digestive issues
-4. **Micronutrients for Immunity & Healing** - Vitamins, minerals, and their food sources
-
-Additionally:
-- Set Mindful Eating and Meal Planning as "Recommended for You" modules
-- Remove the "Coming Soon" badge from all module cards
+Add a new "Trackers" tab to the Member Home page, positioned between Health Coach and Profile in the navigation. This tab will contain two sub-sections:
+1. **Food Diary** - Log daily meals and snacks
+2. **Activity Tracker** - Log physical activities and exercise
 
 ---
 
-## Content Categorization
+## UI Structure
 
-| New Module | Category | Rationale |
-|------------|----------|-----------|
-| Mindful Eating | Lifestyle & Mental Health | Covers mindfulness and stress management |
-| Meal Planning & Portion Control | Healthy Eating | Core nutrition planning skills |
-| Hydration & GI Health | Managing Conditions | Addresses digestive health conditions |
-| Micronutrients | Healthy Eating | Foundational nutrition knowledge |
+The Trackers tab will use an internal layout with two cards or sub-tabs:
+
+```text
++--------------------------------------------------+
+| TRACKERS TAB                                      |
++--------------------------------------------------+
+|                                                   |
+|  [Food Diary]              [Activity Tracker]     |
+|  +-----------------------+ +--------------------+ |
+|  | Today's Meals         | | Today's Activity   | |
+|  | + Add Breakfast       | | + Add Activity     | |
+|  | + Add Lunch           | |                    | |
+|  | + Add Dinner          | | Steps: ___         | |
+|  | + Add Snack           | | Minutes: ___       | |
+|  |                       | | Type: Walking...   | |
+|  | [View History]        | | [View History]     | |
+|  +-----------------------+ +--------------------+ |
+|                                                   |
++--------------------------------------------------+
+```
 
 ---
 
@@ -31,130 +39,138 @@ Additionally:
 
 | File | Change |
 |------|--------|
-| `src/lib/educationData.ts` | Add 2 new module IDs, update existing modules, remove isPlaceholder flags |
-| `src/pages/member/education/MindfulEating.tsx` | Replace placeholder with full content |
-| `src/pages/member/education/MealPlanning.tsx` | Replace placeholder with combined meal planning + portion control content |
-| `src/pages/member/education/HydrationGIHealth.tsx` | Create new page |
-| `src/pages/member/education/MicronutrientsImmunity.tsx` | Create new page |
-| `src/App.tsx` | Add routes for 2 new education pages |
-| `src/components/education/ModuleCard.tsx` | Remove "Coming Soon" badge logic |
+| `src/pages/member/MemberHome.tsx` | Add "trackers" tab with Food Diary and Activity Tracker UI |
+| `src/components/layout/Sidebar.tsx` | Add Trackers nav item with tabId: 'trackers' |
+| `src/hooks/useFoodDiary.ts` | New hook for managing food diary entries (localStorage) |
+| `src/hooks/useActivityTracker.ts` | New hook for managing activity entries (localStorage) |
 
 ---
 
 ## Technical Details
 
-### 1. educationData.ts Updates
+### 1. Sidebar.tsx Update
 
-Add two new module IDs to the MODULES array:
-- `'hydration-gi-health'`
-- `'micronutrients-immunity'`
-
-Add new module definitions:
+Add new nav item to `memberNav` array:
 
 ```typescript
-// In healthy-eating category
-{
-  id: 'micronutrients-immunity',
-  title: 'Micronutrients for Immunity',
-  description: 'Vitamins and minerals that support healing',
-  category: 'healthy-eating',
-  icon: 'Sparkles',
-  duration: '4 min read',
-}
-
-// In managing-conditions category
-{
-  id: 'hydration-gi-health',
-  title: 'Hydration & GI Health',
-  description: 'Managing fluid balance and digestive comfort',
-  category: 'managing-conditions',
-  icon: 'Droplets',
-  duration: '5 min read',
-}
+const memberNav: NavItem[] = [
+  { label: 'Home', path: '/member', icon: Home, tabId: 'overview' },
+  { label: 'My Program', path: '/member', icon: ClipboardList, tabId: 'plan' },
+  { label: 'My Orders', path: '/member', icon: Package, tabId: 'orders' },
+  { label: 'Education', path: '/member', icon: FileText, tabId: 'content' },
+  { label: 'Health Coach', path: '/member', icon: CalendarCheck, tabId: 'coach' },
+  { label: 'Trackers', path: '/member', icon: Activity, tabId: 'trackers' },  // NEW
+  { label: 'Profile', path: '/member/profile', icon: User },
+];
 ```
 
-Update existing modules to remove `isPlaceholder: true` for all modules (per user request to remove "Coming Soon" badge).
+Import `Activity` icon from lucide-react.
 
-Update `getRecommendedModules()` to prioritize `'mindful-eating'` and `'meal-planning'` as recommended.
+### 2. MemberHome.tsx Updates
 
-### 2. MindfulEating.tsx - Full Content
+**Add new TabsTrigger and TabsContent:**
 
-Replace placeholder with content adapted from PDF:
-- Why Try Mindful Eating section
-- 10 Steps to Practice (numbered list)
-- Tips for Success
-- Stress-Management Resource List (Deep breathing, Apps, Journaling, Support groups, Helplines)
-- Mark as Complete button
-
-### 3. MealPlanning.tsx - Combined Content
-
-Replace placeholder with content from PDF:
-- Plate Model section (half veggies, quarter protein, quarter grains)
-- Weekly Meal Planning Worksheet (visual table)
-- Grocery Shopping List (organized by category)
-- Mark as Complete button
-
-Note: Portion Control content is merged here since the PDF combines both topics.
-
-### 4. HydrationGIHealth.tsx - New Page
-
-Create new education page with:
-- Fluid Balance & Dehydration Risks
-- Signs of dehydration
-- Managing Diarrhea (BRAT diet tips)
-- Managing Constipation (fiber, fluids)
-- Hydration Log Template
-- Electrolyte Solution Recipes (DIY sports drink, Coconut water refresher)
-- Fiber Timing Chart
-- Mark as Complete button
-
-### 5. MicronutrientsImmunity.tsx - New Page
-
-Create new education page with:
-- Why Micronutrients Matter section
-- Table of Key Antioxidant Vitamins & Trace Minerals (Vitamin A, C, E, Zinc, Selenium)
-- Food Sources vs Supplements guidance
-- Mark as Complete button
-
-### 6. App.tsx Updates
-
-Add two new routes:
 ```tsx
-<Route path="/member/education/hydration-gi-health" element={<HydrationGIHealth />} />
-<Route path="/member/education/micronutrients-immunity" element={<MicronutrientsImmunity />} />
+<TabsTrigger value="trackers">Trackers</TabsTrigger>
+
+<TabsContent value="trackers" className="space-y-6">
+  {/* Food Diary and Activity Tracker components */}
+</TabsContent>
 ```
 
-### 7. ModuleCard.tsx Update
+### 3. useFoodDiary.ts Hook (New File)
 
-Remove the "Coming Soon" badge logic:
-- Remove lines 37-39 in featured variant
-- Remove lines 66-68 in default variant
+Manages food diary entries with localStorage persistence:
+
+```typescript
+interface FoodEntry {
+  id: string;
+  date: string;
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  description: string;
+  timestamp: string;
+}
+
+// Functions: addEntry, getEntriesByDate, deleteEntry
+```
+
+### 4. useActivityTracker.ts Hook (New File)
+
+Manages activity entries with localStorage persistence:
+
+```typescript
+interface ActivityEntry {
+  id: string;
+  date: string;
+  activityType: string;  // walking, running, swimming, etc.
+  duration: number;      // minutes
+  steps?: number;        // optional step count
+  notes?: string;
+  timestamp: string;
+}
+
+// Functions: addActivity, getActivitiesByDate, deleteActivity
+```
+
+### 5. Trackers Tab Content
+
+The tab will include:
+
+**Food Diary Section:**
+- Date selector (today by default)
+- Add meal buttons for Breakfast, Lunch, Dinner, Snack
+- Simple form dialog to log meal description
+- Daily meal list showing logged entries
+- Quick delete option
+
+**Activity Tracker Section:**
+- Date selector (synced with Food Diary)
+- Add activity form with:
+  - Activity type dropdown (Walking, Running, Swimming, Cycling, Strength Training, Yoga, Other)
+  - Duration in minutes
+  - Optional step count
+  - Optional notes
+- Daily activity summary
+- List of logged activities
 
 ---
 
-## Recommendation Logic Update
+## Data Persistence
 
-Modify `getRecommendedModules()` in educationData.ts to ensure Mindful Eating and Meal Planning appear in recommendations:
+Both trackers use localStorage for demo purposes:
+- `umoja-food-diary` - stores food entries
+- `umoja-activity-log` - stores activity entries
 
-```typescript
-// Add to the beginning of recommendations if not completed
-const priorityModules = ['mindful-eating', 'meal-planning'];
-for (const id of priorityModules) {
-  const module = EDUCATION_MODULES.find(m => m.id === id);
-  if (module && !completedModuleIds.has(module.id)) {
-    recommendations.unshift(module);
-  }
-}
-```
+This follows the existing pattern used by `useEducationProgress` and `useSupportCases`.
+
+---
+
+## Icons Used
+
+| Feature | Icon |
+|---------|------|
+| Trackers nav item | `Activity` |
+| Food Diary | `UtensilsCrossed` or `Apple` |
+| Activity Tracker | `Footprints` or `Dumbbell` |
+| Add buttons | `Plus` |
+
+---
+
+## Mobile Responsiveness
+
+- Cards stack vertically on mobile (`grid-cols-1 lg:grid-cols-2`)
+- Form dialogs are mobile-friendly (already using Dialog component)
+- Tab navigation remains horizontally scrollable
 
 ---
 
 ## Acceptance Criteria
 
 After implementation:
-- 4 new education modules are accessible from the Education tab
-- Mindful Eating and Meal Planning appear in "Recommended for You" section
-- No "Coming Soon" badges appear on any module cards
-- All modules have Mark as Complete functionality
-- New modules appear in their respective category accordions
+- New "Trackers" tab appears between Health Coach and Profile in both tabs and sidebar
+- Food Diary allows logging meals by type with descriptions
+- Activity Tracker allows logging activities with duration and optional steps
+- Entries persist across page refreshes (localStorage)
+- Both sections show today's entries by default
+- Works correctly on mobile devices
 
