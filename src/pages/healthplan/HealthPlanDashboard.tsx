@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { members, enrollments, programs, orders, contentPlans, cbos } from '@/lib/mockData';
+import { members, enrollments, programs, orders, contentPlans, cbos, cohortUtilizationData } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,7 +7,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { Users, Package, BookOpen, TrendingUp, Download, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import { useApp } from '@/contexts/AppContext';
 
 export default function HealthPlanDashboard() {
@@ -94,22 +94,28 @@ export default function HealthPlanDashboard() {
     });
   }, [filteredData.enrollments]);
 
-  // Generate shipment data based on filtered orders
-  const shipmentData = useMemo(() => {
-    const delivered = filteredData.orders.filter(o => o.shipmentStatus === 'delivered').length;
-    const exceptions = filteredData.orders.filter(o => o.shipmentStatus === 'exception').length;
+  // Transform cohort utilization data for Recharts multi-line chart
+  const utilizationChartData = useMemo(() => {
+    const periods = ['Baseline', 'Month 1', 'Month 2', 'Month 3', 'Month 4'];
+    return periods.map(period => {
+      const dataPoint: Record<string, string | number> = { period };
+      cohortUtilizationData.forEach(cohort => {
+        const periodData = cohort.utilizationData.find(d => d.period === period);
+        if (periodData) {
+          dataPoint[cohort.cohortName] = periodData.cost;
+        }
+      });
+      return dataPoint;
+    });
+  }, []);
 
-    // Distribute across weeks
-    const weeklyDelivered = Math.ceil(delivered / 4);
-    const weeklyExceptions = Math.ceil(exceptions / 4);
-
-    return [
-      { week: 'W1', delivered: weeklyDelivered, exception: Math.max(0, weeklyExceptions - 1) },
-      { week: 'W2', delivered: Math.round(weeklyDelivered * 1.1), exception: weeklyExceptions },
-      { week: 'W3', delivered: Math.round(weeklyDelivered * 0.95), exception: Math.max(0, weeklyExceptions - 1) },
-      { week: 'W4', delivered: Math.round(weeklyDelivered * 1.05), exception: weeklyExceptions + 1 },
-    ];
-  }, [filteredData.orders]);
+  // Cohort colors for the utilization chart
+  const cohortColors: Record<string, string> = {
+    'Oct 2024': 'hsl(var(--primary))',
+    'Nov 2024': 'hsl(var(--accent))',
+    'Dec 2024': 'hsl(var(--success))',
+    'Jan 2025': 'hsl(210 80% 55%)', // Blue for info
+  };
 
   // Generate engagement data based on filtered content plans
   const engagementData = useMemo(() => {
@@ -304,28 +310,56 @@ export default function HealthPlanDashboard() {
             </CardContent>
           </Card>
 
-          {/* Shipment Performance */}
+          {/* Utilization Trends by Cohort */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Shipment Performance</CardTitle>
-              <CardDescription>Weekly delivery success vs exceptions</CardDescription>
+              <CardTitle className="text-lg">Utilization Trends by Cohort</CardTitle>
+              <CardDescription>Average monthly cost per member (PMPM)</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={shipmentData}>
+                  <LineChart data={utilizationChartData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="week" className="text-xs" />
-                    <YAxis className="text-xs" />
+                    <XAxis dataKey="period" className="text-xs" />
+                    <YAxis 
+                      className="text-xs" 
+                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                      domain={[0, 20000]}
+                    />
                     <Tooltip 
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--card))', 
                         border: '1px solid hsl(var(--border))' 
-                      }} 
+                      }}
+                      formatter={(value: number, name: string) => {
+                        const cohort = cohortUtilizationData.find(c => c.cohortName === name);
+                        const baseline = cohort?.utilizationData.find(d => d.period === 'Baseline')?.cost || value;
+                        const reduction = ((baseline - value) / baseline * 100).toFixed(1);
+                        return [
+                          `$${value.toLocaleString()} (${value < baseline ? `-${reduction}%` : 'baseline'})`,
+                          `${name} (T${cohort?.tier})`
+                        ];
+                      }}
                     />
-                    <Bar dataKey="delivered" fill="hsl(var(--success))" name="Delivered" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="exception" fill="hsl(var(--destructive))" name="Exceptions" radius={[4, 4, 0, 0]} />
-                  </BarChart>
+                    <Legend 
+                      formatter={(value: string) => {
+                        const cohort = cohortUtilizationData.find(c => c.cohortName === value);
+                        return `${value} (T${cohort?.tier}, ${cohort?.memberCount} members)`;
+                      }}
+                    />
+                    {cohortUtilizationData.map(cohort => (
+                      <Line
+                        key={cohort.id}
+                        type="monotone"
+                        dataKey={cohort.cohortName}
+                        stroke={cohortColors[cohort.cohortName]}
+                        strokeWidth={2}
+                        dot={{ fill: cohortColors[cohort.cohortName], strokeWidth: 2, r: 4 }}
+                        connectNulls={false}
+                      />
+                    ))}
+                  </LineChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>

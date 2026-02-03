@@ -186,6 +186,72 @@ export const CLINICAL_SAVINGS = {
   BMI_PER_POINT: 250,            // $250 per point reduction per member
 };
 
+// Cohort utilization data for tracking healthcare cost reduction over time
+export interface CohortUtilization {
+  id: string;
+  cohortName: string;    // "Oct 2024"
+  cohortMonth: string;   // "2024-10"
+  tier: 1 | 2 | 3;
+  memberCount: number;
+  utilizationData: {
+    period: string;      // "Baseline", "Month 1", etc.
+    cost: number;        // Average PMPM cost
+  }[];
+}
+
+export const cohortUtilizationData: CohortUtilization[] = [
+  {
+    id: 'cohort-oct-24',
+    cohortName: 'Oct 2024',
+    cohortMonth: '2024-10',
+    tier: 1,
+    memberCount: 12,
+    utilizationData: [
+      { period: 'Baseline', cost: 17200 },
+      { period: 'Month 1', cost: 15100 },
+      { period: 'Month 2', cost: 13400 },
+      { period: 'Month 3', cost: 11800 },
+      { period: 'Month 4', cost: 10500 },
+    ],
+  },
+  {
+    id: 'cohort-nov-24',
+    cohortName: 'Nov 2024',
+    cohortMonth: '2024-11',
+    tier: 1,
+    memberCount: 15,
+    utilizationData: [
+      { period: 'Baseline', cost: 16800 },
+      { period: 'Month 1', cost: 14900 },
+      { period: 'Month 2', cost: 13200 },
+      { period: 'Month 3', cost: 11900 },
+    ],
+  },
+  {
+    id: 'cohort-dec-24',
+    cohortName: 'Dec 2024',
+    cohortMonth: '2024-12',
+    tier: 2,
+    memberCount: 18,
+    utilizationData: [
+      { period: 'Baseline', cost: 12400 },
+      { period: 'Month 1', cost: 10800 },
+      { period: 'Month 2', cost: 9600 },
+    ],
+  },
+  {
+    id: 'cohort-jan-25',
+    cohortName: 'Jan 2025',
+    cohortMonth: '2025-01',
+    tier: 2,
+    memberCount: 21,
+    utilizationData: [
+      { period: 'Baseline', cost: 9800 },
+      { period: 'Month 1', cost: 8900 },
+    ],
+  },
+];
+
 export interface IntegrationStatus {
   id: string;
   name: string;
