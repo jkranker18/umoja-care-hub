@@ -9,7 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles } from 'lucide-react';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,17 +17,20 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEducationProgress, ModuleId } from '@/hooks/useEducationProgress';
+import { useEducationProgress } from '@/hooks/useEducationProgress';
 import { useSupportCases } from '@/hooks/useSupportCases';
 import { HealthieChatWrapper } from '@/components/healthie/HealthieChatWrapper';
 import { HealthieChat } from '@/components/healthie/HealthieChat';
 import { MyAppointments } from '@/components/healthie/MyAppointments';
+import { ModuleCard } from '@/components/education/ModuleCard';
+import { CategoryAccordion } from '@/components/education/CategoryAccordion';
+import { CATEGORIES, getModulesByCategory, getRecommendedModules } from '@/lib/educationData';
 
 export default function MemberHome() {
   const { members } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
-  const { completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
+  const { completedModules, completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
   const { addCase } = useSupportCases();
   // Handle navigation state for active tab
   const initialTab = (location.state as any)?.activeTab || 'overview';
@@ -514,71 +517,67 @@ export default function MemberHome() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="content">
+          <TabsContent value="content" className="space-y-6">
+            {/* Overall Progress */}
             <Card>
-              <CardHeader>
-                <CardTitle>Education Plan</CardTitle>
-                <CardDescription>Your personalized learning modules.</CardDescription>
+              <CardHeader className="pb-2">
+                <CardTitle>Education</CardTitle>
+                <CardDescription>Your personalized learning journey</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Overall Progress</span>
-                    <span className="font-medium">{completedCount} of {eduTotalModules} complete</span>
-                  </div>
-                  <Progress value={progressPercent} />
+                <div className="flex items-center justify-between text-sm mb-2">
+                  <span className="text-muted-foreground">Overall Progress</span>
+                  <span className="font-medium">{completedCount} of {eduTotalModules} modules complete</span>
                 </div>
-                <div className="space-y-3">
-                  <div 
-                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => navigate('/member/education/general-nutrition')}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('general-nutrition') ? 'bg-success/10' : 'bg-muted'}`}>
-                        <BookOpen className={`h-5 w-5 ${isComplete('general-nutrition') ? 'text-success' : 'text-muted-foreground'}`} />
-                      </div>
-                      <div>
-                        <p className="font-medium">General Nutrition</p>
-                        <p className="text-sm text-muted-foreground">What Your Body Needs to Stay Healthy</p>
-                      </div>
-                    </div>
-                    <StatusPill status={isComplete('general-nutrition') ? 'completed' : 'pending'} />
-                  </div>
-                  
-                  <div 
-                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => navigate('/member/education/reading-nutrition-label')}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('reading-nutrition-label') ? 'bg-success/10' : 'bg-muted'}`}>
-                        <BookOpen className={`h-5 w-5 ${isComplete('reading-nutrition-label') ? 'text-success' : 'text-muted-foreground'}`} />
-                      </div>
-                      <div>
-                        <p className="font-medium">Reading a Nutrition Label</p>
-                        <p className="text-sm text-muted-foreground">Learn to make healthier food choices</p>
-                      </div>
-                    </div>
-                    <StatusPill status={isComplete('reading-nutrition-label') ? 'completed' : 'pending'} />
-                  </div>
-                  
-                  <div 
-                    className="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => navigate('/member/education/budget-friendly-meals')}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isComplete('budget-friendly-meals') ? 'bg-success/10' : 'bg-muted'}`}>
-                        <BookOpen className={`h-5 w-5 ${isComplete('budget-friendly-meals') ? 'text-success' : 'text-muted-foreground'}`} />
-                      </div>
-                      <div>
-                        <p className="font-medium">Budget-Friendly Meals Made Easy</p>
-                        <p className="text-sm text-muted-foreground">Create satisfying meals without overspending</p>
-                      </div>
-                    </div>
-                    <StatusPill status={isComplete('budget-friendly-meals') ? 'completed' : 'pending'} />
-                  </div>
-                </div>
+                <Progress value={progressPercent} />
               </CardContent>
             </Card>
+
+            {/* Recommended for You */}
+            {(() => {
+              const recommendedModules = getRecommendedModules(
+                chronicConditions,
+                completedModules,
+                enrollment?.currentWeek || 1
+              );
+              
+              if (recommendedModules.length === 0) return null;
+              
+              return (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">Recommended for You</h3>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {recommendedModules.map(module => (
+                      <ModuleCard
+                        key={module.id}
+                        module={module}
+                        isComplete={isComplete(module.id)}
+                        variant="featured"
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Explore More - Categories */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">Explore More</h3>
+              <div className="space-y-2">
+                {CATEGORIES.map((category, index) => (
+                  <CategoryAccordion
+                    key={category.id}
+                    category={category}
+                    modules={getModulesByCategory(category.id)}
+                    completedModules={completedModules}
+                    defaultOpen={index === 0}
+                  />
+                ))}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="coach" className="space-y-6">
