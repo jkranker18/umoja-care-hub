@@ -4,6 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import laFoodBankLogo from '@/assets/la-food-bank-logo.png';
 import umojaLogoLight from '@/assets/umoja-logo-light.png';
+import bcbsIllinoisLogo from '@/assets/bcbs-illinois-logo.png';
 import {
   Home,
   User,
@@ -111,10 +112,11 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
               className="h-12 object-contain"
             />
           ) : currentRole === 'healthplan' ? (
-            <div className="flex flex-col">
-              <span className="text-lg font-display font-bold text-sidebar-foreground">Blue Cross</span>
-              <span className="text-xs text-sidebar-foreground/70">of California</span>
-            </div>
+            <img 
+              src={bcbsIllinoisLogo} 
+              alt="Blue Cross Blue Shield of Illinois" 
+              className="h-12 object-contain"
+            />
           ) : (
             <img 
               src={umojaLogoLight} 
