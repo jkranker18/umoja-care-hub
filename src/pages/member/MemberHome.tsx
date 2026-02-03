@@ -304,7 +304,7 @@ export default function MemberHome() {
               <TabsTrigger value="plan">My Program</TabsTrigger>
               <TabsTrigger value="orders">My Orders</TabsTrigger>
               <TabsTrigger value="content">Education</TabsTrigger>
-              <TabsTrigger value="coach">Health Coach</TabsTrigger>
+              <TabsTrigger value="coach">My Care Team</TabsTrigger>
               <TabsTrigger value="trackers">Trackers</TabsTrigger>
             </TabsList>
           </div>
