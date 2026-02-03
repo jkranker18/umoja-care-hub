@@ -9,7 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2 } from 'lucide-react';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,8 +17,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useEducationProgress } from '@/hooks/useEducationProgress';
 import { useSupportCases } from '@/hooks/useSupportCases';
+import { useFoodDiary, FoodEntry } from '@/hooks/useFoodDiary';
+import { useActivityTracker, ActivityEntry } from '@/hooks/useActivityTracker';
 import { HealthieChatWrapper } from '@/components/healthie/HealthieChatWrapper';
 import { HealthieChat } from '@/components/healthie/HealthieChat';
 import { MyAppointments } from '@/components/healthie/MyAppointments';
@@ -32,6 +35,8 @@ export default function MemberHome() {
   const location = useLocation();
   const { completedModules, completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
   const { addCase } = useSupportCases();
+  const { addEntry: addFoodEntry, getEntriesByDate, deleteEntry: deleteFoodEntry } = useFoodDiary();
+  const { addActivity, getActivitiesByDate, deleteActivity, getTotalMinutesByDate, getTotalStepsByDate } = useActivityTracker();
   // Handle navigation state for active tab
   const initialTab = (location.state as any)?.activeTab || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -74,7 +79,60 @@ export default function MemberHome() {
   const [supportCaseNumber, setSupportCaseNumber] = useState('');
   const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
-  // Get phase info for the current member
+  // Trackers state
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const [selectedDate, setSelectedDate] = useState(todayStr);
+  const [foodModalOpen, setFoodModalOpen] = useState(false);
+  const [activityModalOpen, setActivityModalOpen] = useState(false);
+  const [selectedMealType, setSelectedMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
+  const [mealDescription, setMealDescription] = useState('');
+  const [activityType, setActivityType] = useState('');
+  const [activityDuration, setActivityDuration] = useState('');
+  const [activitySteps, setActivitySteps] = useState('');
+  const [activityNotes, setActivityNotes] = useState('');
+
+  // Get entries for selected date
+  const todayMeals = getEntriesByDate(selectedDate);
+  const todayActivities = getActivitiesByDate(selectedDate);
+  const totalMinutes = getTotalMinutesByDate(selectedDate);
+  const totalSteps = getTotalStepsByDate(selectedDate);
+
+  const handleAddMeal = () => {
+    if (mealDescription.trim()) {
+      addFoodEntry({
+        date: selectedDate,
+        mealType: selectedMealType,
+        description: mealDescription.trim(),
+      });
+      setMealDescription('');
+      setFoodModalOpen(false);
+    }
+  };
+
+  const handleAddActivity = () => {
+    if (activityType && activityDuration) {
+      addActivity({
+        date: selectedDate,
+        activityType,
+        duration: parseInt(activityDuration),
+        steps: activitySteps ? parseInt(activitySteps) : undefined,
+        notes: activityNotes || undefined,
+      });
+      setActivityType('');
+      setActivityDuration('');
+      setActivitySteps('');
+      setActivityNotes('');
+      setActivityModalOpen(false);
+    }
+  };
+
+  const openFoodModal = (mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack') => {
+    setSelectedMealType(mealType);
+    setMealDescription('');
+    setFoodModalOpen(true);
+  };
+
+
   const phaseInfo = program ? getPhaseInfo(program, enrollment?.currentWeek || 1) : null;
 
   // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming (fixed dates for consistent demo)
@@ -247,6 +305,7 @@ export default function MemberHome() {
               <TabsTrigger value="orders">My Orders</TabsTrigger>
               <TabsTrigger value="content">Education</TabsTrigger>
               <TabsTrigger value="coach">Health Coach</TabsTrigger>
+              <TabsTrigger value="trackers">Trackers</TabsTrigger>
             </TabsList>
           </div>
 
@@ -663,6 +722,162 @@ export default function MemberHome() {
               </Card>
             </HealthieChatWrapper>
           </TabsContent>
+
+          {/* Trackers Tab */}
+          <TabsContent value="trackers" className="space-y-6">
+            {/* Date Selector */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="tracker-date" className="text-sm font-medium">Date:</Label>
+              <Input
+                id="tracker-date"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-auto"
+              />
+              {selectedDate !== todayStr && (
+                <Button variant="outline" size="sm" onClick={() => setSelectedDate(todayStr)}>
+                  Today
+                </Button>
+              )}
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Food Diary Card */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <UtensilsCrossed className="h-5 w-5 text-primary" />
+                      <CardTitle>Food Diary</CardTitle>
+                    </div>
+                  </div>
+                  <CardDescription>Track your daily meals and snacks</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Add Meal Buttons */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" size="sm" onClick={() => openFoodModal('breakfast')}>
+                      <Plus className="h-4 w-4 mr-1" /> Breakfast
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => openFoodModal('lunch')}>
+                      <Plus className="h-4 w-4 mr-1" /> Lunch
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => openFoodModal('dinner')}>
+                      <Plus className="h-4 w-4 mr-1" /> Dinner
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => openFoodModal('snack')}>
+                      <Plus className="h-4 w-4 mr-1" /> Snack
+                    </Button>
+                  </div>
+
+                  {/* Today's Meals */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">
+                      {selectedDate === todayStr ? "Today's Meals" : `Meals for ${format(new Date(selectedDate), 'MMM d, yyyy')}`}
+                    </h4>
+                    {todayMeals.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic py-4 text-center">No meals logged yet</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {['breakfast', 'lunch', 'dinner', 'snack'].map(mealType => {
+                          const meals = todayMeals.filter(m => m.mealType === mealType);
+                          if (meals.length === 0) return null;
+                          return (
+                            <div key={mealType} className="space-y-1">
+                              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                {mealType}
+                              </p>
+                              {meals.map(meal => (
+                                <div key={meal.id} className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+                                  <span className="text-sm">{meal.description}</span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                                    onClick={() => deleteFoodEntry(meal.id)}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Activity Tracker Card */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Dumbbell className="h-5 w-5 text-primary" />
+                      <CardTitle>Activity Tracker</CardTitle>
+                    </div>
+                  </div>
+                  <CardDescription>Log your physical activities</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Add Activity Button */}
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setActivityModalOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Add Activity
+                  </Button>
+
+                  {/* Daily Summary */}
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary">{totalMinutes}</p>
+                      <p className="text-xs text-muted-foreground">Total Minutes</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-primary">{totalSteps.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">Total Steps</p>
+                    </div>
+                  </div>
+
+                  {/* Today's Activities */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">
+                      {selectedDate === todayStr ? "Today's Activities" : `Activities for ${format(new Date(selectedDate), 'MMM d, yyyy')}`}
+                    </h4>
+                    {todayActivities.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic py-4 text-center">No activities logged yet</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {todayActivities.map(activity => (
+                          <div key={activity.id} className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+                            <div>
+                              <p className="text-sm font-medium">{activity.activityType}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {activity.duration} min
+                                {activity.steps ? ` • ${activity.steps.toLocaleString()} steps` : ''}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                              onClick={() => deleteActivity(activity.id)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
         </Tabs>
 
         {/* Support Button */}
@@ -679,6 +894,108 @@ export default function MemberHome() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Food Entry Modal */}
+      <Dialog open={foodModalOpen} onOpenChange={setFoodModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="capitalize">Add {selectedMealType}</DialogTitle>
+            <DialogDescription>
+              What did you have for {selectedMealType}?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="meal-description">Description</Label>
+              <Textarea
+                id="meal-description"
+                placeholder="e.g., Oatmeal with berries and a glass of orange juice"
+                value={mealDescription}
+                onChange={(e) => setMealDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFoodModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddMeal} disabled={!mealDescription.trim()}>
+              Add Entry
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Activity Modal */}
+      <Dialog open={activityModalOpen} onOpenChange={setActivityModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Activity</DialogTitle>
+            <DialogDescription>
+              Log your physical activity
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="activity-type">Activity Type</Label>
+              <Select value={activityType} onValueChange={setActivityType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an activity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Walking">Walking</SelectItem>
+                  <SelectItem value="Running">Running</SelectItem>
+                  <SelectItem value="Swimming">Swimming</SelectItem>
+                  <SelectItem value="Cycling">Cycling</SelectItem>
+                  <SelectItem value="Strength Training">Strength Training</SelectItem>
+                  <SelectItem value="Yoga">Yoga</SelectItem>
+                  <SelectItem value="Stretching">Stretching</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="activity-duration">Duration (minutes)</Label>
+              <Input
+                id="activity-duration"
+                type="number"
+                placeholder="30"
+                value={activityDuration}
+                onChange={(e) => setActivityDuration(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="activity-steps">Steps (optional)</Label>
+              <Input
+                id="activity-steps"
+                type="number"
+                placeholder="5000"
+                value={activitySteps}
+                onChange={(e) => setActivitySteps(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="activity-notes">Notes (optional)</Label>
+              <Textarea
+                id="activity-notes"
+                placeholder="Any additional details..."
+                value={activityNotes}
+                onChange={(e) => setActivityNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setActivityModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddActivity} disabled={!activityType || !activityDuration}>
+              Add Activity
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Report Issue Modal */}
       <Dialog open={issueModalOpen} onOpenChange={setIssueModalOpen}>
