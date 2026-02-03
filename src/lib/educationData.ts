@@ -7,6 +7,7 @@ export const MODULES = [
   'budget-friendly-meals',
   'meal-planning',
   'portion-control',
+  'micronutrients-immunity',
   // Lifestyle & Mental Health
   'stress-eating',
   'better-sleep',
@@ -17,6 +18,7 @@ export const MODULES = [
   'diabetes-nutrition',
   'managing-hypertension',
   'kidney-health',
+  'hydration-gi-health',
   // Recipes & Food Prep
   'kitchen-basics',
   'batch-cooking',
@@ -51,7 +53,6 @@ export interface EducationModule {
   icon: string;
   duration?: string;
   conditions?: string[]; // For personalization based on member health profile
-  isPlaceholder?: boolean; // True for modules without full content yet
 }
 
 export interface ContentCategoryInfo {
@@ -128,12 +129,11 @@ export const EDUCATION_MODULES: EducationModule[] = [
   },
   {
     id: 'meal-planning',
-    title: 'Meal Planning 101',
-    description: 'Plan your week for healthier eating',
+    title: 'Meal Planning & Portion Control',
+    description: 'Plan your week and right-size your plate',
     category: 'healthy-eating',
     icon: 'Calendar',
-    duration: '5 min read',
-    isPlaceholder: true,
+    duration: '6 min read',
   },
   {
     id: 'portion-control',
@@ -142,7 +142,14 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'healthy-eating',
     icon: 'Scale',
     duration: '4 min read',
-    isPlaceholder: true,
+  },
+  {
+    id: 'micronutrients-immunity',
+    title: 'Micronutrients for Immunity',
+    description: 'Vitamins and minerals that support healing',
+    category: 'healthy-eating',
+    icon: 'Sparkles',
+    duration: '4 min read',
   },
 
   // Lifestyle & Mental Health
@@ -153,7 +160,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'lifestyle-mental-health',
     icon: 'Frown',
     duration: '5 min read',
-    isPlaceholder: true,
   },
   {
     id: 'better-sleep',
@@ -162,7 +168,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'lifestyle-mental-health',
     icon: 'Moon',
     duration: '4 min read',
-    isPlaceholder: true,
   },
   {
     id: 'staying-active',
@@ -171,7 +176,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'lifestyle-mental-health',
     icon: 'Footprints',
     duration: '5 min read',
-    isPlaceholder: true,
   },
   {
     id: 'mindful-eating',
@@ -179,8 +183,7 @@ export const EDUCATION_MODULES: EducationModule[] = [
     description: 'Eating with awareness and intention',
     category: 'lifestyle-mental-health',
     icon: 'Leaf',
-    duration: '4 min read',
-    isPlaceholder: true,
+    duration: '5 min read',
   },
 
   // Managing Health Conditions
@@ -192,7 +195,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     icon: 'Heart',
     duration: '6 min read',
     conditions: ['heart disease', 'cardiovascular'],
-    isPlaceholder: true,
   },
   {
     id: 'diabetes-nutrition',
@@ -202,7 +204,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     icon: 'Droplet',
     duration: '7 min read',
     conditions: ['diabetes', 'pre-diabetes'],
-    isPlaceholder: true,
   },
   {
     id: 'managing-hypertension',
@@ -212,7 +213,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     icon: 'Activity',
     duration: '6 min read',
     conditions: ['hypertension', 'high blood pressure'],
-    isPlaceholder: true,
   },
   {
     id: 'kidney-health',
@@ -222,7 +222,14 @@ export const EDUCATION_MODULES: EducationModule[] = [
     icon: 'Bean',
     duration: '5 min read',
     conditions: ['kidney disease', 'CKD'],
-    isPlaceholder: true,
+  },
+  {
+    id: 'hydration-gi-health',
+    title: 'Hydration & GI Health',
+    description: 'Managing fluid balance and digestive comfort',
+    category: 'managing-conditions',
+    icon: 'Droplets',
+    duration: '5 min read',
   },
 
   // Recipes & Food Prep
@@ -233,7 +240,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'recipes-food-prep',
     icon: 'Utensils',
     duration: '6 min read',
-    isPlaceholder: true,
   },
   {
     id: 'batch-cooking',
@@ -242,7 +248,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'recipes-food-prep',
     icon: 'Container',
     duration: '7 min read',
-    isPlaceholder: true,
   },
   {
     id: 'healthy-substitutions',
@@ -251,7 +256,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'recipes-food-prep',
     icon: 'ArrowLeftRight',
     duration: '4 min read',
-    isPlaceholder: true,
   },
   {
     id: 'quick-recipes',
@@ -260,7 +264,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'recipes-food-prep',
     icon: 'Timer',
     duration: '5 min read',
-    isPlaceholder: true,
   },
 
   // Understanding Healthcare
@@ -271,7 +274,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'understanding-healthcare',
     icon: 'Shield',
     duration: '5 min read',
-    isPlaceholder: true,
   },
   {
     id: 'talking-to-doctor',
@@ -280,7 +282,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'understanding-healthcare',
     icon: 'MessageCircle',
     duration: '4 min read',
-    isPlaceholder: true,
   },
   {
     id: 'medications',
@@ -289,7 +290,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'understanding-healthcare',
     icon: 'Pill',
     duration: '5 min read',
-    isPlaceholder: true,
   },
   {
     id: 'insurance-basics',
@@ -298,7 +298,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'understanding-healthcare',
     icon: 'FileCheck',
     duration: '6 min read',
-    isPlaceholder: true,
   },
 
   // Local Resources
@@ -309,7 +308,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'local-resources',
     icon: 'HandHeart',
     duration: '5 min read',
-    isPlaceholder: true,
   },
   {
     id: 'community-health',
@@ -318,7 +316,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'local-resources',
     icon: 'Users',
     duration: '4 min read',
-    isPlaceholder: true,
   },
   {
     id: 'transportation',
@@ -327,7 +324,6 @@ export const EDUCATION_MODULES: EducationModule[] = [
     category: 'local-resources',
     icon: 'Bus',
     duration: '3 min read',
-    isPlaceholder: true,
   },
 ];
 
@@ -349,9 +345,18 @@ export function getRecommendedModules(
 ): EducationModule[] {
   const recommendations: EducationModule[] = [];
   
-  // Add condition-specific modules first (if not completed)
+  // Priority modules: Mindful Eating and Meal Planning first
+  const priorityModules: ModuleId[] = ['mindful-eating', 'meal-planning'];
+  for (const id of priorityModules) {
+    const module = EDUCATION_MODULES.find(m => m.id === id);
+    if (module && !completedModuleIds.has(module.id)) {
+      recommendations.push(module);
+    }
+  }
+  
+  // Add condition-specific modules (if not completed)
   for (const module of EDUCATION_MODULES) {
-    if (module.conditions && !completedModuleIds.has(module.id)) {
+    if (module.conditions && !completedModuleIds.has(module.id) && !recommendations.find(r => r.id === module.id)) {
       const matchesCondition = memberConditions.some(condition =>
         module.conditions?.some(mc => 
           mc.toLowerCase().includes(condition.toLowerCase()) ||
@@ -366,7 +371,7 @@ export function getRecommendedModules(
 
   // Add phase-appropriate basics if early in program
   if (currentWeek <= 4) {
-    const basics = ['general-nutrition', 'kitchen-basics', 'reading-nutrition-label'];
+    const basics: ModuleId[] = ['general-nutrition', 'kitchen-basics', 'reading-nutrition-label'];
     for (const id of basics) {
       const module = EDUCATION_MODULES.find(m => m.id === id);
       if (module && !completedModuleIds.has(module.id) && !recommendations.find(r => r.id === module.id)) {
@@ -377,7 +382,7 @@ export function getRecommendedModules(
 
   // Add meal prep modules during MTG transition phase
   if (currentWeek >= 5) {
-    const mealPrepModules = ['meal-planning', 'batch-cooking', 'budget-friendly-meals'];
+    const mealPrepModules: ModuleId[] = ['batch-cooking', 'budget-friendly-meals'];
     for (const id of mealPrepModules) {
       const module = EDUCATION_MODULES.find(m => m.id === id);
       if (module && !completedModuleIds.has(module.id) && !recommendations.find(r => r.id === module.id)) {
