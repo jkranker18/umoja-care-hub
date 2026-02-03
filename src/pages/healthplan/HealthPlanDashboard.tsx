@@ -328,9 +328,17 @@ export default function HealthPlanDashboard() {
                       domain={[0, 20000]}
                     />
                     <Tooltip 
+                      position={{ y: 280 }}
+                      wrapperStyle={{ 
+                        left: '50%', 
+                        transform: 'translateX(-50%)',
+                        pointerEvents: 'none'
+                      }}
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--card))', 
-                        border: '1px solid hsl(var(--border))' 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '6px',
+                        padding: '8px 12px'
                       }}
                       formatter={(value: number, name: string) => {
                         const cohort = cohortUtilizationData.find(c => c.cohortName === name);
