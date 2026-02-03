@@ -13,6 +13,7 @@ import ReadingNutritionLabel from "./pages/member/education/ReadingNutritionLabe
 import BudgetFriendlyMeals from "./pages/member/education/BudgetFriendlyMeals";
 import MealPlanning from "./pages/member/education/MealPlanning";
 import PortionControl from "./pages/member/education/PortionControl";
+import MicronutrientsImmunity from "./pages/member/education/MicronutrientsImmunity";
 import StressEating from "./pages/member/education/StressEating";
 import BetterSleep from "./pages/member/education/BetterSleep";
 import StayingActive from "./pages/member/education/StayingActive";
@@ -21,6 +22,7 @@ import HeartHealthy from "./pages/member/education/HeartHealthy";
 import DiabetesNutrition from "./pages/member/education/DiabetesNutrition";
 import ManagingHypertension from "./pages/member/education/ManagingHypertension";
 import KidneyHealth from "./pages/member/education/KidneyHealth";
+import HydrationGIHealth from "./pages/member/education/HydrationGIHealth";
 import KitchenBasics from "./pages/member/education/KitchenBasics";
 import BatchCooking from "./pages/member/education/BatchCooking";
 import HealthySubstitutions from "./pages/member/education/HealthySubstitutions";
@@ -69,6 +71,7 @@ function App() {
             <Route path="/member/education/budget-friendly-meals" element={<BudgetFriendlyMeals />} />
             <Route path="/member/education/meal-planning" element={<MealPlanning />} />
             <Route path="/member/education/portion-control" element={<PortionControl />} />
+            <Route path="/member/education/micronutrients-immunity" element={<MicronutrientsImmunity />} />
             {/* Education - Lifestyle & Mental Health */}
             <Route path="/member/education/stress-eating" element={<StressEating />} />
             <Route path="/member/education/better-sleep" element={<BetterSleep />} />
@@ -79,6 +82,7 @@ function App() {
             <Route path="/member/education/diabetes-nutrition" element={<DiabetesNutrition />} />
             <Route path="/member/education/managing-hypertension" element={<ManagingHypertension />} />
             <Route path="/member/education/kidney-health" element={<KidneyHealth />} />
+            <Route path="/member/education/hydration-gi-health" element={<HydrationGIHealth />} />
             {/* Education - Recipes & Food Prep */}
             <Route path="/member/education/kitchen-basics" element={<KitchenBasics />} />
             <Route path="/member/education/batch-cooking" element={<BatchCooking />} />

@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { StatusPill } from '@/components/shared/StatusPill';
-import { Badge } from '@/components/ui/badge';
 import { Clock } from 'lucide-react';
 import { icons } from 'lucide-react';
-import type { EducationModule, ModuleId } from '@/lib/educationData';
+import type { EducationModule } from '@/lib/educationData';
 
 interface ModuleCardProps {
   module: EducationModule;
@@ -32,12 +31,7 @@ export function ModuleCard({ module, isComplete, variant = 'default' }: ModuleCa
             {IconComponent && <IconComponent className={`h-6 w-6 ${isComplete ? 'text-success' : 'text-primary'}`} />}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <p className="font-medium truncate group-hover:text-primary transition-colors">{module.title}</p>
-              {module.isPlaceholder && (
-                <Badge variant="secondary" className="text-xs shrink-0">Coming Soon</Badge>
-              )}
-            </div>
+            <p className="font-medium truncate group-hover:text-primary transition-colors mb-1">{module.title}</p>
             <p className="text-sm text-muted-foreground line-clamp-2">{module.description}</p>
             {module.duration && (
               <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
@@ -61,12 +55,7 @@ export function ModuleCard({ module, isComplete, variant = 'default' }: ModuleCa
           {IconComponent && <IconComponent className={`h-5 w-5 ${isComplete ? 'text-success' : 'text-muted-foreground'}`} />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="font-medium truncate">{module.title}</p>
-            {module.isPlaceholder && (
-              <Badge variant="secondary" className="text-xs shrink-0">Coming Soon</Badge>
-            )}
-          </div>
+          <p className="font-medium truncate">{module.title}</p>
           <p className="text-sm text-muted-foreground truncate">{module.description}</p>
         </div>
       </div>
