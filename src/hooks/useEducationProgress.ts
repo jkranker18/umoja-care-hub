@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react';
+import { MODULES, type ModuleId } from '@/lib/educationData';
 
 const STORAGE_KEY = 'education-completed-modules';
 
-const MODULES = [
-  'general-nutrition',
-  'reading-nutrition-label', 
-  'budget-friendly-meals',
-] as const;
-
-export type ModuleId = typeof MODULES[number];
+export type { ModuleId };
 
 export function useEducationProgress() {
   const [completedModules, setCompletedModules] = useState<Set<ModuleId>>(new Set());
