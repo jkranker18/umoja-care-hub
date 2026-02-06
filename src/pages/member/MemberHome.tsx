@@ -160,8 +160,8 @@ export default function MemberHome() {
 
   const demoOrders = Array.from({ length: 12 }, (_, index) => {
     const weekNumber = index + 1;
-    const isDelivered = weekNumber <= 4;  // Weeks 1-4 delivered
-    const isInTransit = weekNumber === 5;  // Week 5 in transit (Feb 3)
+    const isDelivered = weekNumber <= 5;  // Weeks 1-5 delivered (through Feb 3)
+    const isInTransit = weekNumber === 6;  // Week 6 in transit (Feb 10)
     
     return {
       id: `ORD-${String(weekNumber).padStart(3, '0')}`,
