@@ -278,7 +278,7 @@ export default function Landing() {
               <div className="w-12 h-12 rounded-full bg-nudge/10 flex items-center justify-center mx-auto mb-3">
                 <span className="text-2xl">📚</span>
               </div>
-              <h3 className="font-semibold mb-1">Nudge</h3>
+              <h3 className="font-semibold mb-1">Nudj</h3>
               <p className="text-xs text-muted-foreground">Content & Education</p>
               <div className="mt-3">
                 <span className="status-pill status-active">Connected</span>
