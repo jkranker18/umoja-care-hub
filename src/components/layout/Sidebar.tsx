@@ -114,11 +114,18 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
               className="h-12 object-contain"
             />
           ) : currentRole === 'healthplan' ? (
-            <img 
-              src={hcscLogo} 
-              alt="HCSC" 
-              className="h-12 object-contain"
-            />
+            <div className="flex items-center gap-3 w-full">
+              <img 
+                src={hcscLogo} 
+                alt="HCSC" 
+                className="h-12 object-contain"
+              />
+              <img 
+                src={umojaLogoLight} 
+                alt="Umoja Food For Health" 
+                className="h-10 object-contain"
+              />
+            </div>
           ) : (
             <img 
               src={umojaLogoLight} 
