@@ -43,8 +43,8 @@ export function Header({ onMenuClick, onEducationClick }: HeaderProps) {
         
         <button onClick={() => navigate('/')} className="flex items-center gap-2">
           <img 
-            src={currentRole === 'healthplan' ? hcscLogo : umojaLogo} 
-            alt={currentRole === 'healthplan' ? 'HCSC' : 'Umoja Food For Health'} 
+            src={(currentRole === 'healthplan' || currentRole === 'member') ? hcscLogo : umojaLogo} 
+            alt={(currentRole === 'healthplan' || currentRole === 'member') ? 'HCSC' : 'Umoja Food For Health'}
             className="h-8 object-contain"
           />
         </button>

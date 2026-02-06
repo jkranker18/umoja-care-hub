@@ -121,8 +121,8 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
             />
           ) : (
             <img 
-              src={umojaLogoLight} 
-              alt="Umoja Food For Health" 
+              src={hcscLogo} 
+              alt="HCSC" 
               className="h-10 object-contain"
             />
           )}
