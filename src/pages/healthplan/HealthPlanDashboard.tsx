@@ -203,10 +203,10 @@ export default function HealthPlanDashboard() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Select value={programFilter} onValueChange={setProgramFilter}>
               <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue placeholder="All Programs" />
+                <SelectValue placeholder="HCSC Programs" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Programs</SelectItem>
+                <SelectItem value="all">HCSC Programs</SelectItem>
                 {programs.map(prog => (
                   <SelectItem key={prog.id} value={prog.id}>{prog.name}</SelectItem>
                 ))}
