@@ -976,7 +976,7 @@ export const healthPlanUsers: HealthPlanUser[] = [
     healthPlanId: 'hp-001',
     name: 'Michael Torres',
     email: 'mtorres@bluecross.com',
-    role: 'analyst',
+    role: 'viewer',
     status: 'active',
     lastLogin: '2025-01-27',
   },
