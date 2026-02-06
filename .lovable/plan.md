@@ -1,12 +1,13 @@
 
-# Rename "Nudge" to "Nudj" on the Landing Page
+# Rename "All Programs" to "HCSC Programs" on Health Plan Dashboard
 
 ## Overview
-The integration name on the `/` landing page currently reads "Nudge" but should be spelled **"Nudj"**.
+Change the program filter dropdown label from "All Programs" to "HCSC Programs" on the Health Plan Dashboard page.
 
 ## Change
 
-### `src/pages/Landing.tsx`
-- Line 281: Change the text `Nudge` to `Nudj`
+### `src/pages/healthplan/HealthPlanDashboard.tsx`
+- Line 206: Change the placeholder from `"All Programs"` to `"HCSC Programs"`
+- Line 209: Change the SelectItem text from `"All Programs"` to `"HCSC Programs"`
 
-This is a single text change on the landing page. The internal type names, CSS classes, and other references throughout the codebase will remain as-is since they are code identifiers, not user-facing labels. Only the visible display text on the landing page will be updated.
+Two text changes in a single file.
