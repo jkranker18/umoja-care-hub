@@ -1,20 +1,17 @@
 
 
-# Swap Logos: Umoja in Sidebar, HCSC in Header (Health Plan Portal)
+# HCSC Logo on Member Pages
 
 ## Overview
-For `/healthplan` pages, the sidebar currently shows the HCSC logo and the header shows the Umoja logo. You want them swapped: **Umoja FFH logo in the sidebar**, **HCSC logo in the header**.
+Replace the Umoja FFH logo with the HCSC logo in both the sidebar and the main header when viewing `/member` pages.
 
 ## Changes
 
 ### 1. Sidebar (`src/components/layout/Sidebar.tsx`)
-- Change the `healthplan` condition to show the **Umoja light logo** (`umojaLogoLight`) instead of `hcscLogo`
-- Update alt text to "Umoja Food For Health"
+- The default/member case currently shows `umojaLogoLight` -- change it to show `hcscLogo` with appropriate alt text and sizing
 
 ### 2. Header (`src/components/layout/Header.tsx`)
-- Import `useApp` from AppContext and `hcscLogo` asset
-- When `currentRole === 'healthplan'`, display the **HCSC logo** instead of the default Umoja logo
-- Keep the default Umoja logo for all other roles
+- Expand the conditional so that both `healthplan` and `member` roles show the HCSC logo instead of the Umoja logo
 
 ### Files Modified
 - `src/components/layout/Sidebar.tsx`
