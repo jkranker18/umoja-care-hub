@@ -1,19 +1,15 @@
 
 
-# Update Browser Tab Title
+# Update Browser Tab Favicon
 
 ## Overview
+Replace the default Lovable heart icon in the browser tab with the uploaded Umoja cube logo.
 
-Change the browser tab title from "Lovable App" to your preferred app name (e.g., "Umoja Food For Health").
+## Steps
 
-## Change
+1. **Copy the uploaded image** to the public directory as the new favicon (`public/favicon.png`).
+2. **Update `index.html`** to reference the new favicon with the correct image type:
+   - Add: `<link rel="icon" href="/favicon.png" type="image/png">`
 
-**File: `index.html`**
-
-Update the `<title>` tag and the `og:title` meta tag:
-
-- `<title>Lovable App</title>` → `<title>Umoja Food For Health</title>`
-- `<meta property="og:title" content="Lovable App" />` → `<meta property="og:title" content="Umoja Food For Health" />`
-
-This will update the text shown in the browser tab immediately.
+This will immediately replace the heart icon in the browser tab with the Umoja cube logo.
 
