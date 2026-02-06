@@ -956,7 +956,7 @@ export const healthPlans: HealthPlan[] = [
     contactName: 'Jennifer Adams',
     contactEmail: 'jadams@bluecross.com',
     phone: '(800) 555-BLUE',
-    address: '21555 Oxnard St, Woodland Hills, CA 91367',
+    address: '300 E Randolph St, Chicago, IL 60601',
     memberCount: 50,
   },
 ];
