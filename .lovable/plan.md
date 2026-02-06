@@ -1,34 +1,22 @@
 
 
-# Replace Blue Cross Branding with HCSC
+# Swap Logos: Umoja in Sidebar, HCSC in Header (Health Plan Portal)
 
 ## Overview
-Replace all Blue Cross Blue Shield of Illinois branding with HCSC (Health Care Service Corporation) across the health plan portal -- logo and text references.
+For `/healthplan` pages, the sidebar currently shows the HCSC logo and the header shows the Umoja logo. You want them swapped: **Umoja FFH logo in the sidebar**, **HCSC logo in the header**.
 
 ## Changes
 
-### 1. Add HCSC Logo Asset
-- Copy the uploaded HCSC logo to `src/assets/hcsc-logo.png`
+### 1. Sidebar (`src/components/layout/Sidebar.tsx`)
+- Change the `healthplan` condition to show the **Umoja light logo** (`umojaLogoLight`) instead of `hcscLogo`
+- Update alt text to "Umoja Food For Health"
 
-### 2. Update Sidebar Logo (src/components/layout/Sidebar.tsx)
-- Replace the `bcbs-illinois-logo` import with the new `hcsc-logo.png`
-- Update the alt text from "Blue Cross Blue Shield of Illinois" to "HCSC"
+### 2. Header (`src/components/layout/Header.tsx`)
+- Import `useApp` from AppContext and `hcscLogo` asset
+- When `currentRole === 'healthplan'`, display the **HCSC logo** instead of the default Umoja logo
+- Keep the default Umoja logo for all other roles
 
-### 3. Update Text References
-
-**src/pages/healthplan/HealthPlanDashboard.tsx**
-- "Blue Cross Dashboard" → "HCSC Dashboard"
-
-**src/pages/healthplan/HealthPlanProfile.tsx**
-- "Staff members with access to the Blue Cross portal" → "Staff members with access to the HCSC portal"
-
-**src/lib/mockData.ts**
-- `name: 'Blue Cross of Illinois'` → `name: 'HCSC'`
-
-## Files Modified
-- `src/assets/hcsc-logo.png` (new)
+### Files Modified
 - `src/components/layout/Sidebar.tsx`
-- `src/pages/healthplan/HealthPlanDashboard.tsx`
-- `src/pages/healthplan/HealthPlanProfile.tsx`
-- `src/lib/mockData.ts`
+- `src/components/layout/Header.tsx`
 
