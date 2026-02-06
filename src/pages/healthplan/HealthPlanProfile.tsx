@@ -108,7 +108,7 @@ export default function HealthPlanProfile() {
           <CardHeader>
             <CardTitle>Authorized Users</CardTitle>
             <CardDescription>
-              Staff members with access to the Blue Cross portal
+              Staff members with access to the HCSC portal
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">

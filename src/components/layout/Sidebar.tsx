@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import laFoodBankLogo from '@/assets/la-food-bank-logo.png';
 import umojaLogoLight from '@/assets/umoja-logo-light.png';
-import bcbsIllinoisLogo from '@/assets/bcbs-illinois-logo.png';
+import hcscLogo from '@/assets/hcsc-logo.png';
 import {
   Home,
   User,
@@ -115,8 +115,8 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
             />
           ) : currentRole === 'healthplan' ? (
             <img 
-              src={bcbsIllinoisLogo} 
-              alt="Blue Cross Blue Shield of Illinois" 
+              src={hcscLogo} 
+              alt="HCSC" 
               className="h-12 object-contain"
             />
           ) : (
