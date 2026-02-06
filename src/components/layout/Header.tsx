@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Bell, HelpCircle, Menu, CheckCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import umojaLogo from '@/assets/umoja-food-for-health-logo.webp';
+import hcscLogo from '@/assets/hcsc-logo.png';
+import { useApp } from '@/contexts/AppContext';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,7 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, onEducationClick }: HeaderProps) {
   const navigate = useNavigate();
+  const { currentRole } = useApp();
   const [dialogOpen, setDialogOpen] = useState(false);
   const { completedCount, totalModules, progressPercent } = useEducationProgress();
   
@@ -40,8 +43,8 @@ export function Header({ onMenuClick, onEducationClick }: HeaderProps) {
         
         <button onClick={() => navigate('/')} className="flex items-center gap-2">
           <img 
-            src={umojaLogo} 
-            alt="Umoja Food For Health" 
+            src={currentRole === 'healthplan' ? hcscLogo : umojaLogo} 
+            alt={currentRole === 'healthplan' ? 'HCSC' : 'Umoja Food For Health'} 
             className="h-8 object-contain"
           />
         </button>
