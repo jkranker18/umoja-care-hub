@@ -41,6 +41,8 @@ import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
 import HealthPlanOutcomes from "./pages/healthplan/HealthPlanOutcomes";
 import HealthPlanMembers from "./pages/healthplan/HealthPlanMembers";
 import HealthPlanProfile from "./pages/healthplan/HealthPlanProfile";
+import HealthPlanAssessments from "./pages/healthplan/HealthPlanAssessments";
+import HealthPlanAssessmentDetail from "./pages/healthplan/HealthPlanAssessmentDetail";
 import InternalOpsDashboard from "./pages/internal/InternalOpsDashboard";
 import AdminManagement from "./pages/internal/AdminManagement";
 import NotFound from "./pages/NotFound";
@@ -106,6 +108,8 @@ function App() {
             
             {/* Health Plan Portal */}
             <Route path="/healthplan" element={<HealthPlanDashboard />} />
+            <Route path="/healthplan/assessments" element={<HealthPlanAssessments />} />
+            <Route path="/healthplan/assessments/:id" element={<HealthPlanAssessmentDetail />} />
             <Route path="/healthplan/outcomes" element={<HealthPlanOutcomes />} />
             <Route path="/healthplan/members" element={<HealthPlanMembers />} />
             <Route path="/healthplan/profile" element={<HealthPlanProfile />} />
