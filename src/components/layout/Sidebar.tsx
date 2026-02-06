@@ -106,7 +106,10 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
         </div>
 
         {/* Logo area for desktop */}
-        <div className="hidden lg:flex items-center gap-3 p-4 border-b border-sidebar-border">
+        <div className={cn(
+          "hidden lg:flex items-center gap-3 p-4 border-b border-sidebar-border",
+          (currentRole === 'member' || currentRole === 'internal') && "bg-white rounded-md mx-3 mt-3 mb-1 border-none"
+        )}>
           {currentRole === 'cbo' ? (
             <img 
               src={laFoodBankLogo} 
