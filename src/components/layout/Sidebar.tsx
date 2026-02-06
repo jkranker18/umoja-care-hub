@@ -53,9 +53,9 @@ const cboNav: NavItem[] = [
 
 const healthplanNav: NavItem[] = [
   { label: 'Home', path: '/healthplan', icon: Home },
-  { label: 'Assessment Library', path: '/healthplan/assessments', icon: ClipboardList },
   { label: 'Outcomes Report', path: '/healthplan/outcomes', icon: BarChart3 },
   { label: 'Member Drill Down', path: '/healthplan/members', icon: Users },
+  { label: 'Assessment Library', path: '/healthplan/assessments', icon: ClipboardList },
   { label: 'Profile', path: '/healthplan/profile', icon: Building2 },
 ];
 
