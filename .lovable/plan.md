@@ -1,64 +1,19 @@
 
 
-# Update "Health Coach" to "My Care Team"
+# Update Browser Tab Title
 
 ## Overview
 
-Update the navigation label from "Health Coach" to "My Care Team" across all relevant UI locations. This creates a more inclusive title that can represent health coaches, registered dietitians, or other clinical care providers.
+Change the browser tab title from "Lovable App" to your preferred app name (e.g., "Umoja Food For Health").
 
----
+## Change
 
-## File Changes Summary
+**File: `index.html`**
 
-| File | Change |
-|------|--------|
-| `src/components/layout/Sidebar.tsx` | Update nav item label from "Health Coach" to "My Care Team" |
-| `src/pages/member/MemberHome.tsx` | Update TabsTrigger label from "Health Coach" to "My Care Team" |
+Update the `<title>` tag and the `og:title` meta tag:
 
----
+- `<title>Lovable App</title>` → `<title>Umoja Food For Health</title>`
+- `<meta property="og:title" content="Lovable App" />` → `<meta property="og:title" content="Umoja Food For Health" />`
 
-## Technical Details
-
-### 1. Sidebar.tsx
-
-Update the `memberNav` array:
-
-```typescript
-// Change:
-{ label: 'Health Coach', path: '/member', icon: CalendarCheck, tabId: 'coach' }
-
-// To:
-{ label: 'My Care Team', path: '/member', icon: CalendarCheck, tabId: 'coach' }
-```
-
-Note: The `tabId: 'coach'` remains unchanged as it's an internal identifier.
-
-### 2. MemberHome.tsx
-
-Update the TabsTrigger component:
-
-```tsx
-// Change:
-<TabsTrigger value="coach">Health Coach</TabsTrigger>
-
-// To:
-<TabsTrigger value="coach">My Care Team</TabsTrigger>
-```
-
----
-
-## What Stays the Same
-
-- Tab value (`coach`) - internal identifier, no user-facing impact
-- Icon (`CalendarCheck`) - still appropriate for care team appointments
-- All functionality remains identical
-
----
-
-## Acceptance Criteria
-
-After implementation:
-- Sidebar shows "My Care Team" instead of "Health Coach"
-- Tab bar shows "My Care Team" instead of "Health Coach"
-- Clicking the nav item or tab still navigates to the same content
+This will update the text shown in the browser tab immediately.
 
