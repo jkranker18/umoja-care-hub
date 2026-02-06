@@ -951,7 +951,7 @@ export interface HealthPlanUser {
 export const healthPlans: HealthPlan[] = [
   {
     id: 'hp-001',
-    name: 'Blue Cross of Illinois',
+    name: 'HCSC',
     planId: 'BCCA-2024',
     contactName: 'Jennifer Adams',
     contactEmail: 'jadams@bluecross.com',

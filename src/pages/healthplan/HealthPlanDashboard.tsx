@@ -185,7 +185,7 @@ export default function HealthPlanDashboard() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-display font-bold">Blue Cross Dashboard</h1>
+            <h1 className="text-2xl font-display font-bold">HCSC Dashboard</h1>
             <p className="text-muted-foreground">
               Program performance and population health outcomes
               {programFilter !== 'all' && (
