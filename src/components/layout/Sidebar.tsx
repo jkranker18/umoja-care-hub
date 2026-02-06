@@ -115,9 +115,9 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
             />
           ) : currentRole === 'healthplan' ? (
             <img 
-              src={hcscLogo} 
-              alt="HCSC" 
-              className="h-12 object-contain"
+              src={umojaLogoLight} 
+              alt="Umoja Food For Health" 
+              className="h-10 object-contain"
             />
           ) : (
             <img 
