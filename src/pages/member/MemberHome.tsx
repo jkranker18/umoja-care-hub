@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useApp } from '@/contexts/AppContext';
-import { programs, enrollments, orders, contentPlans, assessments, getPhaseInfo } from '@/lib/mockData';
+import { programs, enrollments, orders, contentPlans, assessments, getPhaseInfo, members as allMembers } from '@/lib/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2 } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2, CalendarCheck, ArrowRight } from 'lucide-react';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -29,40 +29,79 @@ import { ModuleCard } from '@/components/education/ModuleCard';
 import { CategoryAccordion } from '@/components/education/CategoryAccordion';
 import { CATEGORIES, getModulesByCategory, getRecommendedModules } from '@/lib/educationData';
 
+// Per-member demo configuration
+interface DemoMemberConfig {
+  allergens: string[];
+  chronicConditions: string[];
+  appointments: { month: string; label: string; status: 'completed' | 'to_be_scheduled' | 'scheduled' | 'upcoming' }[];
+  hasHealthie: boolean;
+}
+
+const demoMemberConfigs: Record<string, DemoMemberConfig> = {
+  'mem-001': {
+    allergens: ['Eggs', 'Soy', 'Shellfish'],
+    chronicConditions: ['Hypertension', 'Depression', 'Overweight', 'Chronic Back Pain'],
+    appointments: [
+      { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+    ],
+    hasHealthie: true,
+  },
+  'mem-suzie': {
+    allergens: ['Gluten'],
+    chronicConditions: ['Type 2 Diabetes'],
+    appointments: [
+      { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'scheduled' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+    ],
+    hasHealthie: false,
+  },
+  'mem-olivia': {
+    allergens: [],
+    chronicConditions: [],
+    appointments: [
+      { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'scheduled' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+    ],
+    hasHealthie: false,
+  },
+};
+
 export default function MemberHome() {
-  const { members } = useApp();
+  const { members, activeDemoMemberId } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const { completedModules, completedCount, totalModules: eduTotalModules, progressPercent, isComplete } = useEducationProgress();
   const { addCase } = useSupportCases();
   const { addEntry: addFoodEntry, getEntriesByDate, deleteEntry: deleteFoodEntry } = useFoodDiary();
   const { addActivity, getActivitiesByDate, deleteActivity, getTotalMinutesByDate, getTotalStepsByDate } = useActivityTracker();
-  // Handle navigation state for active tab
   const initialTab = (location.state as any)?.activeTab || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
   
-  // Update tab when navigating back with state
   useEffect(() => {
     if ((location.state as any)?.activeTab) {
       setActiveTab((location.state as any).activeTab);
     }
   }, [location.state]);
   
-  // Mock: using first member as current user
-  const member = members[0];
+  // Use active demo member
+  const member = allMembers.find(m => m.id === activeDemoMemberId) || allMembers[0];
   const enrollment = enrollments.find(e => e.memberId === member?.id && e.status === 'active');
   const program = programs.find(p => p.id === enrollment?.programId);
   const memberOrders = orders.filter(o => o.memberId === member?.id);
   const contentPlan = contentPlans.find(cp => cp.memberId === member?.id);
   const assessment = assessments.find(a => a.memberId === member?.id);
 
-  // Calculate the dynamic next shipment based on actual order data
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
+  today.setHours(0, 0, 0, 0);
 
-  // Demo allergens and chronic conditions
-  const allergens = ['Eggs', 'Soy', 'Shellfish'];
-  const chronicConditions = ['Hypertension'];
+  // Get per-member config
+  const memberConfig = demoMemberConfigs[activeDemoMemberId] || demoMemberConfigs['mem-001'];
+  const allergens = memberConfig.allergens;
+  const chronicConditions = memberConfig.chronicConditions;
 
   // Issue reporting modal state
   const [issueModalOpen, setIssueModalOpen] = useState(false);
@@ -79,6 +118,9 @@ export default function MemberHome() {
   const [supportCaseNumber, setSupportCaseNumber] = useState('');
   const [reportedOrders, setReportedOrders] = useState<Set<string>>(new Set());
 
+  // Change Order modal
+  const [changeOrderModalOpen, setChangeOrderModalOpen] = useState(false);
+
   // Trackers state
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const [selectedDate, setSelectedDate] = useState(todayStr);
@@ -91,7 +133,6 @@ export default function MemberHome() {
   const [activitySteps, setActivitySteps] = useState('');
   const [activityNotes, setActivityNotes] = useState('');
 
-  // Get entries for selected date
   const todayMeals = getEntriesByDate(selectedDate);
   const todayActivities = getActivitiesByDate(selectedDate);
   const totalMinutes = getTotalMinutesByDate(selectedDate);
@@ -135,16 +176,11 @@ export default function MemberHome() {
 
   const phaseInfo = program ? getPhaseInfo(program, enrollment?.currentWeek || 1) : null;
 
-  // Demo orders - 12 total: 3 delivered, 1 in transit, 8 upcoming (fixed dates for consistent demo)
-  // Helper function to get the meal plan label based on week number
+  // Demo orders based on member tier
   const getMealPlanLabelForWeek = (weekNumber: number): string => {
     if (!program) return 'Medically Tailored Meals';
     if (program.tier === 3) return 'Produce Box (15 lbs)';
-    
-    // For Tier 1: MTM weeks 1-8, MTG weeks 9-12
-    // For Tier 2: MTM weeks 1-4, MTG weeks 5-12
     const mtmWeeks = program.mtmWeeks;
-    
     if (weekNumber <= mtmWeeks) {
       return 'Medically Tailored Meals (MTM)';
     } else {
@@ -158,40 +194,59 @@ export default function MemberHome() {
     'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025'
   ];
 
-  const demoOrders = Array.from({ length: 12 }, (_, index) => {
-    const weekNumber = index + 1;
-    const isDelivered = weekNumber <= 5;  // Weeks 1-5 delivered (through Feb 3)
-    const isInTransit = weekNumber === 6;  // Week 6 in transit (Feb 10)
-    
-    return {
-      id: `ORD-${String(weekNumber).padStart(3, '0')}`,
-      memberId: member?.id,
-      weekNumber,
-      mealPlan: getMealPlanLabelForWeek(weekNumber),
-      mealsCount: program?.tier === 3 ? 0 : 14,
-      shipmentStatus: isDelivered ? 'delivered' as const : isInTransit ? 'in_transit' as const : 'processing' as const,
-      trackingNumber: `TRK-883452${weekNumber}`,
-      estimatedDelivery: orderDates[index],
-    };
-  });
+  // For Tier 3: bi-weekly produce boxes
+  const produceBoxDates = [
+    'Jan 6, 2025', 'Jan 20, 2025', 'Feb 3, 2025', 'Feb 17, 2025', 'Mar 3, 2025', 'Mar 17, 2025'
+  ];
 
-  // Find the next shipment: prioritize in-transit that hasn't passed, then processing
-  const nextShipment = demoOrders.find(order => {
-    if (order.shipmentStatus === 'in_transit') {
-      const deliveryDate = new Date(order.estimatedDelivery);
-      deliveryDate.setHours(0, 0, 0, 0);
-      return deliveryDate >= today;
-    }
-    return false;
-  }) || demoOrders.find(order => order.shipmentStatus === 'processing');
+  const getOrderStatus = (weekNumber: number): 'delivered' | 'in_transit' | 'upcoming' => {
+    // Feb 10 (week 6) = delivered, Feb 17 (week 7) = in_transit, Feb 24+ = upcoming
+    if (weekNumber <= 6) return 'delivered';
+    if (weekNumber === 7) return 'in_transit';
+    return 'upcoming';
+  };
 
+  const getProduceBoxStatus = (index: number): 'delivered' | 'in_transit' | 'upcoming' => {
+    // First 3 delivered (Jan 6, Jan 20, Feb 3), 4th in transit (Feb 17), rest upcoming
+    if (index <= 2) return 'delivered';
+    if (index === 3) return 'in_transit';
+    return 'upcoming';
+  };
+
+  const demoOrders = program?.tier === 3 
+    ? produceBoxDates.map((date, index) => ({
+        id: `ORD-P${String(index + 1).padStart(3, '0')}`,
+        memberId: member?.id,
+        weekNumber: (index + 1) * 2 - 1,
+        mealPlan: 'Produce Box (15 lbs)',
+        mealsCount: 0,
+        shipmentStatus: getProduceBoxStatus(index),
+        trackingNumber: `TRK-PB${index + 1}`,
+        estimatedDelivery: date,
+      }))
+    : Array.from({ length: 12 }, (_, index) => {
+        const weekNumber = index + 1;
+        return {
+          id: `ORD-${String(weekNumber).padStart(3, '0')}`,
+          memberId: member?.id,
+          weekNumber,
+          mealPlan: getMealPlanLabelForWeek(weekNumber),
+          mealsCount: 14,
+          shipmentStatus: getOrderStatus(weekNumber),
+          trackingNumber: `TRK-883452${weekNumber}`,
+          estimatedDelivery: orderDates[index],
+        };
+      });
+
+  const nextShipment = demoOrders.find(order => order.shipmentStatus === 'in_transit') 
+    || demoOrders.find(order => order.shipmentStatus === 'upcoming');
   const nextShipmentDate = nextShipment ? new Date(nextShipment.estimatedDelivery) : addWeeks(new Date(), 2);
   const nextShipmentStatus = nextShipment?.shipmentStatus === 'in_transit' ? 'In Transit' : 'Scheduled';
 
-  // Get representative orders for overview: last delivered, in transit, next to ship
+  // Overview display orders
   const lastDelivered = demoOrders.filter(o => o.shipmentStatus === 'delivered').slice(-1)[0];
   const inTransit = demoOrders.find(o => o.shipmentStatus === 'in_transit');
-  const nextToShip = demoOrders.find(o => o.shipmentStatus === 'processing');
+  const nextToShip = demoOrders.find(o => o.shipmentStatus === 'upcoming');
   const displayOrders = [lastDelivered, inTransit, nextToShip].filter(Boolean);
 
   const handleReportIssue = (orderId: string) => {
@@ -222,10 +277,8 @@ export default function MemberHome() {
 
   const handleSupportSubmit = () => {
     setSupportSubmitting(true);
-    // Simulate Salesforce API call
     setTimeout(() => {
       const caseNum = `SF-${Math.floor(100000 + Math.random() * 900000)}`;
-      // Save case to shared state
       addCase({
         caseNumber: caseNum,
         subject: supportSubject,
@@ -240,7 +293,6 @@ export default function MemberHome() {
   const handleSupportModalClose = (open: boolean) => {
     if (!open) {
       setSupportModalOpen(false);
-      // Reset state after close animation
       setTimeout(() => {
         setSupportSubject('');
         setSupportMessage('');
@@ -414,26 +466,30 @@ export default function MemberHome() {
                         </div>
                       </div>
                       <div className="flex gap-6">
-                        <div>
-                          <span className="text-muted-foreground text-xs">Allergens</span>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {allergens.map(allergen => (
-                              <Badge key={allergen} variant="secondary" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
-                                {allergen}
-                              </Badge>
-                            ))}
+                        {allergens.length > 0 && (
+                          <div>
+                            <span className="text-muted-foreground text-xs">Allergens</span>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {allergens.map(allergen => (
+                                <Badge key={allergen} variant="secondary" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
+                                  {allergen}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground text-xs">Tailored For</span>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {chronicConditions.map(condition => (
-                              <Badge key={condition} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs">
-                                {condition}
-                              </Badge>
-                            ))}
+                        )}
+                        {chronicConditions.length > 0 && (
+                          <div>
+                            <span className="text-muted-foreground text-xs">Tailored For</span>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {chronicConditions.map(condition => (
+                                <Badge key={condition} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-xs">
+                                  {condition}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -442,6 +498,48 @@ export default function MemberHome() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Recent Appointments */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Recent Appointments</CardTitle>
+                  <Button variant="ghost" size="sm" onClick={() => setActiveTab('coach')}>
+                    View All
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {memberConfig.appointments.map((appt, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <CalendarCheck className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium text-sm">{appt.label}</p>
+                          <p className="text-xs text-muted-foreground">{appt.month} 2025</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {appt.status === 'to_be_scheduled' ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-primary border-primary/30 hover:bg-primary/5"
+                            onClick={() => setActiveTab('coach')}
+                          >
+                            Schedule Now
+                            <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                          </Button>
+                        ) : (
+                          <StatusPill status={appt.status} />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Recent Orders */}
             <Card>
@@ -462,10 +560,24 @@ export default function MemberHome() {
                           <Package className="h-5 w-5 text-muted-foreground" />
                           <div>
                             <p className="font-medium text-sm">{order.mealPlan}</p>
-                            <p className="text-xs text-muted-foreground">{order.mealsCount} meals • {order.trackingNumber}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {order.mealsCount > 0 ? `${order.mealsCount} meals • ` : ''}{order.trackingNumber}
+                            </p>
                           </div>
                         </div>
-                        <StatusPill status={order.shipmentStatus} />
+                        <div className="flex items-center gap-2">
+                          {order.shipmentStatus === 'upcoming' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-xs"
+                              onClick={() => setChangeOrderModalOpen(true)}
+                            >
+                              Change Order
+                            </Button>
+                          )}
+                          <StatusPill status={order.shipmentStatus} />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -520,7 +632,7 @@ export default function MemberHome() {
             <Card>
               <CardHeader>
                 <CardTitle>Order History</CardTitle>
-                <CardDescription>Track all your meal shipments. {demoOrders.length} total orders.</CardDescription>
+                <CardDescription>Track all your {program?.tier === 3 ? 'produce box' : 'meal'} shipments. {demoOrders.length} total orders.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -561,6 +673,15 @@ export default function MemberHome() {
                               Report Issue
                             </Button>
                           )
+                        )}
+                        {order.shipmentStatus === 'upcoming' && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setChangeOrderModalOpen(true)}
+                          >
+                            Change Order
+                          </Button>
                         )}
                         <div className="text-right">
                           <StatusPill status={order.shipmentStatus} />
@@ -640,87 +761,142 @@ export default function MemberHome() {
           </TabsContent>
 
           <TabsContent value="coach" className="space-y-6">
-            {/* Wrap all Healthie components in the authenticated provider */}
-            <HealthieChatWrapper 
-              userId={member?.healthieUserId}
-              email={member?.healthieEmail}
-              password={member?.healthiePassword}
-            >
-              {/* My Appointments Section */}
-              {member?.healthieUserId && (
-                <MyAppointments userId={member.healthieUserId} />
-              )}
+            {memberConfig.hasHealthie ? (
+              <HealthieChatWrapper 
+                userId={member?.healthieUserId}
+                email={member?.healthieEmail}
+                password={member?.healthiePassword}
+              >
+                {member?.healthieUserId && (
+                  <MyAppointments userId={member.healthieUserId} />
+                )}
 
-              {/* Booking Section */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Book an Appointment</CardTitle>
-                  <CardDescription>
-                    Schedule a session with one of our certified health coaches.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
-                    <iframe 
-                      src={(() => {
-                        const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
-                        const params = new URLSearchParams({
-                          dietitian_id: '11976136',
-                          provider_ids: '[11976136]',
-                          appt_type_ids: '[466786,466787,466788]',
-                        });
-                        if (member?.firstName) params.append('first_name', member.firstName);
-                        if (member?.lastName) params.append('last_name', member.lastName);
-                        if (member?.email) params.append('email', member.email);
-                        if (member?.phone) params.append('phone_number', member.phone);
-                        params.append('read_only', 'true');
-                        return `${baseUrl}?${params.toString()}`;
-                      })()}
-                      style={{ width: '100%', height: '600px', border: 'none' }}
-                      title="Book Health Coach Appointment"
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-4 text-center">
-                    Booking provided by{' '}
-                    <a 
-                      href="https://gethealthie.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      Healthie
-                    </a>
-                  </p>
-                </CardContent>
-              </Card>
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Book an Appointment</CardTitle>
+                    <CardDescription>
+                      Schedule a session with one of our certified health coaches.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
+                      <iframe 
+                        src={(() => {
+                          const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
+                          const params = new URLSearchParams({
+                            dietitian_id: '11976136',
+                            provider_ids: '[11976136]',
+                            appt_type_ids: '[466786,466787,466788]',
+                          });
+                          if (member?.firstName) params.append('first_name', member.firstName);
+                          if (member?.lastName) params.append('last_name', member.lastName);
+                          if (member?.email) params.append('email', member.email);
+                          if (member?.phone) params.append('phone_number', member.phone);
+                          params.append('read_only', 'true');
+                          return `${baseUrl}?${params.toString()}`;
+                        })()}
+                        style={{ width: '100%', height: '600px', border: 'none' }}
+                        title="Book Health Coach Appointment"
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-4 text-center">
+                      Booking provided by{' '}
+                      <a 
+                        href="https://gethealthie.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Healthie
+                      </a>
+                    </p>
+                  </CardContent>
+                </Card>
 
-              {/* Chat Section */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    Message Your Coach
-                  </CardTitle>
-                  <CardDescription>
-                    Chat directly with your health coach between sessions.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <HealthieChat conversationId={member?.healthieConversationId} />
-                  <p className="text-sm text-muted-foreground mt-4 text-center">
-                    Messaging powered by{' '}
-                    <a 
-                      href="https://gethealthie.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      Healthie
-                    </a>
-                  </p>
-                </CardContent>
-              </Card>
-            </HealthieChatWrapper>
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      Message Your Coach
+                    </CardTitle>
+                    <CardDescription>
+                      Chat directly with your health coach between sessions.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <HealthieChat conversationId={member?.healthieConversationId} />
+                    <p className="text-sm text-muted-foreground mt-4 text-center">
+                      Messaging powered by{' '}
+                      <a 
+                        href="https://gethealthie.com" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Healthie
+                      </a>
+                    </p>
+                  </CardContent>
+                </Card>
+              </HealthieChatWrapper>
+            ) : (
+              <>
+                {/* Appointments list for non-Healthie members */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>My Appointments</CardTitle>
+                    <CardDescription>Your upcoming and past health coach sessions.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {memberConfig.appointments.map((appt, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <CalendarCheck className="h-5 w-5 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium text-sm">{appt.label}</p>
+                              <p className="text-xs text-muted-foreground">{appt.month} 2025</p>
+                            </div>
+                          </div>
+                          <StatusPill status={appt.status} />
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Book an Appointment</CardTitle>
+                    <CardDescription>
+                      Schedule a session with one of our certified health coaches.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="w-full min-h-[600px] rounded-lg overflow-hidden border">
+                      <iframe 
+                        src={(() => {
+                          const baseUrl = 'https://secure.gethealthie.com/appointments/embed_appt';
+                          const params = new URLSearchParams({
+                            dietitian_id: '11976136',
+                            provider_ids: '[11976136]',
+                            appt_type_ids: '[466786,466787,466788]',
+                          });
+                          if (member?.firstName) params.append('first_name', member.firstName);
+                          if (member?.lastName) params.append('last_name', member.lastName);
+                          if (member?.email) params.append('email', member.email);
+                          if (member?.phone) params.append('phone_number', member.phone);
+                          params.append('read_only', 'true');
+                          return `${baseUrl}?${params.toString()}`;
+                        })()}
+                        style={{ width: '100%', height: '600px', border: 'none' }}
+                        title="Book Health Coach Appointment"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Trackers Tab */}
@@ -755,7 +931,6 @@ export default function MemberHome() {
                   <CardDescription>Track your daily meals and snacks</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Add Meal Buttons */}
                   <div className="grid grid-cols-2 gap-2">
                     <Button variant="outline" size="sm" onClick={() => openFoodModal('breakfast')}>
                       <Plus className="h-4 w-4 mr-1" /> Breakfast
@@ -771,7 +946,6 @@ export default function MemberHome() {
                     </Button>
                   </div>
 
-                  {/* Today's Meals */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-muted-foreground">
                       {selectedDate === todayStr ? "Today's Meals" : `Meals for ${format(new Date(selectedDate), 'MMM d, yyyy')}`}
@@ -822,7 +996,6 @@ export default function MemberHome() {
                   <CardDescription>Log your physical activities</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Add Activity Button */}
                   <Button 
                     variant="outline" 
                     className="w-full"
@@ -831,7 +1004,6 @@ export default function MemberHome() {
                     <Plus className="h-4 w-4 mr-2" /> Add Activity
                   </Button>
 
-                  {/* Daily Summary */}
                   <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-primary">{totalMinutes}</p>
@@ -843,7 +1015,6 @@ export default function MemberHome() {
                     </div>
                   </div>
 
-                  {/* Today's Activities */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-muted-foreground">
                       {selectedDate === todayStr ? "Today's Activities" : `Activities for ${format(new Date(selectedDate), 'MMM d, yyyy')}`}
@@ -1043,6 +1214,31 @@ export default function MemberHome() {
         </DialogContent>
       </Dialog>
 
+      {/* Change Order Modal */}
+      <Dialog open={changeOrderModalOpen} onOpenChange={setChangeOrderModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Change Order Request</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <MessageSquare className="h-8 w-8 text-primary" />
+            </div>
+            <p className="text-center text-lg font-medium">
+              A Dietitian will be in contact with you shortly.
+            </p>
+            <p className="text-sm text-muted-foreground text-center">
+              Your request has been noted and a member of our clinical team will reach out to discuss changes to your upcoming order.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setChangeOrderModalOpen(false)} className="w-full">
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Contact Support Modal */}
       <Dialog open={supportModalOpen} onOpenChange={handleSupportModalClose}>
         <DialogContent className="sm:max-w-md">
@@ -1114,7 +1310,6 @@ export default function MemberHome() {
               <div className="text-center space-y-2">
                 <p className="font-semibold text-lg">Case Created Successfully</p>
                 <p className="text-2xl font-bold text-primary">{supportCaseNumber}</p>
-                
               </div>
               <p className="text-sm text-muted-foreground text-center max-w-xs">
                 We've received your request and will respond within 24 hours.

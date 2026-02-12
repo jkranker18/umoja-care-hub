@@ -16,6 +16,8 @@ interface AppContextType {
   setDemoMode: (mode: boolean) => void;
   currentDemoStep: number;
   setCurrentDemoStep: (step: number) => void;
+  activeDemoMemberId: string;
+  setActiveDemoMemberId: (id: string) => void;
   resetDemoData: () => void;
 }
 
@@ -29,6 +31,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [currentDemoStep, setCurrentDemoStep] = useState(1);
+  const [activeDemoMemberId, setActiveDemoMemberId] = useState('mem-001');
 
   const resetDemoData = () => {
     setMembers([...initialMembers]);
@@ -55,6 +58,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setDemoMode,
         currentDemoStep,
         setCurrentDemoStep,
+        activeDemoMemberId,
+        setActiveDemoMemberId,
         resetDemoData,
       }}
     >
