@@ -1,18 +1,15 @@
 
-# Add Empty "Message Your Coach" Section for Suzie and Olivia
+# Update Suzie (Tier 2) to MTG-Only
 
-## Overview
-Add a "Message Your Coach" card to the Care Team tab for Suzie and Olivia (non-Healthie members). It will match the same card style used for John but show an empty chat placeholder instead of the live Healthie chat.
+## Summary
+Suzie should not receive any Medically Tailored Meals (MTM). Her entire 12-week program should be Medically Tailored Groceries (MTG) only.
 
-## Change
+## Changes
 
-### `src/pages/member/MemberHome.tsx`
-After the "Book an Appointment" card in the non-Healthie branch (around line 897, before the closing `</>` at line 898), add a new Card:
+### 1. `src/lib/mockData.ts` - Update Tier 2 Program Definition
+Change `prog-tier2` from `mtmWeeks: 4, mtgWeeks: 8` to `mtmWeeks: 0, mtgWeeks: 12` so all 12 weeks are MTG.
 
-- Title: "Message Your Coach" with the MessageSquare icon (same as John's)
-- Description: "Chat directly with your health coach between sessions."
-- Content: An empty chat-like container (matching the `h-[500px] border rounded-lg` style of the HealthieChat component) with a centered placeholder message such as "No messages yet. Start a conversation with your coach." and a disabled "Send" input area at the bottom to give it the look of a real chat UI.
+### 2. `src/pages/member/MemberHome.tsx` - Handle MTG-Only Display
+Update the Phase Progress bar section so that when `program.mtmWeeks === 0`, it shows only the MTG progress bar (no MTM bar). Also update the "Current Phase" KPI card and the meal plan description text to reflect MTG-only when there are no MTM weeks.
 
-This keeps it visually consistent with John's connected chat while clearly showing it's empty for demo purposes.
-
-One file modified, no new files needed.
+Two files modified. No new files.
