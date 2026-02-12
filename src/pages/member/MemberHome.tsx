@@ -9,7 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2, CalendarCheck, ArrowRight } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2, CalendarCheck, ArrowRight, Send } from 'lucide-react';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -892,6 +892,29 @@ export default function MemberHome() {
                         style={{ width: '100%', height: '600px', border: 'none' }}
                         title="Book Health Coach Appointment"
                       />
+                    </div>
+                  </CardContent>
+                </Card>
+                {/* Message Your Coach - empty placeholder */}
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      Message Your Coach
+                    </CardTitle>
+                    <CardDescription>Chat directly with your health coach between sessions.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[500px] border rounded-lg flex flex-col overflow-hidden bg-background">
+                      <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+                        No messages yet. Start a conversation with your coach.
+                      </div>
+                      <div className="p-3 border-t flex gap-2">
+                        <Input disabled placeholder="Type a message..." className="flex-1" />
+                        <Button disabled variant="default" size="sm">
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
