@@ -314,8 +314,8 @@ export const programs: Program[] = [
     eligibilityRules: 'Medium risk score, chronic condition diagnosis, capacity for meal preparation',
     duration: '12 weeks',
     mealsPerWeek: 14,
-    mtmWeeks: 4, // Weeks 1-4: Medically Tailored Meals
-    mtgWeeks: 8, // Weeks 5-12: Medically Tailored Groceries
+    mtmWeeks: 0, // No MTM for Tier 2
+    mtgWeeks: 12, // All 12 weeks: Medically Tailored Groceries
     clinicalSupport: '3 months',
     status: 'active',
   },
@@ -343,8 +343,8 @@ export function calculatePhase(tier: 1 | 2 | 3, currentWeek: number): FoodPhase 
   if (tier === 1) {
     return currentWeek <= 8 ? 'MTM' : 'MTG';
   }
-  // Tier 2
-  return currentWeek <= 4 ? 'MTM' : 'MTG';
+  // Tier 2 - MTG only
+  return 'MTG';
 }
 
 // Helper to get phase week info
@@ -373,11 +373,8 @@ export function getPhaseInfo(program: Program, currentWeek: number): {
     return { phase, phaseWeek: currentWeek - 8, phaseTotal: 4, phaseName: 'Medically Tailored Groceries' };
   }
   
-  // Tier 2
-  if (phase === 'MTM') {
-    return { phase, phaseWeek: currentWeek, phaseTotal: 4, phaseName: 'Medically Tailored Meals' };
-  }
-  return { phase, phaseWeek: currentWeek - 4, phaseTotal: 8, phaseName: 'Medically Tailored Groceries' };
+  // Tier 2 - MTG only
+  return { phase, phaseWeek: currentWeek, phaseTotal: 12, phaseName: 'Medically Tailored Groceries' };
 }
 
 // CBO Authorized Users

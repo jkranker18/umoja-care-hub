@@ -385,38 +385,57 @@ export default function MemberHome() {
                         <span className="font-medium">Week {enrollment?.currentWeek} of 12</span>
                       </div>
                       {program.tier !== 3 ? (
-                        <div className="flex gap-1">
-                          <div className="flex-1 space-y-1">
+                        program.mtmWeeks === 0 ? (
+                          <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
-                              <span className={enrollment?.currentPhase === 'MTM' ? 'font-medium text-primary' : 'text-muted-foreground'}>
-                                MTM (Weeks 1-{program.mtmWeeks})
+                              <span className="font-medium text-primary">
+                                MTG (Weeks 1-12)
                               </span>
+                              <span className="text-muted-foreground">Week {enrollment?.currentWeek || 1} of 12</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-primary rounded-full transition-all" 
                                 style={{ 
-                                  width: `${Math.min(100, ((enrollment?.currentWeek || 1) / program.mtmWeeks) * 100)}%` 
+                                  width: `${((enrollment?.currentWeek || 1) / 12) * 100}%` 
                                 }}
                               />
                             </div>
                           </div>
-                          <div className="flex-1 space-y-1">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className={enrollment?.currentPhase === 'MTG' ? 'font-medium text-primary' : 'text-muted-foreground'}>
-                                MTG (Weeks {program.mtmWeeks + 1}-12)
-                              </span>
+                        ) : (
+                          <div className="flex gap-1">
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className={enrollment?.currentPhase === 'MTM' ? 'font-medium text-primary' : 'text-muted-foreground'}>
+                                  MTM (Weeks 1-{program.mtmWeeks})
+                                </span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-primary rounded-full transition-all" 
+                                  style={{ 
+                                    width: `${Math.min(100, ((enrollment?.currentWeek || 1) / program.mtmWeeks) * 100)}%` 
+                                  }}
+                                />
+                              </div>
                             </div>
-                            <div className="h-2 bg-muted rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary rounded-full transition-all" 
-                                style={{ 
-                                  width: `${Math.max(0, (((enrollment?.currentWeek || 1) - program.mtmWeeks) / program.mtgWeeks) * 100)}%` 
-                                }}
-                              />
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className={enrollment?.currentPhase === 'MTG' ? 'font-medium text-primary' : 'text-muted-foreground'}>
+                                  MTG (Weeks {program.mtmWeeks + 1}-12)
+                                </span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-primary rounded-full transition-all" 
+                                  style={{ 
+                                    width: `${Math.max(0, (((enrollment?.currentWeek || 1) - program.mtmWeeks) / program.mtgWeeks) * 100)}%` 
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        )
                       ) : (
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
