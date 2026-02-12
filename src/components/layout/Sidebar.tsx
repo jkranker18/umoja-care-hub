@@ -19,8 +19,11 @@ import {
   X,
   CalendarCheck,
   Activity,
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useState } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -33,8 +36,14 @@ interface NavItem {
   label: string;
   path: string;
   icon: React.ElementType;
-  tabId?: string; // For member nav items that map to tabs
+  tabId?: string;
 }
+
+const demoMembers = [
+  { id: 'mem-001', name: 'John T.', tier: 1, label: 'Tier 1 — High Risk' },
+  { id: 'mem-suzie', name: 'Suzie M.', tier: 2, label: 'Tier 2 — Medium Risk' },
+  { id: 'mem-olivia', name: 'Olivia W.', tier: 3, label: 'Tier 3 — Preventive' },
+];
 
 const memberNav: NavItem[] = [
   { label: 'Home', path: '/member', icon: Home, tabId: 'overview' },
@@ -72,9 +81,12 @@ const navByRole: Record<UserRole, NavItem[]> = {
 };
 
 export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }: SidebarProps) {
-  const { currentRole } = useApp();
+  const { currentRole, activeDemoMemberId, setActiveDemoMemberId } = useApp();
   const location = useLocation();
   const navItems = navByRole[currentRole];
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+
+  const activeDemoMember = demoMembers.find(m => m.id === activeDemoMemberId) || demoMembers[0];
 
   return (
     <>
@@ -89,7 +101,7 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground transform transition-transform duration-200 lg:translate-x-0 lg:static lg:z-auto',
+          'fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground transform transition-transform duration-200 lg:translate-x-0 lg:static lg:z-auto flex flex-col',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -133,9 +145,8 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 space-y-1">
+        <nav className="p-3 space-y-1 flex-1">
           {navItems.map((item) => {
-            // For member role with tabs, check if this tab is active
             const isMemberTabItem = currentRole === 'member' && item.tabId;
             const isActive = isMemberTabItem 
               ? activeMemberTab === item.tabId
@@ -165,6 +176,49 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
           })}
         </nav>
 
+        {/* Member Switcher - only for member role */}
+        {currentRole === 'member' && (
+          <div className="p-3 border-t border-sidebar-border">
+            <Popover open={switcherOpen} onOpenChange={setSwitcherOpen}>
+              <PopoverTrigger asChild>
+                <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors text-left">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary shrink-0">
+                    {activeDemoMember.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{activeDemoMember.name}</p>
+                    <p className="text-xs text-sidebar-foreground/60 truncate">{activeDemoMember.label}</p>
+                  </div>
+                  <ChevronDown className="h-4 w-4 text-sidebar-foreground/60 shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent side="top" align="start" className="w-56 p-1">
+                <p className="text-xs font-medium text-muted-foreground px-3 py-2">Switch Demo Member</p>
+                {demoMembers.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => {
+                      setActiveDemoMemberId(m.id);
+                      setSwitcherOpen(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2 rounded-md text-left text-sm hover:bg-muted transition-colors',
+                      m.id === activeDemoMemberId && 'bg-muted font-medium'
+                    )}
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                      {m.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium">{m.name}</p>
+                      <p className="text-xs text-muted-foreground">{m.label}</p>
+                    </div>
+                  </button>
+                ))}
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
       </aside>
     </>
   );

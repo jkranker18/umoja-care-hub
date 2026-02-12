@@ -105,7 +105,7 @@ export interface Order {
   enrollmentId: string;
   mealPlan: string;
   mealsCount: number;
-  shipmentStatus: 'processing' | 'shipped' | 'in_transit' | 'delivered' | 'exception';
+  shipmentStatus: 'processing' | 'shipped' | 'in_transit' | 'delivered' | 'exception' | 'upcoming';
   trackingNumber?: string;
   estimatedDelivery?: string;
   deliveryExceptions?: string[];
@@ -495,6 +495,44 @@ export const members: Member[] = [
     healthieConversationId: '17976028', // Conversation with health coach
   },
   {
+    id: 'mem-suzie',
+    name: 'Suzie Martinez',
+    firstName: 'Suzie',
+    lastName: 'Martinez',
+    dob: '1970-04-18',
+    address: '567 Willow Ln',
+    city: 'San Diego',
+    state: 'CA',
+    zip: '92101',
+    county: 'San Diego',
+    phone: '(619) 555-0088',
+    email: 'smartinez@email.com',
+    preferredLanguage: 'English',
+    consentGiven: true,
+    consentDate: '2025-01-08',
+    riskFlags: ['Type 2 Diabetes'],
+    createdAt: '2025-01-08',
+  },
+  {
+    id: 'mem-olivia',
+    name: 'Olivia Williams',
+    firstName: 'Olivia',
+    lastName: 'Williams',
+    dob: '1982-09-25',
+    address: '890 Cedar Blvd',
+    city: 'Irvine',
+    state: 'CA',
+    zip: '92618',
+    county: 'Orange',
+    phone: '(949) 555-0044',
+    email: 'owilliams@email.com',
+    preferredLanguage: 'English',
+    consentGiven: true,
+    consentDate: '2025-01-10',
+    riskFlags: [],
+    createdAt: '2025-01-10',
+  },
+  {
     id: 'mem-002',
     name: 'Maria Rodriguez',
     firstName: 'Maria',
@@ -619,8 +657,52 @@ export const enrollments: Enrollment[] = members.map((member, idx) => {
   const statuses: Enrollment['status'][] = ['active', 'active', 'active', 'pending', 'paused', 'complete'];
   const sources: EnrollmentSource[] = ['CBO', 'CBO', 'HP Outreach', 'Provider', 'Self'];
   
-  // First member (demo member) is always active in Tier 1
-  const status = idx === 0 ? 'active' : statuses[Math.floor(Math.random() * statuses.length)];
+  // Demo members have fixed configurations
+  if (member.id === 'mem-001') {
+    return {
+      id: 'enr-john',
+      memberId: 'mem-001',
+      programId: 'prog-tier1',
+      status: 'active' as const,
+      enrollmentSource: 'CBO' as const,
+      sourceId: 'cbo-001',
+      enrollmentDate: member.createdAt,
+      currentWeek: 6,
+      currentPhase: calculatePhase(1, 6),
+      benefitLevel: 'Tier 1 - Week 6',
+      nextShipmentDate: '2025-02-10',
+    };
+  }
+  if (member.id === 'mem-suzie') {
+    return {
+      id: 'enr-suzie',
+      memberId: 'mem-suzie',
+      programId: 'prog-tier2',
+      status: 'active' as const,
+      enrollmentSource: 'HP Outreach' as const,
+      enrollmentDate: member.createdAt,
+      currentWeek: 6,
+      currentPhase: calculatePhase(2, 6),
+      benefitLevel: 'Tier 2 - Week 6',
+      nextShipmentDate: '2025-02-10',
+    };
+  }
+  if (member.id === 'mem-olivia') {
+    return {
+      id: 'enr-olivia',
+      memberId: 'mem-olivia',
+      programId: 'prog-tier3',
+      status: 'active' as const,
+      enrollmentSource: 'Provider' as const,
+      enrollmentDate: member.createdAt,
+      currentWeek: 4,
+      currentPhase: calculatePhase(3, 4),
+      benefitLevel: 'Tier 3 - Week 4',
+      nextShipmentDate: '2025-02-10',
+    };
+  }
+
+  const status = statuses[Math.floor(Math.random() * statuses.length)];
   
   // Distribute across tiers: 40% Tier 1, 40% Tier 2, 20% Tier 3
   let programId: string;
@@ -633,15 +715,8 @@ export const enrollments: Enrollment[] = members.map((member, idx) => {
     programId = 'prog-tier3';
   }
   
-  // First member (demo member) is always Tier 1, Week 3
-  if (idx === 0) {
-    programId = 'prog-tier1';
-  }
-  
   const program = programs.find(p => p.id === programId)!;
-  
-  // Calculate current week (1-12), demo member is week 3
-  const currentWeek = idx === 0 ? 3 : Math.floor(Math.random() * 12) + 1;
+  const currentWeek = Math.floor(Math.random() * 12) + 1;
   const currentPhase = calculatePhase(program.tier, currentWeek);
   
   return {
@@ -649,8 +724,8 @@ export const enrollments: Enrollment[] = members.map((member, idx) => {
     memberId: member.id,
     programId,
     status,
-    enrollmentSource: idx === 0 ? 'CBO' : sources[Math.floor(Math.random() * sources.length)],
-    sourceId: idx === 0 ? 'cbo-001' : (Math.random() > 0.5 ? cbos[Math.floor(Math.random() * cbos.length)].id : undefined),
+    enrollmentSource: sources[Math.floor(Math.random() * sources.length)],
+    sourceId: Math.random() > 0.5 ? cbos[Math.floor(Math.random() * cbos.length)].id : undefined,
     enrollmentDate: member.createdAt,
     currentWeek,
     currentPhase,

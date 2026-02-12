@@ -12,10 +12,10 @@ import { StatusPill } from '@/components/shared/StatusPill';
 import { format } from 'date-fns';
 
 export default function MemberProfile() {
-  const { members } = useApp();
+  const { members, activeDemoMemberId } = useApp();
   const { toast } = useToast();
   const { cases } = useSupportCases();
-  const member = members[0];
+  const member = members.find(m => m.id === activeDemoMemberId) || members[0];
 
   // Address state
   const [isEditingAddress, setIsEditingAddress] = useState(false);

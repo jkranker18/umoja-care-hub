@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 type StatusType = 'active' | 'inactive' | 'pending' | 'paused' | 'complete' | 'error' | 'approved' | 'denied' | 'pending_review' |
   'open' | 'in_progress' | 'resolved' | 'closed' | 'draft' | 'published' | 'connected' | 'syncing' | 'disconnected' |
-  'processing' | 'shipped' | 'in_transit' | 'delivered' | 'exception' | 'assigned' | 'completed';
+  'processing' | 'shipped' | 'in_transit' | 'delivered' | 'exception' | 'assigned' | 'completed' | 'upcoming' | 'scheduled' | 'to_be_scheduled';
 
 interface StatusPillProps {
   status: StatusType;
@@ -35,6 +35,9 @@ const statusConfig: Record<StatusType, { label: string; className: string }> = {
   delivered: { label: 'Delivered', className: 'status-complete' },
   exception: { label: 'Exception', className: 'status-error' },
   assigned: { label: 'Assigned', className: 'status-pending' },
+  upcoming: { label: 'Upcoming', className: 'status-pending' },
+  scheduled: { label: 'Scheduled', className: 'status-active' },
+  to_be_scheduled: { label: 'To Be Scheduled', className: 'status-pending' },
 };
 
 export function StatusPill({ status, className }: StatusPillProps) {
