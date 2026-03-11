@@ -1047,7 +1047,7 @@ export default function MemberHome() {
                 )}
 
                 {/* Olivia: Smart Scale */}
-                {activeDemoMemberId === 'mem-003' && (
+                {activeDemoMemberId === 'mem-olivia' && (
                   <Card>
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
