@@ -67,6 +67,7 @@ const healthplanNav: NavItem[] = [
   { label: 'Member Drill Down', path: '/healthplan/members', icon: Users },
   { label: 'Assessment Library', path: '/healthplan/assessments', icon: ClipboardList },
   { label: 'Profile', path: '/healthplan/profile', icon: Building2 },
+  { label: 'File Transfer', path: 'https://umojacloud.io/webclient/Login.xhtml', icon: FolderSync },
 ];
 
 const internalNav: NavItem[] = [
