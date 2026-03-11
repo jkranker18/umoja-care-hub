@@ -200,16 +200,16 @@ export default function MemberHome() {
   ];
 
   const getOrderStatus = (weekNumber: number): 'delivered' | 'in_transit' | 'upcoming' => {
-    // Feb 10 (week 6) = delivered, Feb 17 (week 7) = in_transit, Feb 24+ = upcoming
-    if (weekNumber <= 6) return 'delivered';
-    if (weekNumber === 7) return 'in_transit';
+    // As of Mar 11: Weeks 1-10 (through Mar 10) delivered, Week 11 (Mar 17) in transit, Week 12 (Mar 24) upcoming
+    if (weekNumber <= 10) return 'delivered';
+    if (weekNumber === 11) return 'in_transit';
     return 'upcoming';
   };
 
   const getProduceBoxStatus = (index: number): 'delivered' | 'in_transit' | 'upcoming' => {
-    // First 3 delivered (Jan 6, Jan 20, Feb 3), 4th in transit (Feb 17), rest upcoming
-    if (index <= 2) return 'delivered';
-    if (index === 3) return 'in_transit';
+    // Index 0-4 (Jan 6 through Mar 3) delivered, Index 5 (Mar 17) in transit
+    if (index <= 4) return 'delivered';
+    if (index === 5) return 'in_transit';
     return 'upcoming';
   };
 
