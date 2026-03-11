@@ -990,7 +990,7 @@ export const rules: Rule[] = [
     id: 'rule-003',
     name: 'Tier 3 Preventive Eligibility',
     condition: 'program = "Tier 3" AND diet_quality_goal = true AND consent = true',
-    action: 'benefit = 12 weeks, produce_box = bi-weekly (6 distributions), produce_weight = 15lbs',
+    action: 'benefit = 16 weeks, produce_box = bi-weekly (8 distributions), produce_weight = 15lbs',
     version: 'v1.0',
     status: 'published',
     createdAt: '2025-01-01',

@@ -466,7 +466,7 @@ export default function MemberHome() {
                     </div>
                     <div>
                       <span className="text-muted-foreground text-xs">Duration</span>
-                      <p className="font-medium">{program?.duration || '12 weeks'}</p>
+                      <p className="font-medium">{program?.duration || '16 weeks'}</p>
                     </div>
                   </div>
                 </CardContent>

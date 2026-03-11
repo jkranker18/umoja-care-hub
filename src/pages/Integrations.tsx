@@ -22,7 +22,7 @@ export default function Integrations() {
       member_id: 'mem-001',
       enrollment_id: 'enr-001',
       eligibility_result: 'approved',
-      benefit_level: '12 weeks',
+      benefit_level: '16 weeks',
       frequency: 'weekly',
       next_shipment: '2024-04-01',
       rule_version: 'v2.3',
