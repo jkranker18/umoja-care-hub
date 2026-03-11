@@ -191,12 +191,14 @@ export default function MemberHome() {
   const orderDates = [
     'Jan 6, 2025', 'Jan 13, 2025', 'Jan 20, 2025', 'Jan 27, 2025',
     'Feb 3, 2025', 'Feb 10, 2025', 'Feb 17, 2025', 'Feb 24, 2025',
-    'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025'
+    'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025',
+    'Mar 31, 2025', 'Apr 7, 2025', 'Apr 14, 2025', 'Apr 21, 2025'
   ];
 
-  // For Tier 3: bi-weekly produce boxes
+  // For Tier 3: bi-weekly produce boxes (8 distributions over 16 weeks)
   const produceBoxDates = [
-    'Jan 6, 2025', 'Jan 20, 2025', 'Feb 3, 2025', 'Feb 17, 2025', 'Mar 3, 2025', 'Mar 17, 2025'
+    'Jan 6, 2025', 'Jan 20, 2025', 'Feb 3, 2025', 'Feb 17, 2025',
+    'Mar 3, 2025', 'Mar 17, 2025', 'Mar 31, 2025', 'Apr 14, 2025'
   ];
 
   const getOrderStatus = (weekNumber: number): 'delivered' | 'in_transit' | 'upcoming' => {
@@ -382,22 +384,22 @@ export default function MemberHome() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Phase Progress</span>
-                        <span className="font-medium">Week {enrollment?.currentWeek} of 12</span>
+                        <span className="font-medium">Week {enrollment?.currentWeek} of 16</span>
                       </div>
                       {program.tier !== 3 ? (
                         program.mtmWeeks === 0 ? (
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
                               <span className="font-medium text-primary">
-                                MTG (Weeks 1-12)
+                                MTG (Weeks 1-16)
                               </span>
-                              <span className="text-muted-foreground">Week {enrollment?.currentWeek || 1} of 12</span>
+                              <span className="text-muted-foreground">Week {enrollment?.currentWeek || 1} of 16</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div 
                                 className="h-full bg-primary rounded-full transition-all" 
                                 style={{ 
-                                  width: `${((enrollment?.currentWeek || 1) / 12) * 100}%` 
+                                  width: `${((enrollment?.currentWeek || 1) / 16) * 100}%` 
                                 }}
                               />
                             </div>
@@ -422,7 +424,7 @@ export default function MemberHome() {
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center justify-between text-xs">
                                 <span className={enrollment?.currentPhase === 'MTG' ? 'font-medium text-primary' : 'text-muted-foreground'}>
-                                  MTG (Weeks {program.mtmWeeks + 1}-12)
+                                  MTG (Weeks {program.mtmWeeks + 1}-16)
                                 </span>
                               </div>
                               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -440,12 +442,12 @@ export default function MemberHome() {
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-medium text-primary">Produce Box (Bi-weekly)</span>
-                            <span className="text-muted-foreground">Distribution {phaseInfo.phaseWeek} of 6</span>
+                            <span className="text-muted-foreground">Distribution {phaseInfo.phaseWeek} of 8</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-primary rounded-full transition-all" 
-                              style={{ width: `${(phaseInfo.phaseWeek / 6) * 100}%` }}
+                              style={{ width: `${(phaseInfo.phaseWeek / 8) * 100}%` }}
                             />
                           </div>
                         </div>
@@ -464,7 +466,7 @@ export default function MemberHome() {
                     </div>
                     <div>
                       <span className="text-muted-foreground text-xs">Duration</span>
-                      <p className="font-medium">{program?.duration || '12 weeks'}</p>
+                      <p className="font-medium">{program?.duration || '16 weeks'}</p>
                     </div>
                   </div>
                 </CardContent>

@@ -35,7 +35,7 @@ export interface Program {
   startDate: string;
   endDate: string;
   eligibilityRules: string;
-  duration: string; // "12 weeks"
+  duration: string; // "16 weeks"
   mealsPerWeek: number;
   mtmWeeks: number; // Medically Tailored Meals phase
   mtgWeeks: number; // Medically Tailored Groceries phase
@@ -292,15 +292,15 @@ export const programs: Program[] = [
     name: 'Tier 1: High Risk & Comorbidity',
     tier: 1,
     riskLevel: 'high',
-    description: 'Intensive 12-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
+    description: 'Intensive 16-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'High risk score, multiple chronic conditions, comorbidity present',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 14,
     mtmWeeks: 8, // Weeks 1-8: Medically Tailored Meals
-    mtgWeeks: 4, // Weeks 9-12: Medically Tailored Groceries
-    clinicalSupport: '3 months',
+    mtgWeeks: 8, // Weeks 9-16: Medically Tailored Groceries
+    clinicalSupport: '4 months',
     status: 'active',
   },
   {
@@ -308,15 +308,15 @@ export const programs: Program[] = [
     name: 'Tier 2: Medium Risk',
     tier: 2,
     riskLevel: 'medium',
-    description: '12-week step-down program for members with chronic conditions who have some capacity for self-preparation',
+    description: '16-week step-down program for members with chronic conditions who have some capacity for self-preparation',
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'Medium risk score, chronic condition diagnosis, capacity for meal preparation',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 14,
     mtmWeeks: 0, // No MTM for Tier 2
-    mtgWeeks: 12, // All 12 weeks: Medically Tailored Groceries
-    clinicalSupport: '3 months',
+    mtgWeeks: 16, // All 16 weeks: Medically Tailored Groceries
+    clinicalSupport: '4 months',
     status: 'active',
   },
   {
@@ -328,11 +328,11 @@ export const programs: Program[] = [
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'Preventive care, diet quality improvement, inflammation reduction goals',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 0, // Uses produce boxes instead
     mtmWeeks: 0,
     mtgWeeks: 0,
-    clinicalSupport: '3 months',
+    clinicalSupport: '4 months',
     status: 'active',
   },
 ];
@@ -359,7 +359,7 @@ export function getPhaseInfo(program: Program, currentWeek: number): {
     return { 
       phase: 'Produce', 
       phaseWeek: distribution, 
-      phaseTotal: 6,
+      phaseTotal: 8,
       phaseName: 'Produce Box'
     };
   }
@@ -370,11 +370,11 @@ export function getPhaseInfo(program: Program, currentWeek: number): {
     if (phase === 'MTM') {
       return { phase, phaseWeek: currentWeek, phaseTotal: 8, phaseName: 'Medically Tailored Meals' };
     }
-    return { phase, phaseWeek: currentWeek - 8, phaseTotal: 4, phaseName: 'Medically Tailored Groceries' };
+    return { phase, phaseWeek: currentWeek - 8, phaseTotal: 8, phaseName: 'Medically Tailored Groceries' };
   }
   
   // Tier 2 - MTG only
-  return { phase, phaseWeek: currentWeek, phaseTotal: 12, phaseName: 'Medically Tailored Groceries' };
+  return { phase, phaseWeek: currentWeek, phaseTotal: 16, phaseName: 'Medically Tailored Groceries' };
 }
 
 // CBO Authorized Users
@@ -970,7 +970,7 @@ export const rules: Rule[] = [
     id: 'rule-001',
     name: 'Tier 1 High Risk Eligibility',
     condition: 'program = "Tier 1" AND risk_score >= 7 AND comorbidity_count >= 2 AND consent = true',
-    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-8), phase_2 = MTG (weeks 9-12), meals = 14/week',
+    action: 'benefit = 16 weeks, phase_1 = MTM (weeks 1-8), phase_2 = MTG (weeks 9-16), meals = 14/week',
     version: 'v2.3',
     status: 'published',
     createdAt: '2025-01-01',
@@ -980,7 +980,7 @@ export const rules: Rule[] = [
     id: 'rule-002',
     name: 'Tier 2 Medium Risk Eligibility',
     condition: 'program = "Tier 2" AND risk_score >= 4 AND risk_score < 7 AND chronic_condition = true AND consent = true',
-    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-4), phase_2 = MTG (weeks 5-12), meals = 14/week',
+    action: 'benefit = 16 weeks, MTG (weeks 1-16), meals = 14/week',
     version: 'v1.2',
     status: 'published',
     createdAt: '2025-01-01',
@@ -990,7 +990,7 @@ export const rules: Rule[] = [
     id: 'rule-003',
     name: 'Tier 3 Preventive Eligibility',
     condition: 'program = "Tier 3" AND diet_quality_goal = true AND consent = true',
-    action: 'benefit = 12 weeks, produce_box = bi-weekly (6 distributions), produce_weight = 15lbs',
+    action: 'benefit = 16 weeks, produce_box = bi-weekly (8 distributions), produce_weight = 15lbs',
     version: 'v1.0',
     status: 'published',
     createdAt: '2025-01-01',
