@@ -191,12 +191,14 @@ export default function MemberHome() {
   const orderDates = [
     'Jan 6, 2025', 'Jan 13, 2025', 'Jan 20, 2025', 'Jan 27, 2025',
     'Feb 3, 2025', 'Feb 10, 2025', 'Feb 17, 2025', 'Feb 24, 2025',
-    'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025'
+    'Mar 3, 2025', 'Mar 10, 2025', 'Mar 17, 2025', 'Mar 24, 2025',
+    'Mar 31, 2025', 'Apr 7, 2025', 'Apr 14, 2025', 'Apr 21, 2025'
   ];
 
-  // For Tier 3: bi-weekly produce boxes
+  // For Tier 3: bi-weekly produce boxes (8 distributions over 16 weeks)
   const produceBoxDates = [
-    'Jan 6, 2025', 'Jan 20, 2025', 'Feb 3, 2025', 'Feb 17, 2025', 'Mar 3, 2025', 'Mar 17, 2025'
+    'Jan 6, 2025', 'Jan 20, 2025', 'Feb 3, 2025', 'Feb 17, 2025',
+    'Mar 3, 2025', 'Mar 17, 2025', 'Mar 31, 2025', 'Apr 14, 2025'
   ];
 
   const getOrderStatus = (weekNumber: number): 'delivered' | 'in_transit' | 'upcoming' => {
