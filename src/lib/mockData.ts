@@ -980,7 +980,7 @@ export const rules: Rule[] = [
     id: 'rule-002',
     name: 'Tier 2 Medium Risk Eligibility',
     condition: 'program = "Tier 2" AND risk_score >= 4 AND risk_score < 7 AND chronic_condition = true AND consent = true',
-    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-4), phase_2 = MTG (weeks 5-12), meals = 14/week',
+    action: 'benefit = 16 weeks, MTG (weeks 1-16), meals = 14/week',
     version: 'v1.2',
     status: 'published',
     createdAt: '2025-01-01',
