@@ -1015,7 +1015,7 @@ export default function MemberHome() {
                 )}
 
                 {/* Suzie: Glucometer */}
-                {activeDemoMemberId === 'mem-002' && (
+                {activeDemoMemberId === 'mem-suzie' && (
                   <Card>
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
