@@ -424,7 +424,7 @@ export default function MemberHome() {
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center justify-between text-xs">
                                 <span className={enrollment?.currentPhase === 'MTG' ? 'font-medium text-primary' : 'text-muted-foreground'}>
-                                  MTG (Weeks {program.mtmWeeks + 1}-12)
+                                  MTG (Weeks {program.mtmWeeks + 1}-16)
                                 </span>
                               </div>
                               <div className="h-2 bg-muted rounded-full overflow-hidden">
