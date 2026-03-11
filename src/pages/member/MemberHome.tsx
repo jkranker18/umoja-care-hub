@@ -943,6 +943,142 @@ export default function MemberHome() {
 
           {/* Trackers Tab */}
           <TabsContent value="trackers" className="space-y-6">
+            {/* Connected Devices (RPM) */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Bluetooth className="h-5 w-5 text-primary" />
+                Connected Devices
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* John: Smart Scale */}
+                {activeDemoMemberId === 'mem-001' && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Weight className="h-5 w-5 text-primary" />
+                          <CardTitle className="text-base">Smart Scale</CardTitle>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700 border-green-200">Connected</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <table className="w-full text-sm">
+                        <thead><tr className="text-muted-foreground border-b"><th className="text-left py-1 font-medium">Date</th><th className="text-left py-1 font-medium">Weight</th><th className="text-right py-1 font-medium">Trend</th></tr></thead>
+                        <tbody>
+                          {[
+                            { date: 'Mar 10', weight: '214.2 lbs', trend: '—' },
+                            { date: 'Mar 7', weight: '215.0 lbs', trend: '↓' },
+                            { date: 'Mar 3', weight: '216.1 lbs', trend: '↓' },
+                            { date: 'Feb 28', weight: '217.4 lbs', trend: '↓' },
+                            { date: 'Feb 24', weight: '218.0 lbs', trend: '—' },
+                          ].map((r, i) => (
+                            <tr key={i} className="border-b last:border-0"><td className="py-1.5">{r.date}</td><td className="py-1.5">{r.weight}</td><td className="py-1.5 text-right text-green-600">{r.trend}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-xs text-muted-foreground pt-1">Last synced: 12 minutes ago</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* John: Blood Pressure Cuff */}
+                {activeDemoMemberId === 'mem-001' && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Heart className="h-5 w-5 text-destructive" />
+                          <CardTitle className="text-base">Blood Pressure Cuff</CardTitle>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700 border-green-200">Connected</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <table className="w-full text-sm">
+                        <thead><tr className="text-muted-foreground border-b"><th className="text-left py-1 font-medium">Date</th><th className="text-left py-1 font-medium">Reading</th><th className="text-right py-1 font-medium">Status</th></tr></thead>
+                        <tbody>
+                          {[
+                            { date: 'Mar 10', reading: '138/88', status: 'Elevated', color: 'text-yellow-600' },
+                            { date: 'Mar 7', reading: '142/90', status: 'High', color: 'text-destructive' },
+                            { date: 'Mar 3', reading: '140/89', status: 'High', color: 'text-destructive' },
+                            { date: 'Feb 28', reading: '144/92', status: 'High', color: 'text-destructive' },
+                            { date: 'Feb 24', reading: '146/94', status: 'High', color: 'text-destructive' },
+                          ].map((r, i) => (
+                            <tr key={i} className="border-b last:border-0"><td className="py-1.5">{r.date}</td><td className="py-1.5">{r.reading}</td><td className={`py-1.5 text-right font-medium ${r.color}`}>{r.status}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-xs text-muted-foreground pt-1">Last synced: 8 minutes ago</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Suzie: Glucometer */}
+                {activeDemoMemberId === 'mem-002' && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Droplets className="h-5 w-5 text-primary" />
+                          <CardTitle className="text-base">Glucometer</CardTitle>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700 border-green-200">Connected</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <table className="w-full text-sm">
+                        <thead><tr className="text-muted-foreground border-b"><th className="text-left py-1 font-medium">Date</th><th className="text-left py-1 font-medium">Fasting BG</th><th className="text-right py-1 font-medium">Status</th></tr></thead>
+                        <tbody>
+                          {[
+                            { date: 'Mar 10', bg: '128 mg/dL', status: 'Above Target', color: 'text-yellow-600' },
+                            { date: 'Mar 7', bg: '134 mg/dL', status: 'Above Target', color: 'text-yellow-600' },
+                            { date: 'Mar 3', bg: '142 mg/dL', status: 'High', color: 'text-destructive' },
+                            { date: 'Feb 28', bg: '138 mg/dL', status: 'High', color: 'text-destructive' },
+                            { date: 'Feb 24', bg: '145 mg/dL', status: 'High', color: 'text-destructive' },
+                          ].map((r, i) => (
+                            <tr key={i} className="border-b last:border-0"><td className="py-1.5">{r.date}</td><td className="py-1.5">{r.bg}</td><td className={`py-1.5 text-right font-medium ${r.color}`}>{r.status}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-xs text-muted-foreground pt-1">Last synced: 22 minutes ago</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Olivia: Smart Scale */}
+                {activeDemoMemberId === 'mem-003' && (
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Weight className="h-5 w-5 text-primary" />
+                          <CardTitle className="text-base">Smart Scale</CardTitle>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700 border-green-200">Connected</Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <table className="w-full text-sm">
+                        <thead><tr className="text-muted-foreground border-b"><th className="text-left py-1 font-medium">Date</th><th className="text-left py-1 font-medium">Weight</th><th className="text-right py-1 font-medium">Trend</th></tr></thead>
+                        <tbody>
+                          {[
+                            { date: 'Mar 10', weight: '156.8 lbs', trend: '—' },
+                            { date: 'Mar 7', weight: '157.2 lbs', trend: '↓' },
+                            { date: 'Mar 3', weight: '157.0 lbs', trend: '—' },
+                            { date: 'Feb 28', weight: '158.1 lbs', trend: '↓' },
+                            { date: 'Feb 24', weight: '158.5 lbs', trend: '—' },
+                          ].map((r, i) => (
+                            <tr key={i} className="border-b last:border-0"><td className="py-1.5">{r.date}</td><td className="py-1.5">{r.weight}</td><td className="py-1.5 text-right text-green-600">{r.trend}</td></tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p className="text-xs text-muted-foreground pt-1">Last synced: 5 minutes ago</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
             {/* Date Selector */}
             <div className="flex items-center gap-4">
               <Label htmlFor="tracker-date" className="text-sm font-medium">Date:</Label>
