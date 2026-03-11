@@ -384,7 +384,7 @@ export default function MemberHome() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Phase Progress</span>
-                        <span className="font-medium">Week {enrollment?.currentWeek} of 12</span>
+                        <span className="font-medium">Week {enrollment?.currentWeek} of 16</span>
                       </div>
                       {program.tier !== 3 ? (
                         program.mtmWeeks === 0 ? (
