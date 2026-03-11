@@ -20,6 +20,7 @@ import {
   CalendarCheck,
   Activity,
   ChevronDown,
+  FolderSync,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -66,6 +67,7 @@ const healthplanNav: NavItem[] = [
   { label: 'Member Drill Down', path: '/healthplan/members', icon: Users },
   { label: 'Assessment Library', path: '/healthplan/assessments', icon: ClipboardList },
   { label: 'Profile', path: '/healthplan/profile', icon: Building2 },
+  { label: 'File Transfer', path: 'https://umojacloud.io/webclient/Login.xhtml', icon: FolderSync },
 ];
 
 const internalNav: NavItem[] = [
@@ -147,6 +149,7 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
         {/* Navigation */}
         <nav className="p-3 space-y-1 flex-1">
           {navItems.map((item) => {
+            const isExternal = item.path.startsWith('http');
             const isMemberTabItem = currentRole === 'member' && item.tabId;
             const isActive = isMemberTabItem 
               ? activeMemberTab === item.tabId
@@ -158,6 +161,22 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
               }
               onClose();
             };
+
+            if (isExternal) {
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nav-item nav-item-inactive"
+                  onClick={onClose}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </a>
+              );
+            }
 
             return (
               <NavLink
