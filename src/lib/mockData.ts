@@ -359,7 +359,7 @@ export function getPhaseInfo(program: Program, currentWeek: number): {
     return { 
       phase: 'Produce', 
       phaseWeek: distribution, 
-      phaseTotal: 6,
+      phaseTotal: 8,
       phaseName: 'Produce Box'
     };
   }
@@ -370,11 +370,11 @@ export function getPhaseInfo(program: Program, currentWeek: number): {
     if (phase === 'MTM') {
       return { phase, phaseWeek: currentWeek, phaseTotal: 8, phaseName: 'Medically Tailored Meals' };
     }
-    return { phase, phaseWeek: currentWeek - 8, phaseTotal: 4, phaseName: 'Medically Tailored Groceries' };
+    return { phase, phaseWeek: currentWeek - 8, phaseTotal: 8, phaseName: 'Medically Tailored Groceries' };
   }
   
   // Tier 2 - MTG only
-  return { phase, phaseWeek: currentWeek, phaseTotal: 12, phaseName: 'Medically Tailored Groceries' };
+  return { phase, phaseWeek: currentWeek, phaseTotal: 16, phaseName: 'Medically Tailored Groceries' };
 }
 
 // CBO Authorized Users
