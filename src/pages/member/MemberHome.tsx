@@ -43,8 +43,8 @@ const demoMemberConfigs: Record<string, DemoMemberConfig> = {
     chronicConditions: ['Hypertension', 'Depression', 'Overweight', 'Chronic Back Pain'],
     appointments: [
       { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
-      { month: 'February', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
-      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
     ],
     hasHealthie: true,
   },
@@ -53,8 +53,8 @@ const demoMemberConfigs: Record<string, DemoMemberConfig> = {
     chronicConditions: ['Type 2 Diabetes'],
     appointments: [
       { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
-      { month: 'February', label: 'Health Coach Check-in', status: 'scheduled' },
-      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
     ],
     hasHealthie: false,
   },
@@ -63,8 +63,8 @@ const demoMemberConfigs: Record<string, DemoMemberConfig> = {
     chronicConditions: ['Asthma'],
     appointments: [
       { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
-      { month: 'February', label: 'Health Coach Check-in', status: 'scheduled' },
-      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
     ],
     hasHealthie: false,
   },
