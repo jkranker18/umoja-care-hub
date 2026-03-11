@@ -447,7 +447,7 @@ export default function MemberHome() {
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-primary rounded-full transition-all" 
-                              style={{ width: `${(phaseInfo.phaseWeek / 6) * 100}%` }}
+                              style={{ width: `${(phaseInfo.phaseWeek / 8) * 100}%` }}
                             />
                           </div>
                         </div>
