@@ -292,15 +292,15 @@ export const programs: Program[] = [
     name: 'Tier 1: High Risk & Comorbidity',
     tier: 1,
     riskLevel: 'high',
-    description: 'Intensive 12-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
+    description: 'Intensive 16-week program for high-acuity members requiring immediate nutritional and behavioral stabilization',
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'High risk score, multiple chronic conditions, comorbidity present',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 14,
     mtmWeeks: 8, // Weeks 1-8: Medically Tailored Meals
-    mtgWeeks: 4, // Weeks 9-12: Medically Tailored Groceries
-    clinicalSupport: '3 months',
+    mtgWeeks: 8, // Weeks 9-16: Medically Tailored Groceries
+    clinicalSupport: '4 months',
     status: 'active',
   },
   {
