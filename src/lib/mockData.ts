@@ -308,15 +308,15 @@ export const programs: Program[] = [
     name: 'Tier 2: Medium Risk',
     tier: 2,
     riskLevel: 'medium',
-    description: '12-week step-down program for members with chronic conditions who have some capacity for self-preparation',
+    description: '16-week step-down program for members with chronic conditions who have some capacity for self-preparation',
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'Medium risk score, chronic condition diagnosis, capacity for meal preparation',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 14,
     mtmWeeks: 0, // No MTM for Tier 2
-    mtgWeeks: 12, // All 12 weeks: Medically Tailored Groceries
-    clinicalSupport: '3 months',
+    mtgWeeks: 16, // All 16 weeks: Medically Tailored Groceries
+    clinicalSupport: '4 months',
     status: 'active',
   },
   {
