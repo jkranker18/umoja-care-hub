@@ -149,6 +149,7 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
         {/* Navigation */}
         <nav className="p-3 space-y-1 flex-1">
           {navItems.map((item) => {
+            const isExternal = item.path.startsWith('http');
             const isMemberTabItem = currentRole === 'member' && item.tabId;
             const isActive = isMemberTabItem 
               ? activeMemberTab === item.tabId
@@ -160,6 +161,22 @@ export function Sidebar({ isOpen, onClose, onMemberTabChange, activeMemberTab }:
               }
               onClose();
             };
+
+            if (isExternal) {
+              return (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="nav-item nav-item-inactive"
+                  onClick={onClose}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </a>
+              );
+            }
 
             return (
               <NavLink
