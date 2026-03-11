@@ -391,9 +391,9 @@ export default function MemberHome() {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
                               <span className="font-medium text-primary">
-                                MTG (Weeks 1-12)
+                                MTG (Weeks 1-16)
                               </span>
-                              <span className="text-muted-foreground">Week {enrollment?.currentWeek || 1} of 12</span>
+                              <span className="text-muted-foreground">Week {enrollment?.currentWeek || 1} of 16</span>
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div 
