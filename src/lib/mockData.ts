@@ -328,11 +328,11 @@ export const programs: Program[] = [
     startDate: '2025-01-01',
     endDate: '2025-12-31',
     eligibilityRules: 'Preventive care, diet quality improvement, inflammation reduction goals',
-    duration: '12 weeks',
+    duration: '16 weeks',
     mealsPerWeek: 0, // Uses produce boxes instead
     mtmWeeks: 0,
     mtgWeeks: 0,
-    clinicalSupport: '3 months',
+    clinicalSupport: '4 months',
     status: 'active',
   },
 ];
