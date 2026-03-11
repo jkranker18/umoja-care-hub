@@ -1,15 +1,27 @@
 
-# Update Suzie (Tier 2) to MTG-Only
 
-## Summary
-Suzie should not receive any Medically Tailored Meals (MTM). Her entire 12-week program should be Medically Tailored Groceries (MTG) only.
+# Update Shipment Dates to Match March 11
 
-## Changes
+## Problem
+The shipment status logic is frozen at a February baseline. With today being March 11, the statuses need to reflect that we're in week 10 of the 12-week program.
 
-### 1. `src/lib/mockData.ts` - Update Tier 2 Program Definition
-Change `prog-tier2` from `mtmWeeks: 4, mtgWeeks: 8` to `mtmWeeks: 0, mtgWeeks: 12` so all 12 weeks are MTG.
+## Changes — `src/pages/member/MemberHome.tsx`
 
-### 2. `src/pages/member/MemberHome.tsx` - Handle MTG-Only Display
-Update the Phase Progress bar section so that when `program.mtmWeeks === 0`, it shows only the MTG progress bar (no MTM bar). Also update the "Current Phase" KPI card and the meal plan description text to reflect MTG-only when there are no MTM weeks.
+### 1. Update `getOrderStatus` (line 202-207)
+Shift the cutoffs so that:
+- Weeks 1-10 (through Mar 10) → `delivered`
+- Week 11 (Mar 17) → `in_transit`
+- Week 12 (Mar 24) → `upcoming`
 
-Two files modified. No new files.
+### 2. Update `getProduceBoxStatus` (line 209-214)
+Shift so that:
+- Index 0-4 (Jan 6 through Mar 3) → `delivered`
+- Index 5 (Mar 17) → `in_transit`
+
+This will automatically fix:
+- The "Next Shipment" KPI card (picks first in_transit or upcoming order → Mar 17)
+- The "Next Delivery" on the My Orders tab
+- All order status pills in the order history list
+
+One file modified.
+
