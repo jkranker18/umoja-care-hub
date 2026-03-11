@@ -970,7 +970,7 @@ export const rules: Rule[] = [
     id: 'rule-001',
     name: 'Tier 1 High Risk Eligibility',
     condition: 'program = "Tier 1" AND risk_score >= 7 AND comorbidity_count >= 2 AND consent = true',
-    action: 'benefit = 12 weeks, phase_1 = MTM (weeks 1-8), phase_2 = MTG (weeks 9-12), meals = 14/week',
+    action: 'benefit = 16 weeks, phase_1 = MTM (weeks 1-8), phase_2 = MTG (weeks 9-16), meals = 14/week',
     version: 'v2.3',
     status: 'published',
     createdAt: '2025-01-01',
