@@ -442,7 +442,7 @@ export default function MemberHome() {
                         <div className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-medium text-primary">Produce Box (Bi-weekly)</span>
-                            <span className="text-muted-foreground">Distribution {phaseInfo.phaseWeek} of 6</span>
+                            <span className="text-muted-foreground">Distribution {phaseInfo.phaseWeek} of 8</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div 
