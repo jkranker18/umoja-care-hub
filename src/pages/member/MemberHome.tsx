@@ -399,7 +399,7 @@ export default function MemberHome() {
                               <div 
                                 className="h-full bg-primary rounded-full transition-all" 
                                 style={{ 
-                                  width: `${((enrollment?.currentWeek || 1) / 12) * 100}%` 
+                                  width: `${((enrollment?.currentWeek || 1) / 16) * 100}%` 
                                 }}
                               />
                             </div>
