@@ -53,8 +53,8 @@ const demoMemberConfigs: Record<string, DemoMemberConfig> = {
     chronicConditions: ['Type 2 Diabetes'],
     appointments: [
       { month: 'January', label: 'Health Coach Check-in', status: 'completed' },
-      { month: 'February', label: 'Health Coach Check-in', status: 'scheduled' },
-      { month: 'March', label: 'Health Coach Check-in', status: 'upcoming' },
+      { month: 'February', label: 'Health Coach Check-in', status: 'completed' },
+      { month: 'March', label: 'Health Coach Check-in', status: 'to_be_scheduled' },
     ],
     hasHealthie: false,
   },
