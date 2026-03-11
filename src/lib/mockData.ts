@@ -35,7 +35,7 @@ export interface Program {
   startDate: string;
   endDate: string;
   eligibilityRules: string;
-  duration: string; // "12 weeks"
+  duration: string; // "16 weeks"
   mealsPerWeek: number;
   mtmWeeks: number; // Medically Tailored Meals phase
   mtgWeeks: number; // Medically Tailored Groceries phase
