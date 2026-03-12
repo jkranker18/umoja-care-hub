@@ -176,6 +176,9 @@ export interface MemberClinicalData {
   diastolicBP?: number;      // e.g., 92 -> 78
   bmi?: number;              // e.g., 32.5 -> 30.1
   hospitalAdmissions?: number; // Count in past 12 months
+  phq9?: number;             // PHQ-9 Depression score (0-27)
+  gad7?: number;             // GAD-7 Anxiety score (0-21)
+  foodInsecurity?: number;   // Food Insecurity screening score (0-10)
 }
 
 // Financial value constants based on HCSC proposal (using higher values)
