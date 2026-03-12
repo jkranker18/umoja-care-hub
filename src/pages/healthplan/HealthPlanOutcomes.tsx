@@ -286,6 +286,64 @@ export default function HealthPlanOutcomes() {
           />
         </div>
 
+        {/* Mental Health & Social Needs Outcomes */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              Mental Health & Social Needs Outcomes
+            </CardTitle>
+            <CardDescription>Pre/post screening scores for behavioral health and social determinants</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Screening</TableHead>
+                  <TableHead className="text-right">N</TableHead>
+                  <TableHead className="text-right">Avg Baseline</TableHead>
+                  <TableHead className="text-right">Avg Current</TableHead>
+                  <TableHead className="text-right">Avg Δ</TableHead>
+                  <TableHead className="text-right">$/Unit</TableHead>
+                  <TableHead className="text-right">Total Savings</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">PHQ-9 (Depression)</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.count}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.avgBaseline}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.avgCurrent}</TableCell>
+                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.phq9.avgReduction}</TableCell>
+                  <TableCell className="text-right">${CLINICAL_SAVINGS.PHQ9_PER_POINT}</TableCell>
+                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.phq9.totalSavings)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">GAD-7 (Anxiety)</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.count}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.avgBaseline}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.avgCurrent}</TableCell>
+                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.gad7.avgReduction}</TableCell>
+                  <TableCell className="text-right">${CLINICAL_SAVINGS.GAD7_PER_POINT}</TableCell>
+                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.gad7.totalSavings)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Food Insecurity Screening</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.count}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.avgBaseline}</TableCell>
+                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.avgCurrent}</TableCell>
+                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.foodInsecurity.avgReduction}</TableCell>
+                  <TableCell className="text-right">${CLINICAL_SAVINGS.FOOD_INSECURITY_RESOLVED.toLocaleString()}*</TableCell>
+                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.foodInsecurity.totalSavings)}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            <p className="text-xs text-muted-foreground mt-3">
+              * Food Insecurity savings calculated per member achieving score ≤1 (resolved): {clinicalOutcomes.metrics.foodInsecurity.resolved} members
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Clinical Outcomes Summary Table */}
         <Card>
           <CardHeader>
@@ -346,64 +404,6 @@ export default function HealthPlanOutcomes() {
             </Table>
             <p className="text-xs text-muted-foreground mt-3">
               * BP savings calculated per member achieving control (&lt;130/80): {clinicalOutcomes.metrics.bp.controlAchieved} members
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Mental Health & Social Needs Outcomes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-primary" />
-              Mental Health & Social Needs Outcomes
-            </CardTitle>
-            <CardDescription>Pre/post screening scores for behavioral health and social determinants</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Screening</TableHead>
-                  <TableHead className="text-right">N</TableHead>
-                  <TableHead className="text-right">Avg Baseline</TableHead>
-                  <TableHead className="text-right">Avg Current</TableHead>
-                  <TableHead className="text-right">Avg Δ</TableHead>
-                  <TableHead className="text-right">$/Unit</TableHead>
-                  <TableHead className="text-right">Total Savings</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">PHQ-9 (Depression)</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.avgBaseline}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.phq9.avgCurrent}</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.phq9.avgReduction}</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.PHQ9_PER_POINT}</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.phq9.totalSavings)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">GAD-7 (Anxiety)</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.avgBaseline}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.gad7.avgCurrent}</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.gad7.avgReduction}</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.GAD7_PER_POINT}</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.gad7.totalSavings)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Food Insecurity Screening</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.avgBaseline}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.foodInsecurity.avgCurrent}</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.foodInsecurity.avgReduction}</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.FOOD_INSECURITY_RESOLVED.toLocaleString()}*</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.foodInsecurity.totalSavings)}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            <p className="text-xs text-muted-foreground mt-3">
-              * Food Insecurity savings calculated per member achieving score ≤1 (resolved): {clinicalOutcomes.metrics.foodInsecurity.resolved} members
             </p>
           </CardContent>
         </Card>
