@@ -104,12 +104,17 @@ export default function HealthPlanOutcomes() {
         const bpDelta = (p.baseline.systolicBP || 0) - (p.current.systolicBP || 0);
         const bmiDelta = (p.baseline.bmi || 0) - (p.current.bmi || 0);
         const admitDelta = (p.baseline.hospitalAdmissions || 0) - (p.current.hospitalAdmissions || 0);
+        const phq9Delta = (p.baseline.phq9 || 0) - (p.current.phq9 || 0);
+        const gad7Delta = (p.baseline.gad7 || 0) - (p.current.gad7 || 0);
         
         const totalSavings = 
           a1cDelta * CLINICAL_SAVINGS.A1C_PER_PERCENT +
           (p.current.systolicBP! < 130 && p.current.diastolicBP! < 80 ? CLINICAL_SAVINGS.BP_CONTROL_ACHIEVED : 0) +
           bmiDelta * CLINICAL_SAVINGS.BMI_PER_POINT +
-          admitDelta * CLINICAL_SAVINGS.READMISSION_AVOIDED;
+          admitDelta * CLINICAL_SAVINGS.READMISSION_AVOIDED +
+          phq9Delta * CLINICAL_SAVINGS.PHQ9_PER_POINT +
+          gad7Delta * CLINICAL_SAVINGS.GAD7_PER_POINT +
+          ((p.current.foodInsecurity || 99) <= 1 ? CLINICAL_SAVINGS.FOOD_INSECURITY_RESOLVED : 0);
 
         return {
           memberId: p.memberId,
@@ -122,6 +127,10 @@ export default function HealthPlanOutcomes() {
           bmiCurrent: p.current.bmi,
           admitBaseline: p.baseline.hospitalAdmissions,
           admitCurrent: p.current.hospitalAdmissions,
+          phq9Baseline: p.baseline.phq9,
+          phq9Current: p.current.phq9,
+          gad7Baseline: p.baseline.gad7,
+          gad7Current: p.current.gad7,
           totalSavings,
         };
       })
