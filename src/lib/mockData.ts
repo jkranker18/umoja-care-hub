@@ -187,6 +187,9 @@ export const CLINICAL_SAVINGS = {
   READMISSION_AVOIDED: 13000,    // $13,000 per avoided readmission
   BP_CONTROL_ACHIEVED: 500,      // $500 per member achieving BP control
   BMI_PER_POINT: 250,            // $250 per point reduction per member
+  PHQ9_PER_POINT: 200,           // $200 per point reduction in PHQ-9
+  GAD7_PER_POINT: 180,           // $180 per point reduction in GAD-7
+  FOOD_INSECURITY_RESOLVED: 1500, // $1,500 per member with resolved food insecurity
 };
 
 // Cohort utilization data for tracking healthcare cost reduction over time
