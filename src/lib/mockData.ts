@@ -1105,6 +1105,11 @@ function generateClinicalData(): MemberClinicalData[] {
     const baselineBmi = 28 + Math.random() * 10; // 28-38
     const baselineAdmissions = Math.floor(Math.random() * 3) + 1; // 1-3
     
+    // Generate mental health & social needs baselines
+    const baselinePhq9 = 12 + Math.floor(Math.random() * 9); // 12-20 (moderate-severe)
+    const baselineGad7 = 10 + Math.floor(Math.random() * 9); // 10-18
+    const baselineFoodInsecurity = 4 + Math.floor(Math.random() * 5); // 4-8
+
     // Baseline measurement
     clinicalData.push({
       id: `clin-base-${String(idx + 1).padStart(3, '0')}`,
@@ -1116,6 +1121,9 @@ function generateClinicalData(): MemberClinicalData[] {
       diastolicBP: baselineDiastolic,
       bmi: Math.round(baselineBmi * 10) / 10,
       hospitalAdmissions: baselineAdmissions,
+      phq9: baselinePhq9,
+      gad7: baselineGad7,
+      foodInsecurity: baselineFoodInsecurity,
     });
     
     // Current measurement (showing improvement)
@@ -1126,7 +1134,10 @@ function generateClinicalData(): MemberClinicalData[] {
     const systolicReduction = 12 + Math.floor(Math.random() * 18); // 12-30 reduction
     const diastolicReduction = 8 + Math.floor(Math.random() * 12); // 8-20 reduction
     const bmiReduction = 1 + Math.random() * 3; // 1-4 reduction
-    const admissionReduction = Math.min(baselineAdmissions, Math.floor(Math.random() * 2) + 1); // Reduce by 1-2, not below 0
+    const admissionReduction = Math.min(baselineAdmissions, Math.floor(Math.random() * 2) + 1);
+    const phq9Reduction = 4 + Math.floor(Math.random() * 9); // 4-12 reduction
+    const gad7Reduction = 3 + Math.floor(Math.random() * 9); // 3-11 reduction
+    const foodInsecurityReduction = 2 + Math.floor(Math.random() * 4); // 2-5 reduction
     
     clinicalData.push({
       id: `clin-curr-${String(idx + 1).padStart(3, '0')}`,
@@ -1138,6 +1149,9 @@ function generateClinicalData(): MemberClinicalData[] {
       diastolicBP: baselineDiastolic - diastolicReduction,
       bmi: Math.round((baselineBmi - bmiReduction) * 10) / 10,
       hospitalAdmissions: Math.max(0, baselineAdmissions - admissionReduction),
+      phq9: Math.max(0, baselinePhq9 - phq9Reduction),
+      gad7: Math.max(0, baselineGad7 - gad7Reduction),
+      foodInsecurity: Math.max(0, baselineFoodInsecurity - foodInsecurityReduction),
     });
   });
   
