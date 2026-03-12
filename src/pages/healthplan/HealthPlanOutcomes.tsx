@@ -2,7 +2,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KPICard } from '@/components/shared/KPICard';
-import { Download, DollarSign, Users, TrendingUp, Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, DollarSign, Users, TrendingUp, Award, ChevronDown, ChevronUp, Brain, Heart } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
