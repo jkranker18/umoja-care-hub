@@ -9,7 +9,7 @@ import { KPICard } from '@/components/shared/KPICard';
 import { StatusPill } from '@/components/shared/StatusPill';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2, CalendarCheck, ArrowRight, Send, Weight, Droplets, Bluetooth } from 'lucide-react';
+import { Package, ClipboardList, MessageSquare, Heart, Utensils, BookOpen, AlertTriangle, Loader2, CheckCircle, Sparkles, UtensilsCrossed, Dumbbell, Plus, Trash2, CalendarCheck, ArrowRight, Send, Weight, Droplets, Bluetooth, Video } from 'lucide-react';
 import { IntegrationBadge } from '@/components/shared/IntegrationBadge';
 import { format, addWeeks, subWeeks } from 'date-fns';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -120,6 +120,16 @@ export default function MemberHome() {
 
   // Change Order modal
   const [changeOrderModalOpen, setChangeOrderModalOpen] = useState(false);
+
+  // On-Demand Classes video dialog state
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+  const [activeVideoTitle, setActiveVideoTitle] = useState('');
+
+  const onDemandClasses = [
+    { title: 'Cooking Class: Layered Roasted Vegetables', category: 'Cooking', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9YPNPHNDwgvTS82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDClMfdOwAAAA%3D%3D' },
+    { title: 'Nutrition Basics: Salt', category: 'Nutrition', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9YvSHHKSMlyTi82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAWnIGcOwAAAA%3D%3D' },
+    { title: 'Beginner Treadmill Walking Workout', category: 'Exercise', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9ZPNA3MMy8OSi82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQBS8qOaOwAAAA%3D%3D' },
+  ];
 
   // Trackers state
   const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -763,6 +773,55 @@ export default function MemberHome() {
                 </div>
               );
             })()}
+
+            {/* On-Demand Classes */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Video className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">On-Demand Classes</h3>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {onDemandClasses.map((cls) => (
+                  <Card key={cls.title} className="overflow-hidden">
+                    <div className="flex h-24 items-center justify-center bg-muted">
+                      <Video className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <CardContent className="p-4 space-y-3">
+                      <Badge variant="secondary" className="text-xs">{cls.category}</Badge>
+                      <h4 className="font-semibold text-sm leading-tight">{cls.title}</h4>
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          setActiveVideoUrl(cls.url);
+                          setActiveVideoTitle(cls.title);
+                        }}
+                      >
+                        Watch Now
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Video Dialog */}
+            <Dialog open={!!activeVideoUrl} onOpenChange={(open) => { if (!open) setActiveVideoUrl(null); }}>
+              <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle>{activeVideoTitle}</DialogTitle>
+                </DialogHeader>
+                {activeVideoUrl && (
+                  <iframe
+                    src={activeVideoUrl}
+                    className="w-full rounded-md"
+                    style={{ height: '450px' }}
+                    allowFullScreen
+                    title={activeVideoTitle}
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
 
             {/* Explore More - Categories */}
             <div className="space-y-3">
