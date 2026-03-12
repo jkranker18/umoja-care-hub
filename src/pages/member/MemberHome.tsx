@@ -121,6 +121,16 @@ export default function MemberHome() {
   // Change Order modal
   const [changeOrderModalOpen, setChangeOrderModalOpen] = useState(false);
 
+  // On-Demand Classes video dialog state
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
+  const [activeVideoTitle, setActiveVideoTitle] = useState('');
+
+  const onDemandClasses = [
+    { title: 'Cooking Class: Layered Roasted Vegetables', category: 'Cooking', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9YPNPHNDwgvTS82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDClMfdOwAAAA%3D%3D' },
+    { title: 'Nutrition Basics: Salt', category: 'Nutrition', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9YvSHHKSMlyTi82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAWnIGcOwAAAA%3D%3D' },
+    { title: 'Beginner Treadmill Walking Workout', category: 'Exercise', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9ZPNA3MMy8OSi82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQBS8qOaOwAAAA%3D%3D' },
+  ];
+
   // Trackers state
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const [selectedDate, setSelectedDate] = useState(todayStr);
