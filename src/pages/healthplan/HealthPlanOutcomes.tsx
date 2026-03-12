@@ -68,8 +68,23 @@ export default function HealthPlanOutcomes() {
     const totalAdmissionsAvoided = admissionData.reduce((sum, p) => sum + (p.baseline.hospitalAdmissions! - p.current.hospitalAdmissions!), 0);
     const readmissionSavings = totalAdmissionsAvoided * CLINICAL_SAVINGS.READMISSION_AVOIDED;
 
+    // Calculate PHQ-9 metrics
+    const phq9Data = completePairs.filter(p => p.baseline.phq9 !== undefined && p.current.phq9 !== undefined);
+    const totalPhq9Reduction = phq9Data.reduce((sum, p) => sum + (p.baseline.phq9! - p.current.phq9!), 0);
+    const phq9Savings = Math.round(totalPhq9Reduction * CLINICAL_SAVINGS.PHQ9_PER_POINT);
+
+    // Calculate GAD-7 metrics
+    const gad7Data = completePairs.filter(p => p.baseline.gad7 !== undefined && p.current.gad7 !== undefined);
+    const totalGad7Reduction = gad7Data.reduce((sum, p) => sum + (p.baseline.gad7! - p.current.gad7!), 0);
+    const gad7Savings = Math.round(totalGad7Reduction * CLINICAL_SAVINGS.GAD7_PER_POINT);
+
+    // Calculate Food Insecurity metrics
+    const foodInsecurityData = completePairs.filter(p => p.baseline.foodInsecurity !== undefined && p.current.foodInsecurity !== undefined);
+    const foodInsecurityResolved = foodInsecurityData.filter(p => p.current.foodInsecurity! <= 1).length;
+    const foodInsecuritySavings = foodInsecurityResolved * CLINICAL_SAVINGS.FOOD_INSECURITY_RESOLVED;
+
     // Total value
-    const totalValue = a1cSavings + bpSavings + bmiSavings + readmissionSavings;
+    const totalValue = a1cSavings + bpSavings + bmiSavings + readmissionSavings + phq9Savings + gad7Savings + foodInsecuritySavings;
 
     // Program completion rate
     const totalEnrolled = enrollments.length;
