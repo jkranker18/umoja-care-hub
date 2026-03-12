@@ -789,10 +789,7 @@ export default function MemberHome() {
                       <Button
                         size="sm"
                         className="w-full"
-                        onClick={() => {
-                          setActiveVideoUrl(cls.url);
-                          setActiveVideoTitle(cls.title);
-                        }}
+                        onClick={() => window.open(cls.url, '_blank')}
                       >
                         Watch Now
                       </Button>
