@@ -13,6 +13,7 @@ import { memberClinicalData, members, enrollments, CLINICAL_SAVINGS, MemberClini
 
 export default function HealthPlanOutcomes() {
   const [membersExpanded, setMembersExpanded] = useState(false);
+  const [clinicalFilter, setClinicalFilter] = useState('all');
   const { setCurrentRole } = useApp();
 
   useEffect(() => {
