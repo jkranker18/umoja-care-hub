@@ -177,6 +177,31 @@ export default function HealthPlanOutcomes() {
           totalSavings: readmissionSavings,
           totalAvoided: totalAdmissionsAvoided,
         },
+        phq9: {
+          count: phq9Data.length,
+          avgBaseline: phq9Data.length > 0 ? Math.round(phq9Data.reduce((s, p) => s + p.baseline.phq9!, 0) / phq9Data.length * 10) / 10 : 0,
+          avgCurrent: phq9Data.length > 0 ? Math.round(phq9Data.reduce((s, p) => s + p.current.phq9!, 0) / phq9Data.length * 10) / 10 : 0,
+          avgReduction: phq9Data.length > 0 ? Math.round(totalPhq9Reduction / phq9Data.length * 10) / 10 : 0,
+          savingsPerUnit: CLINICAL_SAVINGS.PHQ9_PER_POINT,
+          totalSavings: phq9Savings,
+        },
+        gad7: {
+          count: gad7Data.length,
+          avgBaseline: gad7Data.length > 0 ? Math.round(gad7Data.reduce((s, p) => s + p.baseline.gad7!, 0) / gad7Data.length * 10) / 10 : 0,
+          avgCurrent: gad7Data.length > 0 ? Math.round(gad7Data.reduce((s, p) => s + p.current.gad7!, 0) / gad7Data.length * 10) / 10 : 0,
+          avgReduction: gad7Data.length > 0 ? Math.round(totalGad7Reduction / gad7Data.length * 10) / 10 : 0,
+          savingsPerUnit: CLINICAL_SAVINGS.GAD7_PER_POINT,
+          totalSavings: gad7Savings,
+        },
+        foodInsecurity: {
+          count: foodInsecurityData.length,
+          avgBaseline: foodInsecurityData.length > 0 ? Math.round(foodInsecurityData.reduce((s, p) => s + p.baseline.foodInsecurity!, 0) / foodInsecurityData.length * 10) / 10 : 0,
+          avgCurrent: foodInsecurityData.length > 0 ? Math.round(foodInsecurityData.reduce((s, p) => s + p.current.foodInsecurity!, 0) / foodInsecurityData.length * 10) / 10 : 0,
+          avgReduction: foodInsecurityData.length > 0 ? Math.round(foodInsecurityData.reduce((s, p) => s + (p.baseline.foodInsecurity! - p.current.foodInsecurity!), 0) / foodInsecurityData.length * 10) / 10 : 0,
+          savingsPerUnit: CLINICAL_SAVINGS.FOOD_INSECURITY_RESOLVED,
+          totalSavings: foodInsecuritySavings,
+          resolved: foodInsecurityResolved,
+        },
       },
       topMembers,
     };
@@ -200,6 +225,9 @@ export default function HealthPlanOutcomes() {
       { name: 'A1c Reduction', value: clinicalOutcomes.metrics.a1c.totalSavings, fill: 'hsl(var(--success))' },
       { name: 'Blood Pressure', value: clinicalOutcomes.metrics.bp.totalSavings, fill: 'hsl(var(--warning))' },
       { name: 'BMI Reduction', value: clinicalOutcomes.metrics.bmi.totalSavings, fill: 'hsl(var(--secondary))' },
+      { name: 'PHQ-9 (Depression)', value: clinicalOutcomes.metrics.phq9.totalSavings, fill: 'hsl(var(--accent))' },
+      { name: 'GAD-7 (Anxiety)', value: clinicalOutcomes.metrics.gad7.totalSavings, fill: 'hsl(var(--destructive))' },
+      { name: 'Food Insecurity', value: clinicalOutcomes.metrics.foodInsecurity.totalSavings, fill: 'hsl(var(--muted-foreground))' },
     ].sort((a, b) => b.value - a.value);
   }, [clinicalOutcomes]);
 
