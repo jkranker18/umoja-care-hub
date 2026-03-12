@@ -1,24 +1,15 @@
 
+# Update Suzie (Tier 2) to MTG-Only
 
-# Add Mental Health & Social Needs Metrics to Outcomes Report
-
-## Overview
-Add a new "Mental Health & Social Needs Outcomes" section to the Health Plan Outcomes page with fake pre/post data for PHQ-9 (Depression), GAD-7 (Anxiety), and Food Insecurity screening scores.
+## Summary
+Suzie should not receive any Medically Tailored Meals (MTM). Her entire 12-week program should be Medically Tailored Groceries (MTG) only.
 
 ## Changes
 
-### 1. `src/lib/mockData.ts`
-- Add `phq9`, `gad7`, and `foodInsecurity` optional fields to `MemberClinicalData` interface
-- Add savings constants: `PHQ9_PER_POINT` ($200), `GAD7_PER_POINT` ($180), `FOOD_INSECURITY_RESOLVED` ($1,500)
-- Update `generateClinicalData()` to populate these fields with realistic fake data:
-  - PHQ-9: baseline 12-20 (moderate-severe), current 5-12 (mild-moderate)
-  - GAD-7: baseline 10-18, current 4-10
-  - Food Insecurity: baseline 4-8 (high need), current 1-4 (reduced)
+### 1. `src/lib/mockData.ts` - Update Tier 2 Program Definition
+Change `prog-tier2` from `mtmWeeks: 4, mtgWeeks: 8` to `mtmWeeks: 0, mtgWeeks: 12` so all 12 weeks are MTG.
 
-### 2. `src/pages/healthplan/HealthPlanOutcomes.tsx`
-- Compute PHQ-9, GAD-7, and Food Insecurity metrics in `clinicalOutcomes` useMemo (same pre/post pattern as existing metrics)
-- Add their savings to `totalValue`
-- Add a new **"Mental Health & Social Needs Outcomes"** Card with a summary table (same format as the Clinical Outcomes Summary table) showing the three new metrics
-- Add the new categories to the Value Realization bar chart
-- Add PHQ-9 and GAD-7 columns to the Top Improving Members table
+### 2. `src/pages/member/MemberHome.tsx` - Handle MTG-Only Display
+Update the Phase Progress bar section so that when `program.mtmWeeks === 0`, it shows only the MTG progress bar (no MTM bar). Also update the "Current Phase" KPI card and the meal plan description text to reflect MTG-only when there are no MTM weeks.
 
+Two files modified. No new files.
