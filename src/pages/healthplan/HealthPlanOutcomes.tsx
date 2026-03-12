@@ -93,7 +93,7 @@ export default function HealthPlanOutcomes() {
 
     // Avg metrics improved per member
     const avgMetricsImproved = completePairs.length > 0 
-      ? (a1cData.length + bpData.length + bmiData.length + admissionData.length) / completePairs.length 
+      ? (a1cData.length + bpData.length + bmiData.length + admissionData.length + phq9Data.length + gad7Data.length + foodInsecurityData.length) / completePairs.length 
       : 0;
 
     // Top improving members
