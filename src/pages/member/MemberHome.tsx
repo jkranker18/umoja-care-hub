@@ -774,6 +774,55 @@ export default function MemberHome() {
               );
             })()}
 
+            {/* On-Demand Classes */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Video className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">On-Demand Classes</h3>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {onDemandClasses.map((cls) => (
+                  <Card key={cls.title} className="overflow-hidden">
+                    <div className="flex h-24 items-center justify-center bg-muted">
+                      <Video className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <CardContent className="p-4 space-y-3">
+                      <Badge variant="secondary" className="text-xs">{cls.category}</Badge>
+                      <h4 className="font-semibold text-sm leading-tight">{cls.title}</h4>
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          setActiveVideoUrl(cls.url);
+                          setActiveVideoTitle(cls.title);
+                        }}
+                      >
+                        Watch Now
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Video Dialog */}
+            <Dialog open={!!activeVideoUrl} onOpenChange={(open) => { if (!open) setActiveVideoUrl(null); }}>
+              <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle>{activeVideoTitle}</DialogTitle>
+                </DialogHeader>
+                {activeVideoUrl && (
+                  <iframe
+                    src={activeVideoUrl}
+                    className="w-full rounded-md"
+                    style={{ height: '450px' }}
+                    allowFullScreen
+                    title={activeVideoTitle}
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
+
             {/* Explore More - Categories */}
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">Explore More</h3>
