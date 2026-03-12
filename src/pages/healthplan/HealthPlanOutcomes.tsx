@@ -348,9 +348,21 @@ export default function HealthPlanOutcomes() {
 
         {/* Clinical Outcomes Summary Table */}
         <Card>
-          <CardHeader>
-            <CardTitle>Clinical Outcomes Summary</CardTitle>
-            <CardDescription>Pre/post measurements and calculated value for each clinical metric</CardDescription>
+          <CardHeader className="flex flex-row items-start justify-between space-y-0">
+            <div className="space-y-1.5">
+              <CardTitle>Clinical Outcomes Summary</CardTitle>
+              <CardDescription>Pre/post measurements and calculated value for each clinical metric</CardDescription>
+            </div>
+            <Select value={clinicalFilter} onValueChange={setClinicalFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Metrics</SelectItem>
+                <SelectItem value="diabetes">Diabetes</SelectItem>
+                <SelectItem value="cardiovascular">Cardiovascular</SelectItem>
+              </SelectContent>
+            </Select>
           </CardHeader>
           <CardContent>
             <Table>
@@ -366,33 +378,39 @@ export default function HealthPlanOutcomes() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">A1c (%)</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.avgBaseline}%</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.avgCurrent}%</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.a1c.avgReduction}%</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.A1C_PER_PERCENT}</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.a1c.totalSavings)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Systolic BP (mmHg)</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bp.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bp.avgBaseline}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bp.avgCurrent}</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.bp.avgReduction}</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.BP_CONTROL_ACHIEVED}*</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.bp.totalSavings)}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">BMI (kg/m²)</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.count}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.avgBaseline}</TableCell>
-                  <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.avgCurrent}</TableCell>
-                  <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.bmi.avgReduction}</TableCell>
-                  <TableCell className="text-right">${CLINICAL_SAVINGS.BMI_PER_POINT}</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.bmi.totalSavings)}</TableCell>
-                </TableRow>
+                {(clinicalFilter === 'all' || clinicalFilter === 'diabetes') && (
+                  <TableRow>
+                    <TableCell className="font-medium">A1c (%)</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.count}</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.avgBaseline}%</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.a1c.avgCurrent}%</TableCell>
+                    <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.a1c.avgReduction}%</TableCell>
+                    <TableCell className="text-right">${CLINICAL_SAVINGS.A1C_PER_PERCENT}</TableCell>
+                    <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.a1c.totalSavings)}</TableCell>
+                  </TableRow>
+                )}
+                {(clinicalFilter === 'all' || clinicalFilter === 'cardiovascular') && (
+                  <TableRow>
+                    <TableCell className="font-medium">Systolic BP (mmHg)</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bp.count}</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bp.avgBaseline}</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bp.avgCurrent}</TableCell>
+                    <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.bp.avgReduction}</TableCell>
+                    <TableCell className="text-right">${CLINICAL_SAVINGS.BP_CONTROL_ACHIEVED}*</TableCell>
+                    <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.bp.totalSavings)}</TableCell>
+                  </TableRow>
+                )}
+                {(clinicalFilter === 'all' || clinicalFilter === 'diabetes' || clinicalFilter === 'cardiovascular') && (
+                  <TableRow>
+                    <TableCell className="font-medium">BMI (kg/m²)</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.count}</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.avgBaseline}</TableCell>
+                    <TableCell className="text-right">{clinicalOutcomes.metrics.bmi.avgCurrent}</TableCell>
+                    <TableCell className="text-right text-success">-{clinicalOutcomes.metrics.bmi.avgReduction}</TableCell>
+                    <TableCell className="text-right">${CLINICAL_SAVINGS.BMI_PER_POINT}</TableCell>
+                    <TableCell className="text-right font-semibold">{formatCurrency(clinicalOutcomes.metrics.bmi.totalSavings)}</TableCell>
+                  </TableRow>
+                )}
                 <TableRow>
                   <TableCell className="font-medium">Hospital Readmissions</TableCell>
                   <TableCell className="text-right">{clinicalOutcomes.metrics.readmissions.count}</TableCell>
