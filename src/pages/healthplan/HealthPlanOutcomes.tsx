@@ -512,6 +512,8 @@ export default function HealthPlanOutcomes() {
                       <TableHead className="text-right">BP (Base → Curr)</TableHead>
                       <TableHead className="text-right">BMI (Base → Curr)</TableHead>
                       <TableHead className="text-right">Admits (Base → Curr)</TableHead>
+                      <TableHead className="text-right">PHQ-9 (Base → Curr)</TableHead>
+                      <TableHead className="text-right">GAD-7 (Base → Curr)</TableHead>
                       <TableHead className="text-right">Value</TableHead>
                     </TableRow>
                   </TableHeader>
