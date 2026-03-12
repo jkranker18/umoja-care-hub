@@ -533,6 +533,12 @@ export default function HealthPlanOutcomes() {
                         <TableCell className="text-right">
                           {member.admitBaseline} → {member.admitCurrent}
                         </TableCell>
+                        <TableCell className="text-right">
+                          {member.phq9Baseline} → {member.phq9Current}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {member.gad7Baseline} → {member.gad7Current}
+                        </TableCell>
                         <TableCell className="text-right font-semibold text-success">
                           {formatCurrency(member.totalSavings)}
                         </TableCell>
