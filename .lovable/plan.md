@@ -1,18 +1,15 @@
 
+# Update Suzie (Tier 2) to MTG-Only
 
-# Fix Video Classes: Open in New Tab Instead of Iframe
-
-## Problem
-The vhpgo.com video URLs block iframe embedding via browser security headers (`X-Frame-Options: DENY` or CSP). This is a server-side restriction we cannot bypass.
-
-## Solution
-Replace the Dialog/iframe approach with a simple "open in new tab" action. When the user clicks "Watch Now", the video opens in a new browser tab where it will load natively.
+## Summary
+Suzie should not receive any Medically Tailored Meals (MTM). Her entire 12-week program should be Medically Tailored Groceries (MTG) only.
 
 ## Changes
 
-### `src/pages/member/MemberHome.tsx`
-1. Remove the `activeVideoUrl` / `activeVideoTitle` state
-2. Remove the `Dialog` component and iframe
-3. Change "Watch Now" button click to `window.open(url, '_blank')`
-4. Remove unused Dialog imports
+### 1. `src/lib/mockData.ts` - Update Tier 2 Program Definition
+Change `prog-tier2` from `mtmWeeks: 4, mtgWeeks: 8` to `mtmWeeks: 0, mtgWeeks: 12` so all 12 weeks are MTG.
 
+### 2. `src/pages/member/MemberHome.tsx` - Handle MTG-Only Display
+Update the Phase Progress bar section so that when `program.mtmWeeks === 0`, it shows only the MTG progress bar (no MTM bar). Also update the "Current Phase" KPI card and the meal plan description text to reflect MTG-only when there are no MTM weeks.
+
+Two files modified. No new files.

@@ -121,9 +121,6 @@ export default function MemberHome() {
   // Change Order modal
   const [changeOrderModalOpen, setChangeOrderModalOpen] = useState(false);
 
-  // On-Demand Classes video dialog state
-  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
-  const [activeVideoTitle, setActiveVideoTitle] = useState('');
 
   const onDemandClasses = [
     { title: 'Cooking Class: Layered Roasted Vegetables', category: 'Cooking', url: 'https://vhpgo.com/VideoLibrary/ExternalMedia?%24web_only=true&_branch_match_id=1546335605275984707&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXN80uzNFLLCjQy8nMy9YPNPHNDwgvTS82TLKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDClMfdOwAAAA%3D%3D' },
@@ -792,10 +789,7 @@ export default function MemberHome() {
                       <Button
                         size="sm"
                         className="w-full"
-                        onClick={() => {
-                          setActiveVideoUrl(cls.url);
-                          setActiveVideoTitle(cls.title);
-                        }}
+                        onClick={() => window.open(cls.url, '_blank')}
                       >
                         Watch Now
                       </Button>
@@ -805,23 +799,6 @@ export default function MemberHome() {
               </div>
             </div>
 
-            {/* Video Dialog */}
-            <Dialog open={!!activeVideoUrl} onOpenChange={(open) => { if (!open) setActiveVideoUrl(null); }}>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>{activeVideoTitle}</DialogTitle>
-                </DialogHeader>
-                {activeVideoUrl && (
-                  <iframe
-                    src={activeVideoUrl}
-                    className="w-full rounded-md"
-                    style={{ height: '450px' }}
-                    allowFullScreen
-                    title={activeVideoTitle}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
 
             {/* Explore More - Categories */}
             <div className="space-y-3">
