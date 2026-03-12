@@ -799,23 +799,6 @@ export default function MemberHome() {
               </div>
             </div>
 
-            {/* Video Dialog */}
-            <Dialog open={!!activeVideoUrl} onOpenChange={(open) => { if (!open) setActiveVideoUrl(null); }}>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>{activeVideoTitle}</DialogTitle>
-                </DialogHeader>
-                {activeVideoUrl && (
-                  <iframe
-                    src={activeVideoUrl}
-                    className="w-full rounded-md"
-                    style={{ height: '450px' }}
-                    allowFullScreen
-                    title={activeVideoTitle}
-                  />
-                )}
-              </DialogContent>
-            </Dialog>
 
             {/* Explore More - Categories */}
             <div className="space-y-3">
