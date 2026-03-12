@@ -462,7 +462,7 @@ export default function HealthPlanOutcomes() {
               <CardDescription>Total savings contribution by each clinical metric</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[380px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={valueByCategory} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
