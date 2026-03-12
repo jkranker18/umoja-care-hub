@@ -1,23 +1,15 @@
 
+# Update Suzie (Tier 2) to MTG-Only
 
-# Add Filter Dropdown to Clinical Outcomes Summary Card
-
-## Overview
-Add a Select dropdown in the top-right of the Clinical Outcomes Summary card header with three options: **All**, **Diabetes** (A1c, BMI, Readmissions), **Cardiovascular** (BP, BMI, Hospital Readmissions).
+## Summary
+Suzie should not receive any Medically Tailored Meals (MTM). Her entire 12-week program should be Medically Tailored Groceries (MTG) only.
 
 ## Changes
 
-### `src/pages/healthplan/HealthPlanOutcomes.tsx`
+### 1. `src/lib/mockData.ts` - Update Tier 2 Program Definition
+Change `prog-tier2` from `mtmWeeks: 4, mtgWeeks: 8` to `mtmWeeks: 0, mtgWeeks: 12` so all 12 weeks are MTG.
 
-1. **Add state**: `const [clinicalFilter, setClinicalFilter] = useState('all');`
+### 2. `src/pages/member/MemberHome.tsx` - Handle MTG-Only Display
+Update the Phase Progress bar section so that when `program.mtmWeeks === 0`, it shows only the MTG progress bar (no MTM bar). Also update the "Current Phase" KPI card and the meal plan description text to reflect MTG-only when there are no MTM weeks.
 
-2. **Update CardHeader** to use a flex layout with the title/description on the left and a `Select` dropdown on the right:
-   - Options: `all` → "All Metrics", `diabetes` → "Diabetes", `cardiovascular` → "Cardiovascular"
-
-3. **Conditionally render table rows** based on filter:
-   - `all`: show A1c, BP, BMI, Readmissions (all 4 rows)
-   - `diabetes`: show A1c, BMI, Readmissions
-   - `cardiovascular`: show BP, BMI, Readmissions
-
-4. **Add imports** for `Select, SelectContent, SelectItem, SelectTrigger, SelectValue` from UI components.
-
+Two files modified. No new files.
