@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { StatusPill } from '@/components/shared/StatusPill';
-import { UserPlus, Shield, CheckCircle2, Circle, ExternalLink, Users, GraduationCap } from 'lucide-react';
+import { UserPlus, Shield, CheckCircle2, Circle, ExternalLink, Users, GraduationCap, ArrowLeft, Phone, Mail, MapPin, Calendar, Edit2 } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
