@@ -202,6 +202,22 @@ export default function CBODashboard() {
           </CardContent>
         </Card>
 
+        {/* RD Portal Login */}
+        <Card className="bg-accent/30 border-accent">
+          <CardContent className="flex items-center justify-between py-4">
+            <div>
+              <h3 className="font-semibold">RD Portal Login</h3>
+              <p className="text-sm text-muted-foreground">
+                Access the Registered Dietitian program enrollment queue
+              </p>
+            </div>
+            <Button variant="default" onClick={() => navigate('/cbo/admin')}>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open RD Portal
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Referral Link */}
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="flex items-center justify-between py-4">
