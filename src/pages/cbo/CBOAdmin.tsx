@@ -96,6 +96,82 @@ const rdPortalData = [
   },
 ];
 
+const contactDetails: Record<string, {
+  name: string;
+  programType: string;
+  phone: string;
+  smsOptIn: string;
+  preferredLanguage: string;
+  icd10: string;
+  mailingAddress: string;
+  gender: string;
+  appointmentDate: string;
+  followUpDate: string;
+  hcscProgramType: string;
+  careCoordinator: string;
+  careCoordinatorEmail: string;
+  payerProgram: string;
+  hcscEnrollmentStatus: string;
+  otherContactName: string;
+  otherContactPhone: string;
+  enrollments: { id: string; program: string; outcome: string; recordId: string; attempts: number }[];
+  activities: { type: string; label: string; date: string; detail: string }[];
+}> = {
+  'John TestSmith': {
+    name: 'John TestSmith',
+    programType: 'Follow Up',
+    phone: '(303) 829-8327',
+    smsOptIn: 'Yes',
+    preferredLanguage: '',
+    icd10: '',
+    mailingAddress: 'WI',
+    gender: '',
+    appointmentDate: '3/18/2026, 3:08 PM',
+    followUpDate: '4/16/2026, 8:00 PM',
+    hcscProgramType: '',
+    careCoordinator: '',
+    careCoordinatorEmail: '',
+    payerProgram: '',
+    hcscEnrollmentStatus: 'Termed',
+    otherContactName: '',
+    otherContactPhone: '(555) 222-6565',
+    enrollments: [
+      { id: 'ENR-48691', program: 'HCSC - L365', outcome: 'Assessment', recordId: 'REC-1001', attempts: 3 },
+    ],
+    activities: [
+      { type: 'task', label: 'Healthie Appointment Completed', date: 'Mar 18', detail: 'You had a task' },
+      { type: 'task', label: 'Healthie Appointment Scheduled', date: 'Mar 18', detail: 'You had a task' },
+      { type: 'call', label: 'Outbound to +13038298327', date: 'Feb 20', detail: 'You logged a call' },
+      { type: 'email', label: 'RE: Test Case creation', date: 'Feb 20', detail: 'ekline@umojahealth.com sent an email' },
+    ],
+  },
+  'Tester HCSC Update Flow': {
+    name: 'Tester HCSC Update Flow',
+    programType: 'Initial',
+    phone: '(555) 000-1234',
+    smsOptIn: 'No',
+    preferredLanguage: 'English',
+    icd10: 'E11.9',
+    mailingAddress: 'IL',
+    gender: 'Male',
+    appointmentDate: '1/10/2026, 10:00 AM',
+    followUpDate: '',
+    hcscProgramType: 'Tier 2',
+    careCoordinator: 'Sarah Chen',
+    careCoordinatorEmail: 'sarah@lafoodbank.org',
+    payerProgram: 'HCSC',
+    hcscEnrollmentStatus: 'Termed',
+    otherContactName: '',
+    otherContactPhone: '',
+    enrollments: [
+      { id: 'ENR-50127', program: 'HCSC - Tier 2', outcome: 'Termed', recordId: 'REC-2045', attempts: 1 },
+    ],
+    activities: [
+      { type: 'call', label: 'Outbound to +15550001234', date: 'Jan 15', detail: 'You logged a call' },
+    ],
+  },
+};
+
 export default function CBOAdmin() {
   const { setCurrentRole } = useApp();
   const [admins, setAdmins] = useState<AdminUser[]>(initialAdmins);
