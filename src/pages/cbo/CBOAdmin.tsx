@@ -236,7 +236,7 @@ export default function CBOAdmin() {
                     size="sm"
                     onClick={() => handleCompleteTraining(trainingUser.id, 'securityTraining')}
                   >
-                    Mark Complete
+                    Start Training
                   </Button>
                 )}
               </div>
@@ -259,7 +259,7 @@ export default function CBOAdmin() {
                     size="sm"
                     onClick={() => handleCompleteTraining(trainingUser.id, 'hipaaTraining')}
                   >
-                    Mark Complete
+                    Start Training
                   </Button>
                 )}
               </div>
