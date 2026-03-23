@@ -59,6 +59,7 @@ const memberNav: NavItem[] = [
 const cboNav: NavItem[] = [
   { label: 'Home', path: '/cbo', icon: Home },
   { label: 'Organization', path: '/cbo/organization', icon: Building2 },
+  { label: 'Admin', path: '/cbo/admin', icon: Users },
 ];
 
 const healthplanNav: NavItem[] = [
