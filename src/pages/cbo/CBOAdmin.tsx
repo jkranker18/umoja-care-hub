@@ -177,6 +177,7 @@ export default function CBOAdmin() {
   const [admins, setAdmins] = useState<AdminUser[]>(initialAdmins);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [rdPortalOpen, setRdPortalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<string | null>(null);
   const [trainingUserId, setTrainingUserId] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'Admin' | 'Registered Dietitian'>('Admin');
