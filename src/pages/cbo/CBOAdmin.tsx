@@ -443,58 +443,211 @@ export default function CBOAdmin() {
         </Card>
 
         {/* RD Portal Dialog */}
-        <Dialog open={rdPortalOpen} onOpenChange={setRdPortalOpen}>
-          <DialogContent className="max-w-6xl max-h-[80vh] overflow-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg">RD Portal — Program Enrollments — Jason's Queue</DialogTitle>
-              <DialogDescription>
-                Salesforce program enrollment queue
-              </DialogDescription>
-            </DialogHeader>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Priority Score</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>FFH Program</TableHead>
-                    <TableHead>Enrollment Status</TableHead>
-                    <TableHead>Attempt Count</TableHead>
-                    <TableHead>Days Until Auth</TableHead>
-                    <TableHead>Days Since Enrollment</TableHead>
-                    <TableHead>Assigned RD</TableHead>
-                    <TableHead>Outcome Status</TableHead>
-                    <TableHead>Program Enrollment ID</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rdPortalData.map((row, i) => (
-                    <TableRow key={i}>
-                      <TableCell>
-                        <Badge variant={row.priorityScore >= 70 ? 'destructive' : 'secondary'}>
-                          {row.priorityScore}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-medium">{row.contact}</TableCell>
-                      <TableCell>{row.program}</TableCell>
-                      <TableCell>
-                        <StatusPill status={row.enrollmentStatus === 'Appointment Complete' ? 'active' : 'complete'} />
-                      </TableCell>
-                      <TableCell className="text-center">{row.attemptCount}</TableCell>
-                      <TableCell className="text-center">{row.daysUntilAuth}</TableCell>
-                      <TableCell className="text-center">{row.daysSinceEnrollment}</TableCell>
-                      <TableCell>{row.assignedRD}</TableCell>
-                      <TableCell>
-                        <Badge variant={row.outcomeStatus === 'In Progress' ? 'default' : 'secondary'}>
-                          {row.outcomeStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">{row.enrollmentId}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+        <Dialog open={rdPortalOpen} onOpenChange={(open) => { setRdPortalOpen(open); if (!open) setSelectedContact(null); }}>
+          <DialogContent className="max-w-6xl max-h-[85vh] overflow-auto">
+            {selectedContact && contactDetails[selectedContact] ? (
+              <>
+                {/* Contact Detail View */}
+                <DialogHeader>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedContact(null)}>
+                      <ArrowLeft className="h-4 w-4 mr-1" />
+                      Back to Queue
+                    </Button>
+                  </div>
+                  <DialogTitle className="text-xl flex items-center gap-2 mt-2">
+                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                      <Users className="h-4 w-4" />
+                    </div>
+                    {contactDetails[selectedContact].name}
+                  </DialogTitle>
+                  <DialogDescription>HCSC RD Portal — Contact Record</DialogDescription>
+                </DialogHeader>
+
+                <div className="flex gap-2 mb-4">
+                  <Button variant="outline" size="sm">Edit</Button>
+                  <Button variant="outline" size="sm">Delete</Button>
+                  <Button variant="outline" size="sm">Clone</Button>
+                </div>
+
+                <Tabs defaultValue="details" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="enrollments">Program Enrollments ({contactDetails[selectedContact].enrollments.length})</TabsTrigger>
+                    <TabsTrigger value="activity">Activity</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="details" className="mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Left Column */}
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Contact Information</h3>
+                        <Separator />
+                        <div className="space-y-3">
+                          {[
+                            ['Name', contactDetails[selectedContact].name],
+                            ['Date Of Birth', ''],
+                            ['Phone', contactDetails[selectedContact].phone],
+                            ['Preferred Language', contactDetails[selectedContact].preferredLanguage],
+                            ['NetSuite ID', ''],
+                            ['Appointment Scheduled Date', contactDetails[selectedContact].appointmentDate],
+                            ['Follow Up Date', contactDetails[selectedContact].followUpDate],
+                            ['Care Coordination', ''],
+                            ['HCSC Program Type', contactDetails[selectedContact].hcscProgramType],
+                            ['Care Coordinator Name', contactDetails[selectedContact].careCoordinator],
+                            ['Care Coordinator Email', contactDetails[selectedContact].careCoordinatorEmail],
+                            ['Payer-Program', contactDetails[selectedContact].payerProgram],
+                            ['HCSC Enrollment Status', contactDetails[selectedContact].hcscEnrollmentStatus],
+                          ].map(([label, value]) => (
+                            <div key={label} className="flex items-center justify-between py-1.5 border-b border-border/50">
+                              <span className="text-sm text-muted-foreground">{label}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{value || '—'}</span>
+                                <Edit2 className="h-3 w-3 text-muted-foreground/50" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">&nbsp;</h3>
+                        <Separator />
+                        <div className="space-y-3">
+                          {[
+                            ['Program Type', contactDetails[selectedContact].programType],
+                            ['Email', ''],
+                            ['SMS Opt In', contactDetails[selectedContact].smsOptIn],
+                            ['ICD-10 Diagnosis Code', contactDetails[selectedContact].icd10],
+                            ['Mailing Address', contactDetails[selectedContact].mailingAddress],
+                            ['Gender', contactDetails[selectedContact].gender],
+                            ['Other Contact Name', contactDetails[selectedContact].otherContactName],
+                            ['Other Contact Phone', contactDetails[selectedContact].otherContactPhone],
+                            ['HCSC Enrollment Status', contactDetails[selectedContact].hcscEnrollmentStatus],
+                          ].map(([label, value]) => (
+                            <div key={label} className="flex items-center justify-between py-1.5 border-b border-border/50">
+                              <span className="text-sm text-muted-foreground">{label}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{value || '—'}</span>
+                                <Edit2 className="h-3 w-3 text-muted-foreground/50" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="enrollments" className="mt-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Program Enrollment ID</TableHead>
+                          <TableHead>FFH Program</TableHead>
+                          <TableHead>Outcome</TableHead>
+                          <TableHead>Record ID</TableHead>
+                          <TableHead>Call Attempts</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {contactDetails[selectedContact].enrollments.map((enr) => (
+                          <TableRow key={enr.id}>
+                            <TableCell className="font-mono text-sm text-primary">{enr.id}</TableCell>
+                            <TableCell>{enr.program}</TableCell>
+                            <TableCell>{enr.outcome}</TableCell>
+                            <TableCell className="font-mono text-sm">{enr.recordId}</TableCell>
+                            <TableCell className="text-center">{enr.attempts}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TabsContent>
+
+                  <TabsContent value="activity" className="mt-4">
+                    <div className="space-y-3">
+                      {contactDetails[selectedContact].activities.map((act, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg border bg-background">
+                          <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                            act.type === 'call' ? 'bg-green-100 text-green-700' :
+                            act.type === 'email' ? 'bg-blue-100 text-blue-700' :
+                            'bg-primary/10 text-primary'
+                          }`}>
+                            {act.type === 'call' ? <Phone className="h-4 w-4" /> :
+                             act.type === 'email' ? <Mail className="h-4 w-4" /> :
+                             <Calendar className="h-4 w-4" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-primary">{act.label}</p>
+                            <p className="text-xs text-muted-foreground">{act.detail}</p>
+                          </div>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">{act.date}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </>
+            ) : (
+              <>
+                {/* Queue View */}
+                <DialogHeader>
+                  <DialogTitle className="text-lg">RD Portal — Program Enrollments — Jason's Queue</DialogTitle>
+                  <DialogDescription>Salesforce program enrollment queue</DialogDescription>
+                </DialogHeader>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Priority Score</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>FFH Program</TableHead>
+                        <TableHead>Enrollment Status</TableHead>
+                        <TableHead>Attempt Count</TableHead>
+                        <TableHead>Days Until Auth</TableHead>
+                        <TableHead>Days Since Enrollment</TableHead>
+                        <TableHead>Assigned RD</TableHead>
+                        <TableHead>Outcome Status</TableHead>
+                        <TableHead>Program Enrollment ID</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {rdPortalData.map((row, i) => (
+                        <TableRow key={i}>
+                          <TableCell>
+                            <Badge variant={row.priorityScore >= 70 ? 'destructive' : 'secondary'}>
+                              {row.priorityScore}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <button
+                              className="font-medium text-primary hover:underline cursor-pointer bg-transparent border-none p-0 text-left"
+                              onClick={() => setSelectedContact(row.contact)}
+                            >
+                              {row.contact}
+                            </button>
+                          </TableCell>
+                          <TableCell>{row.program}</TableCell>
+                          <TableCell>
+                            <StatusPill status={row.enrollmentStatus === 'Appointment Complete' ? 'active' : 'complete'} />
+                          </TableCell>
+                          <TableCell className="text-center">{row.attemptCount}</TableCell>
+                          <TableCell className="text-center">{row.daysUntilAuth}</TableCell>
+                          <TableCell className="text-center">{row.daysSinceEnrollment}</TableCell>
+                          <TableCell>{row.assignedRD}</TableCell>
+                          <TableCell>
+                            <Badge variant={row.outcomeStatus === 'In Progress' ? 'default' : 'secondary'}>
+                              {row.outcomeStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">{row.enrollmentId}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>
