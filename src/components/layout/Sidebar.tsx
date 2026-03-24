@@ -21,6 +21,7 @@ import {
   Activity,
   ChevronDown,
   FolderSync,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -58,6 +59,7 @@ const memberNav: NavItem[] = [
 
 const cboNav: NavItem[] = [
   { label: 'Home', path: '/cbo', icon: Home },
+  { label: 'Referrals', path: '/cbo/referrals', icon: UserPlus },
   { label: 'Organization', path: '/cbo/organization', icon: Building2 },
   { label: 'Admin', path: '/cbo/admin', icon: Users },
 ];

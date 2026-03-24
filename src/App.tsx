@@ -38,6 +38,7 @@ import CBODashboard from "./pages/cbo/CBODashboard";
 import CBOOrganization from "./pages/cbo/CBOOrganization";
 import CBOMemberIntake from "./pages/cbo/CBOMemberIntake";
 import CBOAdmin from "./pages/cbo/CBOAdmin";
+import CBOReferrals from "./pages/cbo/CBOReferrals";
 import HealthPlanDashboard from "./pages/healthplan/HealthPlanDashboard";
 import HealthPlanOutcomes from "./pages/healthplan/HealthPlanOutcomes";
 import HealthPlanMembers from "./pages/healthplan/HealthPlanMembers";
@@ -105,6 +106,7 @@ function App() {
             <Route path="/cbo" element={<CBODashboard />} />
             <Route path="/cbo/members" element={<CBODashboard />} />
             <Route path="/cbo/add-member" element={<CBOMemberIntake />} />
+            <Route path="/cbo/referrals" element={<CBOReferrals />} />
             <Route path="/cbo/organization" element={<CBOOrganization />} />
             <Route path="/cbo/admin" element={<CBOAdmin />} />
             
