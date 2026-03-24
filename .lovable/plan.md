@@ -1,53 +1,36 @@
 
 
-# Add Admin Management Page to CBO Portal
+# Add Referrals Page to CBO Portal
 
 ## Overview
-Add an "Admin" page to the CBO sidebar that manages staff users for the white-labeled CBO (LA Food Bank). It includes an admin roster with roles (Admin / Registered Dietitian), an invite flow, a training checklist, and an RD Portal login button for RD users.
+Add a "Referrals" nav item to the CBO sidebar linking to a new page that lists inbound referrals from Unite US and FindHelp. Each referral represents a person the food bank needs to contact and run through the AHC-HRSN member intake screener.
 
 ## Changes
 
-### 1. Sidebar Navigation (`src/components/layout/Sidebar.tsx`)
-- Add `{ label: 'Admin', path: '/cbo/admin', icon: Users }` to the `cboNav` array
+### 1. Sidebar (`src/components/layout/Sidebar.tsx`)
+- Add `{ label: 'Referrals', path: '/cbo/referrals', icon: UserPlus }` to `cboNav` (between Home and Organization)
 
-### 2. New Route (`src/App.tsx`)
-- Import and add route: `<Route path="/cbo/admin" element={<CBOAdmin />} />`
+### 2. Route (`src/App.tsx`)
+- Add route: `/cbo/referrals` → new `CBOReferrals` component
 
-### 3. New Page (`src/pages/cbo/CBOAdmin.tsx`)
-This is the main new file. It contains:
+### 3. New Page (`src/pages/cbo/CBOReferrals.tsx`)
 
-**Admin Roster Table** — lists all CBO staff with columns:
-- Name, Email, Role (Admin / Registered Dietitian), Training Status, Status (Active / Pending / Training), Last Login
-- Each person shows green checkmarks or pending indicators for their two required trainings
+**KPI Cards** at top:
+- New Referrals (pending outreach count)
+- Contacted (in-progress count)
+- Enrolled (completed screener count)
 
-**Invite New Admin Dialog** — button opens a dialog with:
-- Email input field
-- Role selector (Admin or Registered Dietitian)
-- "Send Invite" button (demo: adds user to table with "Pending" status)
+**Referral Table** with mock data (~6-8 rows):
+- Columns: Name, Source (Unite US / FindHelp badge), Referred Date, Reason/Need (e.g. "Food Insecurity", "Nutrition Support"), Contact Info (phone/email), Status (New / Contacted / Scheduled / Enrolled / Unable to Reach), Actions
+- Source shown as a colored badge distinguishing Unite US vs FindHelp
+- Status shown via StatusPill component
 
-**Training Checklist** — when a pending user "accepts" the invite (demo: click a "Complete Setup" button on their row), they see a training panel with two items styled like the uploaded screenshot:
-- "Complete Security Awareness Training" — click to mark complete (green checkmark)
-- "Complete HIPAA Training" — click to mark complete (green checkmark)
-- Subtitle text: "This is done annually here in Drata"
-- Once both are complete, status changes to "Active"
+**Actions per row:**
+- "Start Screener" button → navigates to `/cbo/intake` (existing AHC-HRSN intake form)
+- "Mark Contacted" → updates status to Contacted
+- "Unable to Reach" → updates status accordingly
 
-**RD Portal Login** — for users with the "Registered Dietitian" role:
-- An "RD Portal" button appears on their profile row
-- Clicking it opens a dialog showing a mock Salesforce-style queue view (based on the second screenshot) with:
-  - Header: "RD Portal — Program Enrollments — Jason's Queue"
-  - Table with columns: Priority Score, Contact, FFH Program, Enrollment Status, Attempt Count, Days Until Auth, Days Since Enrollment, Assigned RD, Outcome Status, Program Enrollment ID
-  - Two mock rows: John TestSmith (Appointment Complete, ENR-48691) and Tester HCSC Update Flow (Termed, ENR-50127)
+**Filters:** Search by name, filter by source (All/Unite US/FindHelp), filter by status
 
-**Mock Data** — hardcoded in the component:
-- 3-4 existing admin users (e.g., Maria Garcia - Admin/Active, Jason Kranker - RD/Active, Sarah Chen - Admin/Active, pending invite user)
-- Training completion states tracked via local useState
-
-### 4. CBO Home Page Update (`src/pages/cbo/CBODashboard.tsx`)
-- For RD users: add an "RD Portal Login" button card at the bottom that links to the same mock RD portal dialog/view
-
-## Technical Details
-- All state is local (useState) — no database needed for this demo
-- Training checkmarks use simple boolean state toggling
-- The RD Portal mock uses a Dialog with a styled Table mimicking the Salesforce screenshot
-- Role force-set via `setCurrentRole('cbo')` in useEffect (existing pattern)
+All data is local mock state via useState.
 
